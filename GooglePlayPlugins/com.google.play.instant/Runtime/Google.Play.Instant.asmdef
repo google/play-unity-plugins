@@ -1,0 +1,10 @@
+{
+    "name": "Google.Play.Instant",
+    "references": [
+        "Google.Play.Common"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ]
+}

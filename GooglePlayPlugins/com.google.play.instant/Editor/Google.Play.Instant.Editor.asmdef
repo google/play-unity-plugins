@@ -1,0 +1,11 @@
+{
+    "name": "Google.Play.Instant.Editor",
+    "references": [
+        "Google.Android.AppBundle.Editor",
+        "Google.Play.Common",
+        "Google.Play.Instant"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

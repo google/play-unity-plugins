@@ -1,0 +1,7 @@
+{
+    "name": "Google.Play.Billing",
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ]
+}

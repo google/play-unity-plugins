@@ -1,0 +1,13 @@
+{
+  "name": "com.google.play.core",
+  "displayName": "Google Play Core",
+  "description": "The Google Play Core package provides the Play Core Library required by some Google Play packages, such as Play Asset Delivery.\n\nThis package doesn't provide any features when installed separately.",
+  "version": "1.0.0",
+  "unity": "2018.4",
+  "author": {
+    "name": "Google LLC"
+  },
+  "dependencies": {
+    "com.google.android.appbundle": "1.0.0"
+  }
+}
