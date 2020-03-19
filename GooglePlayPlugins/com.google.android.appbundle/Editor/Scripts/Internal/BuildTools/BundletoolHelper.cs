@@ -264,7 +264,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// <returns>An error message if there was a problem running bundletool, or null if successful.</returns>
         public virtual string InstallApkSet(string apkSetFile, string adbPath)
         {
-            return Run("install-apks --adb={0} --apks={1}", adbPath, CommandLine.QuotePath(apkSetFile));
+            return Run("install-apks --adb={0} --apks={1}",
+              CommandLine.QuotePath(adbPath),
+              CommandLine.QuotePath(apkSetFile));
         }
 
         private string Run(string bundletoolCommand, params object[] args)
@@ -276,6 +278,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return result.exitCode == 0 ? null : result.message;
         }
 
+        /// <summary>
+        /// Returns the absolute path to the bundletool jar packaged with the plugin.
+        /// Returning the absolute path handles cases where Unity treats relative paths
+        /// differently than the command line. For example Unity treats the Packages/
+        /// folder as a symlink to Library/PackageCache while the command line does not.
+        /// </summary>
         private static string BundletoolJarPath
         {
             get
@@ -284,29 +292,28 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 // define this variable here, rather than below, where it is used.
                 var guidPath = AssetDatabase.GUIDToAssetPath("4c3bd2894171e437eb6d99ddad4a81ac");
 
+                string relativePath = null;
+
                 // Bundletool is normally included with the .unitypackage or UPM package, but the bundletool used for
                 // builds can be overridden by placing a JAR in the project root, i.e. the parent folder of "Assets".
                 if (File.Exists(OverridePath))
                 {
-                    return OverridePath;
+                    relativePath = OverridePath;
                 }
-
-                if (File.Exists(PackagesPath))
+                else if (File.Exists(PackagesPath))
                 {
-                    return PackagesPath;
+                    relativePath = PackagesPath;
                 }
-
-                if (File.Exists(PluginPath))
+                else if (File.Exists(PluginPath))
                 {
-                    return PluginPath;
+                    relativePath = PluginPath;
                 }
-
-                if (!string.IsNullOrEmpty(guidPath) && guidPath.EndsWith(".jar") && File.Exists(guidPath))
+                else if (!string.IsNullOrEmpty(guidPath) && guidPath.EndsWith(".jar") && File.Exists(guidPath))
                 {
-                    return guidPath;
+                    relativePath = guidPath;
                 }
 
-                return null;
+                return relativePath == null ? null : Path.GetFullPath(relativePath);
             }
         }
     }

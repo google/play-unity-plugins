@@ -66,11 +66,14 @@ namespace Google.Android.AppBundle.Editor.Internal
             }
             else
             {
-                BuildAndRunPersistentApk();
+                EmulateUnityBuildAndRun();
             }
         }
 
-        private static void BuildAndRunPersistentApk()
+        /// <summary>
+        /// Emulates Unity's File -> Build And Run menu option.
+        /// </summary>
+        private static void EmulateUnityBuildAndRun()
         {
             var androidSdk = new AndroidSdk();
             var androidSdkPlatform = new AndroidSdkPlatform(androidSdk);
@@ -84,8 +87,9 @@ namespace Google.Android.AppBundle.Editor.Internal
                 return;
             }
 
-            var apkPath = Path.Combine(Path.GetTempPath(), "temp.apk");
-            var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(apkPath);
+            var artifactName = AndroidAppBundle.IsNativeBuildEnabled() ? "temp.aab" : "temp.apk";
+            var artifactPath = Path.Combine(Path.GetTempPath(), artifactName);
+            var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(artifactPath);
             buildPlayerOptions.options |= BuildOptions.AutoRunPlayer;
             androidBuilder.Build(buildPlayerOptions);
         }

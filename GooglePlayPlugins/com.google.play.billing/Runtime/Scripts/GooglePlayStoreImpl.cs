@@ -138,7 +138,7 @@ namespace Google.Play.Billing
         {
             if (!_billingClientReady)
             {
-                _billingUtil.LogErrorFormat("Google Play Store: play     billing service unavailable!");
+                _billingUtil.LogErrorFormat("Google Play Store: play billing service unavailable!");
                 return;
             }
 

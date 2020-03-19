@@ -70,6 +70,18 @@ namespace Google.Android.AppBundle.Editor
         }
 
         /// <summary>
+        /// Returns EditorUserBuildSettings.buildAppBundle if it is defined and false otherwise.
+        /// </summary>
+        public static bool IsNativeBuildEnabled()
+        {
+#if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
+            return EditorUserBuildSettings.buildAppBundle;
+#else
+            return false;
+#endif
+        }
+
+        /// <summary>
         /// Enable the EditorUserBuildSettings.buildAppBundle field if it is defined.
         /// </summary>
         public static void EnableNativeBuild()
