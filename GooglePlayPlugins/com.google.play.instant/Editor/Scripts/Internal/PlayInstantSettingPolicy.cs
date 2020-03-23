@@ -68,22 +68,6 @@ namespace Google.Play.Instant.Editor.Internal
                     () => EditorUserBuildSettings.SwitchActiveBuildTarget(
                         BuildTargetGroup.Android, BuildTarget.Android)),
 
-                // Note: pre-2018 versions of Unity do not have an enum value for AndroidApiLevel26.
-                new PlayInstantSettingPolicy(
-                    "Android targetSdkVersion should be 26 or higher",
-#if UNITY_2017_1_OR_NEWER
-                    null,
-#else
-                    "Set \"Automatic\" and ensure that API 26 or higher is installed in SDK Manager.",
-#endif
-                    () => (int) PlayerSettings.Android.targetSdkVersion >= 26 ||
-                          PlayerSettings.Android.targetSdkVersion == AndroidSdkVersions.AndroidApiLevelAuto,
-                    () =>
-                    {
-                        PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
-                        return true;
-                    }),
-
                 // We require Gradle for 2018.1+, but hide this policy for 2019.1+ since Gradle is the only option.
 #if UNITY_2018_1_OR_NEWER && !UNITY_2019_1_OR_NEWER
                 new PlayInstantSettingPolicy(
