@@ -35,23 +35,29 @@ namespace Google.Android.AppBundle.Editor.Internal
             AssetDeliveryWindow.ShowWindow();
         }
 
-        [MenuItem(AppBundleMenuName + "Build Settings...", false, AboveLine + 1)]
+        [MenuItem(AppBundleMenuName + GoogleEditorMenu.BuildSettings, false, AboveLine + 1)]
         private static void OpenEditorSettings()
         {
             BuildSettingsWindow.ShowWindow();
         }
 
-        [MenuItem(AppBundleMenuName + "View Documentation", false, BelowLine)]
+        [MenuItem(AppBundleMenuName + GoogleEditorMenu.ViewDocumentation, false, BelowLine)]
         private static void ViewDocumentation()
         {
-            Application.OpenURL("https://g.co/InstantApps");
+            Application.OpenURL("https://developer.android.com/guide/app-bundle/asset-delivery/build-unity");
         }
 
-        [MenuItem(AppBundleMenuName + "View License", false, BelowLine + 1)]
+        [MenuItem(AppBundleMenuName + GoogleEditorMenu.ViewLicense, false, BelowLine + 1)]
         private static void ViewLicense()
         {
             // The guid is for GooglePlayPlugins/com.google.android.appbundle/LICENSE.md
             GoogleEditorMenu.OpenFileByGuid("4b995f494568e47259d526c5211d778b");
+        }
+
+        [MenuItem(AppBundleMenuName + GoogleEditorMenu.FileBug, false, BelowLine + 2)]
+        private static void ViewPlayPluginsIssuesPage()
+        {
+            GoogleEditorMenu.ViewPlayPluginsIssuesPage();
         }
 
         [MenuItem(RootMenuName + "Build Android App Bundle...", false, GoogleEditorMenu.RootMenuPriority + 10)]

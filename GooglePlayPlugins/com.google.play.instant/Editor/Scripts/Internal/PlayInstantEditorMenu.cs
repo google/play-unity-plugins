@@ -29,7 +29,7 @@ namespace Google.Play.Instant.Editor.Internal
         private const int AboveLine = GoogleEditorMenu.PlayInstantPriority;
         private const int BelowLine = GoogleEditorMenu.PlayInstantPriority + GoogleEditorMenu.SeparatorSize;
 
-        [MenuItem(PlayInstant + "Build Settings...", false, AboveLine)]
+        [MenuItem(PlayInstant + GoogleEditorMenu.BuildSettings, false, AboveLine)]
         private static void OpenBuildSettings()
         {
             PlayInstantBuildSettingsWindow.ShowWindow();
@@ -47,17 +47,24 @@ namespace Google.Play.Instant.Editor.Internal
             QuickDeployWindow.ShowWindow();
         }
 
-        [MenuItem(PlayInstant + "View Documentation", false, BelowLine)]
+        [MenuItem(PlayInstant + GoogleEditorMenu.ViewDocumentation, false, BelowLine)]
         private static void ViewDocumentation()
         {
-            Application.OpenURL("https://g.co/InstantApps");
+            Application.OpenURL(
+                "https://developer.android.com/topic/google-play-instant/getting-started/game-unity-plugin");
         }
 
-        [MenuItem(PlayInstant + "View License", false, BelowLine + 1)]
+        [MenuItem(PlayInstant + GoogleEditorMenu.ViewLicense, false, BelowLine + 1)]
         private static void ViewLicense()
         {
             // The guid is for GooglePlayPlugins/com.google.play.instant/LICENSE.md
             GoogleEditorMenu.OpenFileByGuid("0a58b4c913b854a34a3d5b54256d3588");
+        }
+
+        [MenuItem(PlayInstant + GoogleEditorMenu.FileBug, false, BelowLine + 2)]
+        private static void ViewPlayPluginsIssuesPage()
+        {
+            GoogleEditorMenu.ViewPlayPluginsIssuesPage();
         }
     }
 }

@@ -32,6 +32,26 @@ namespace Google.Android.AppBundle.Editor.Internal
         public const string MainMenuName = "Google";
 
         /// <summary>
+        /// Menu item name for opening a build settings window.
+        /// </summary>
+        public const string BuildSettings = "Build Settings...";
+
+        /// <summary>
+        /// Menu item name for viewing documentation.
+        /// </summary>
+        public const string ViewDocumentation = "View Documentation";
+
+        /// <summary>
+        /// Menu item name for viewing a license.
+        /// </summary>
+        public const string ViewLicense = "View License";
+
+        /// <summary>
+        /// Menu item name for filing a bug.
+        /// </summary>
+        public const string FileBug = "File a Bug";
+
+        /// <summary>
         /// A number of priority steps between menu items to guarantee that a separator is shown.
         /// </summary>
         public const int SeparatorSize = 100;
@@ -44,6 +64,15 @@ namespace Google.Android.AppBundle.Editor.Internal
 
         // We want a separator before the build options
         public const int RootMenuPriority = 1000;
+
+
+        /// <summary>
+        /// Displays the Google Play Plugins for Unity "Issues" page in a browser.
+        /// </summary>
+        public static void ViewPlayPluginsIssuesPage()
+        {
+            Application.OpenURL("https://github.com/google/play-unity-plugins/issues");
+        }
 
         /// <summary>
         /// Displays a file in a browser, as specified by the file's guid.

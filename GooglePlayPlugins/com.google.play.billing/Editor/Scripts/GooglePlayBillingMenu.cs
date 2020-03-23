@@ -28,23 +28,29 @@ namespace Google.Play.Billing.Editor
         private const int AboveLine = GoogleEditorMenu.PlayBillingPriority;
         private const int BelowLine = GoogleEditorMenu.PlayBillingPriority + GoogleEditorMenu.SeparatorSize;
 
-        [MenuItem(PlayBilling + "Build Settings...", false, AboveLine)]
+        [MenuItem(PlayBilling + GoogleEditorMenu.BuildSettings, false, AboveLine)]
         private static void OpenBuildSettings()
         {
             GooglePlayBillingBuildSettings.ShowWindow();
         }
 
-        [MenuItem(PlayBilling + "View Documentation", false, BelowLine)]
+        [MenuItem(PlayBilling + GoogleEditorMenu.ViewDocumentation, false, BelowLine)]
         private static void ViewDocumentation()
         {
-            Application.OpenURL("https://developer.android.com/google/play/billing/billing_overview");
+            Application.OpenURL("https://developer.android.com/google/play/billing/unity");
         }
 
-        [MenuItem(PlayBilling + "View License", false, BelowLine + 1)]
+        [MenuItem(PlayBilling + GoogleEditorMenu.ViewLicense, false, BelowLine + 1)]
         private static void ViewLicense()
         {
             // The guid is for GooglePlayPlugins/com.google.play.billing/LICENSE.md
             GoogleEditorMenu.OpenFileByGuid("ff930df64f4294487b3b89d15863363c");
+        }
+
+        [MenuItem(PlayBilling + GoogleEditorMenu.FileBug, false, BelowLine + 2)]
+        private static void ViewPlayPluginsIssuesPage()
+        {
+            GoogleEditorMenu.ViewPlayPluginsIssuesPage();
         }
     }
 }
