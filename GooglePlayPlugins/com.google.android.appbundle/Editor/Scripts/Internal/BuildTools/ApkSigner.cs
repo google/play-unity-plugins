@@ -174,7 +174,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 "-jar {0} sign --ks {1} --ks-key-alias {2} --pass-encoding utf-8 {3}{4}",
                 CommandLine.QuotePath(GetApkSignerJarPath()),
                 CommandLine.QuotePath(keystoreName),
-                keyaliasName,
+                CommandLine.QuotePath(keyaliasName),
                 additionalArguments,
                 CommandLine.QuotePath(filePath));
 
