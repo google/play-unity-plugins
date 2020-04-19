@@ -23,6 +23,8 @@ namespace Google.Android.AppBundle.Editor.Internal
     /// <summary>
     /// Provides infrastructure for adding "Google" menu items in the Unity Editor.
     /// </summary>
+    // Note: this class's name doesn't match its file name, but it should only be changed when breaking backwards
+    // compatibility by changing the package major version.
     public static class GoogleEditorMenu
     {
         /// <summary>

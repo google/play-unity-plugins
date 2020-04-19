@@ -28,29 +28,36 @@ namespace Google.Play.Billing.Editor
         private const int AboveLine = GoogleEditorMenu.PlayBillingPriority;
         private const int BelowLine = GoogleEditorMenu.PlayBillingPriority + GoogleEditorMenu.SeparatorSize;
 
-        [MenuItem(PlayBilling + GoogleEditorMenu.BuildSettings, false, AboveLine)]
+        // These fields are defined in GoogleEditorMenu version 1.0.1, but were not present in the 1.0.0 release.
+        private const string BuildSettingsText = "Build Settings...";
+        private const string FileBugText = "File a Bug";
+        private const string ViewDocumentationText = "View Documentation";
+        private const string ViewLicenseText = "View License";
+
+        [MenuItem(PlayBilling + BuildSettingsText, false, AboveLine)]
         private static void OpenBuildSettings()
         {
             GooglePlayBillingBuildSettings.ShowWindow();
         }
 
-        [MenuItem(PlayBilling + GoogleEditorMenu.ViewDocumentation, false, BelowLine)]
+        [MenuItem(PlayBilling + ViewDocumentationText, false, BelowLine)]
         private static void ViewDocumentation()
         {
             Application.OpenURL("https://developer.android.com/google/play/billing/unity");
         }
 
-        [MenuItem(PlayBilling + GoogleEditorMenu.ViewLicense, false, BelowLine + 1)]
+        [MenuItem(PlayBilling + ViewLicenseText, false, BelowLine + 1)]
         private static void ViewLicense()
         {
             // The guid is for GooglePlayPlugins/com.google.play.billing/LICENSE.md
             GoogleEditorMenu.OpenFileByGuid("ff930df64f4294487b3b89d15863363c");
         }
 
-        [MenuItem(PlayBilling + GoogleEditorMenu.FileBug, false, BelowLine + 2)]
+        [MenuItem(PlayBilling + FileBugText, false, BelowLine + 2)]
         private static void ViewPlayPluginsIssuesPage()
         {
-            GoogleEditorMenu.ViewPlayPluginsIssuesPage();
+            // The GoogleEditorMenu version 1.0.0 did not contain ViewPlayPluginsIssuesPage().
+            Application.OpenURL("https://github.com/google/play-unity-plugins/issues");
         }
     }
 }

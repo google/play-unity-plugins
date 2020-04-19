@@ -29,7 +29,13 @@ namespace Google.Play.Instant.Editor.Internal
         private const int AboveLine = GoogleEditorMenu.PlayInstantPriority;
         private const int BelowLine = GoogleEditorMenu.PlayInstantPriority + GoogleEditorMenu.SeparatorSize;
 
-        [MenuItem(PlayInstant + GoogleEditorMenu.BuildSettings, false, AboveLine)]
+        // These fields are defined in GoogleEditorMenu version 1.0.1, but were not present in the 1.0.0 release.
+        private const string BuildSettingsText = "Build Settings...";
+        private const string FileBugText = "File a Bug";
+        private const string ViewDocumentationText = "View Documentation";
+        private const string ViewLicenseText = "View License";
+
+        [MenuItem(PlayInstant + BuildSettingsText, false, AboveLine)]
         private static void OpenBuildSettings()
         {
             PlayInstantBuildSettingsWindow.ShowWindow();
@@ -47,24 +53,25 @@ namespace Google.Play.Instant.Editor.Internal
             QuickDeployWindow.ShowWindow();
         }
 
-        [MenuItem(PlayInstant + GoogleEditorMenu.ViewDocumentation, false, BelowLine)]
+        [MenuItem(PlayInstant + ViewDocumentationText, false, BelowLine)]
         private static void ViewDocumentation()
         {
             Application.OpenURL(
                 "https://developer.android.com/topic/google-play-instant/getting-started/game-unity-plugin");
         }
 
-        [MenuItem(PlayInstant + GoogleEditorMenu.ViewLicense, false, BelowLine + 1)]
+        [MenuItem(PlayInstant + ViewLicenseText, false, BelowLine + 1)]
         private static void ViewLicense()
         {
             // The guid is for GooglePlayPlugins/com.google.play.instant/LICENSE.md
             GoogleEditorMenu.OpenFileByGuid("0a58b4c913b854a34a3d5b54256d3588");
         }
 
-        [MenuItem(PlayInstant + GoogleEditorMenu.FileBug, false, BelowLine + 2)]
+        [MenuItem(PlayInstant + FileBugText, false, BelowLine + 2)]
         private static void ViewPlayPluginsIssuesPage()
         {
-            GoogleEditorMenu.ViewPlayPluginsIssuesPage();
+            // The GoogleEditorMenu version 1.0.0 did not contain ViewPlayPluginsIssuesPage().
+            Application.OpenURL("https://github.com/google/play-unity-plugins/issues");
         }
     }
 }
