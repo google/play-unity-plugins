@@ -26,7 +26,7 @@ namespace Google.Play.Instant.Editor.Internal
     {
         public const string WindowTitle = "Play Instant Build Settings";
         private const int WindowMinWidth = 400;
-        private const int WindowMinHeight = 175;
+        private const int WindowMinHeight = 240;
         private const int FieldWidth = 175;
         private static readonly string[] PlatformOptions = {"Installed", "Instant"};
 
@@ -39,6 +39,7 @@ namespace Google.Play.Instant.Editor.Internal
         private static PlayInstantBuildSettingsWindow _windowInstance;
 
         private bool _isInstant;
+        private bool _playGamesEnabled;
 
         /// <summary>
         /// Displays this window, creating it if necessary.
@@ -65,6 +66,19 @@ namespace Google.Play.Instant.Editor.Internal
         void ReadFromBuildConfiguration()
         {
             _isInstant = PlayInstantBuildSettings.IsInstantBuildType();
+            _playGamesEnabled = PlayInstantBuildConfig.PlayGamesEnabled;
+        }
+
+        /// <summary>
+        /// Update window with most recent build configuration values if the window is open.
+        /// </summary>
+        public static void UpdateWindowIfOpen()
+        {
+            if (_windowInstance != null)
+            {
+                _windowInstance.ReadFromBuildConfiguration();
+                _windowInstance.Repaint();
+            }
         }
 
         private void OnGUI()
@@ -99,6 +113,22 @@ namespace Google.Play.Instant.Editor.Internal
                 EditorGUILayout.SelectableLabel(
                     string.Format("https://play.google.com/store/apps/details?id={0}&launch=true", packageName),
                     descriptionTextStyle);
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Full \"Instant play\" game", EditorStyles.boldLabel,
+                    GUILayout.Width(FieldWidth));
+                _playGamesEnabled = EditorGUILayout.Toggle(_playGamesEnabled);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.LabelField(
+                    "Check this box to indicate that this is a full experience instant game that is eligible for " +
+                    "\"Instant play\" featuring in the Play Games app. Leave the box unchecked if this is a trial or " +
+                    "demo instant game.",
+                    descriptionTextStyle);
+                if (GUILayout.Button("Learn More", GUILayout.Width(90)))
+                {
+                    Application.OpenURL("https://g.co/play/instant");
+                }
             }
             else
             {
@@ -106,9 +136,9 @@ namespace Google.Play.Instant.Editor.Internal
                     "The \"Installed\" build type is used when creating a traditional installable APK. " +
                     "Select \"Instant\" to enable building a Google Play Instant APK or app bundle.",
                     descriptionTextStyle);
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
             }
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
             // Disable the Save button unless one of the fields has changed.
             GUI.enabled = IsAnyFieldChanged();
@@ -130,7 +160,8 @@ namespace Google.Play.Instant.Editor.Internal
 
         private bool IsAnyFieldChanged()
         {
-            return _isInstant != PlayInstantBuildSettings.IsInstantBuildType();
+            return _isInstant != PlayInstantBuildSettings.IsInstantBuildType() ||
+                   _playGamesEnabled != PlayInstantBuildConfig.PlayGamesEnabled;
         }
 
         private void SelectPlatformInstant()
@@ -156,6 +187,7 @@ namespace Google.Play.Instant.Editor.Internal
         private void SaveConfiguration()
         {
             PlayInstantBuildSettings.SetInstantBuildType(_isInstant);
+            PlayInstantBuildConfig.SaveConfiguration(_playGamesEnabled);
             Debug.Log("Saved Play Instant Build Settings");
         }
     }

@@ -38,6 +38,9 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
         private const string PreconditionOneAssetModule =
             "more than one dist:module element with dist:type asset-pack";
 
+        private const string PreconditionOneMetaDataFlavor =
+            "more than one meta-data element for com.google.android.gms.instant.flavor";
+
         private delegate IEnumerable<XElement> ElementFinder(XElement element);
 
         /// <summary>
@@ -66,7 +69,8 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
                         new XAttribute(ManifestConstants.AndroidLabelXName, "@string/app_name"),
                         new XElement(ManifestConstants.Activity,
                             new XAttribute(
-                                ManifestConstants.AndroidNameXName, "com.unity3d.player.UnityPlayerActivity"),
+                                ManifestConstants.AndroidNameXName,
+                                "com.unity3d.player.UnityPlayerActivity"),
                             new XAttribute(ManifestConstants.AndroidLabelXName, "@string/app_name"),
                             new XElement(ManifestConstants.IntentFilter,
                                 new XElement(ManifestConstants.Action,
@@ -94,6 +98,12 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
                 // TODO: it may not always be safe to remove the "dist" or "tools" namespaces.
                 manifestElement.Attributes(ManifestConstants.DistXmlns).Remove();
                 manifestElement.Attributes(ManifestConstants.ToolsXmlns).Remove();
+
+                var applicationElement = GetExactlyOne(manifestElement.Elements(ManifestConstants.Application));
+                if (applicationElement != null)
+                {
+                    FindFlavorMetaDataElements(applicationElement).Remove();
+                }
             }
         }
 
@@ -101,8 +111,11 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
         /// Converts the specified XDocument representing an AndroidManifest to support an instant app build.
         /// </summary>
         /// <param name="doc">An XDocument representing an AndroidManifest.</param>
+        /// <param  name="supportPlayGamesApp">
+        /// Whether or not to configure the manifest to support being launched by the Play Games App.
+        /// </param>
         /// <returns>An error message if there was a problem updating the manifest, or null if successful.</returns>
-        public static string ConvertManifestToInstant(XDocument doc)
+        public static string ConvertManifestToInstant(XDocument doc, bool supportPlayGamesApp)
         {
             var manifestElement = GetExactlyOne(doc.Elements(ManifestConstants.Manifest));
             if (manifestElement == null)
@@ -158,6 +171,17 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
             if (applicationElement == null)
             {
                 return PreconditionOneApplicationElement;
+            }
+
+            if (supportPlayGamesApp)
+            {
+                var result = UpdateMetaDataElement(FindFlavorMetaDataElements, applicationElement,
+                    PreconditionOneMetaDataFlavor, PlayInstantManifestConstants.Flavor,
+                    PlayInstantManifestConstants.PlayGamesInstantFlavor);
+                if (result != null)
+                {
+                    return result;
+                }
             }
 
             return null;
@@ -240,6 +264,34 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
             return from moduleElement in manifestElement.Elements(ManifestConstants.DistModuleXName)
                 where moduleElement.Attribute(ManifestConstants.DistInstantXName) != null
                 select moduleElement;
+        }
+
+        private static IEnumerable<XElement> FindFlavorMetaDataElements(XContainer application)
+        {
+            // Find all elements of the form <meta-data android:name="com.google.android.gms.instant.flavor" />
+            return from metaData in application.Elements(PlayInstantManifestConstants.MetaData)
+                where (string) metaData.Attribute(ManifestConstants.AndroidNameXName) ==
+                      PlayInstantManifestConstants.Flavor
+                select metaData;
+        }
+
+        /// <summary>
+        /// Updates the specified meta-data element to the specified value.
+        /// </summary>
+        /// <returns>An error message if there was a problem updating the manifest, or null if successful.</returns>
+        private static string UpdateMetaDataElement(
+            ElementFinder finder, XElement parentElement, string errorMessage, string name, object attributeValue)
+        {
+            var metaDataElement = GetElement(finder, parentElement, PlayInstantManifestConstants.MetaData);
+            if (metaDataElement == null)
+            {
+                return errorMessage;
+            }
+
+            metaDataElement.SetAttributeValue(ManifestConstants.AndroidNameXName, name);
+            metaDataElement.SetAttributeValue(PlayInstantManifestConstants.AndroidValueXName, attributeValue);
+
+            return null;
         }
 
         private static XElement GetExactlyOne(IEnumerable<XElement> elements)

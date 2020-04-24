@@ -42,7 +42,8 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
                 doc = AndroidManifestHelper.CreateManifestXDocument();
             }
 
-            var errorMessage = AndroidManifestHelper.ConvertManifestToInstant(doc);
+            var errorMessage =
+                AndroidManifestHelper.ConvertManifestToInstant(doc, PlayInstantBuildConfig.PlayGamesEnabled);
             if (errorMessage != null)
             {
                 return errorMessage;

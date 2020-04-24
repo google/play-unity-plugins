@@ -67,7 +67,8 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
             var manifestPath = Path.Combine(path, AndroidManifestRelativePath);
             Debug.LogFormat("Updating manifest for Play Instant: {0}", manifestPath);
             var doc = XDocument.Load(manifestPath);
-            var errorMessage = AndroidManifestHelper.ConvertManifestToInstant(doc);
+            var errorMessage =
+                AndroidManifestHelper.ConvertManifestToInstant(doc, PlayInstantBuildConfig.PlayGamesEnabled);
             if (errorMessage != null)
             {
                 DisplayErrorDialog(buildToolLogger, errorMessage);
