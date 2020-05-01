@@ -103,7 +103,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         private static string GetJdkPath()
         {
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_3_OR_NEWER && UNITY_ANDROID
             var toolsJdkPath = UnityEditor.Android.AndroidExternalToolsSettings.jdkRootPath;
             if (!string.IsNullOrEmpty(toolsJdkPath) && Directory.Exists(toolsJdkPath))
             {

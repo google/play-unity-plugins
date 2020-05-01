@@ -37,7 +37,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
-#if UNITY_2019_3_OR_NEWER
+#if !UNITY_ANDROID
+            string sdkPath = null;
+#elif UNITY_2019_3_OR_NEWER
             var sdkPath = UnityEditor.Android.AndroidExternalToolsSettings.sdkRootPath;
 #else
             var sdkPath = EditorPrefs.GetString(AndroidSdkRootEditorPrefsKey);
@@ -80,7 +82,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// </summary>
         public static void OverrideEditorPreferences()
         {
-#if UNITY_2019_3_OR_NEWER
+#if !UNITY_ANDROID
+            return;
+#elif UNITY_2019_3_OR_NEWER
             OverrideEditorPreference(AndroidHomeEnvironmentVariableKey,
                 () => UnityEditor.Android.AndroidExternalToolsSettings.sdkRootPath,
                 v => { UnityEditor.Android.AndroidExternalToolsSettings.sdkRootPath = v; });
