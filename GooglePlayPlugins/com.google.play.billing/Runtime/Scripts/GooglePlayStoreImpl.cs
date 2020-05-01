@@ -611,7 +611,7 @@ namespace Google.Play.Billing
 
                 // Copy _productInPurchaseFlow.id into the delegate as the delegate is called by the main thread and
                 // _productInPurchaseFlow will get cleaned up immediately in this thread.
-                var productId = _productInPurchaseFlow.id;
+                var productId = _productInPurchaseFlow.storeSpecificId;
                 _billingUtil.RunOnMainThread(() =>
                     _callback.OnPurchaseFailed(
                         new PurchaseFailureDescription(productId, purchaseFailureReason, debugMessage)));
