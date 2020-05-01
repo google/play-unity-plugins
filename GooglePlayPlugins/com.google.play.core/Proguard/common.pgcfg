@@ -1,0 +1,64 @@
+# Copyright 2018 Google LLC
+#
+# The Play Core Library is licensed to you under the Android Software
+# Development Kit License Agreement -
+# https://developer.android.com/studio/terms ("Agreement"). By using the Play
+# Core Library, you agree to the terms of this Agreement.
+
+# Play Core Proguard Rules: Play Core Common (always include this config)
+
+-keep class com.google.android.play.core.common.IntentSenderForResultStarter {
+    public void startIntentSenderForResult(android.content.IntentSender, int, android.content.Intent, int, int, int, android.os.Bundle);
+}
+
+-keep class com.google.android.play.core.common.LocalTestingException {
+}
+
+-keep class com.google.android.play.core.tasks.OnCompleteListener {
+    public abstract void onComplete(com.google.android.play.core.tasks.Task);
+}
+
+-keep class com.google.android.play.core.tasks.OnFailureListener {
+    public abstract void onFailure(java.lang.Exception);
+}
+
+-keep class com.google.android.play.core.tasks.OnSuccessListener {
+    public abstract void onSuccess(java.lang.Object);
+}
+
+-keep class com.google.android.play.core.tasks.RuntimeExecutionException {
+}
+
+-keep class com.google.android.play.core.tasks.Task {
+    <init>();
+
+    public abstract com.google.android.play.core.tasks.Task addOnCompleteListener(com.google.android.play.core.tasks.OnCompleteListener);
+    public abstract com.google.android.play.core.tasks.Task addOnCompleteListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnCompleteListener);
+    public abstract com.google.android.play.core.tasks.Task addOnFailureListener(com.google.android.play.core.tasks.OnFailureListener);
+    public abstract com.google.android.play.core.tasks.Task addOnFailureListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnFailureListener);
+    public abstract com.google.android.play.core.tasks.Task addOnSuccessListener(com.google.android.play.core.tasks.OnSuccessListener);
+    public abstract com.google.android.play.core.tasks.Task addOnSuccessListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnSuccessListener);
+    public abstract java.lang.Exception getException();
+    public abstract java.lang.Object getResult();
+    public abstract java.lang.Object getResult(java.lang.Class);
+    public abstract boolean isComplete();
+    public abstract boolean isSuccessful();
+}
+
+-keep class com.google.android.play.core.tasks.TaskExecutors {
+    public static java.util.concurrent.Executor MAIN_THREAD;
+}
+
+-keep class com.google.android.play.core.tasks.Tasks {
+    public static java.lang.Object await(com.google.android.play.core.tasks.Task);
+    public static java.lang.Object await(com.google.android.play.core.tasks.Task, long, java.util.concurrent.TimeUnit);
+}
+
+-keep class com.google.android.play.core.tasks.NativeOnCompleteListener {
+    <init>(long, int);
+
+    public void onComplete(com.google.android.play.core.tasks.Task);
+    public void nativeOnComplete(long, int, java.lang.Object, int);
+}
+
+-keep class com.google.android.play.core.common.LocalTestingException {}

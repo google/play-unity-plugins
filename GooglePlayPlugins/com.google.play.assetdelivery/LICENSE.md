@@ -1,3 +1,17 @@
+===============================================================================
+
+The following file:
+
+-   Proguard/asset_delivery.pgcfg
+
+is licensed under the
+[Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)
+("Agreement"). By using this file, you agree to the terms of this Agreement.
+
+===============================================================================
+
+Except as indicated previously in this LICENSE file, files in this package are
+licensed as follows:
 
                                  Apache License
                            Version 2.0, January 2004

@@ -1,0 +1,103 @@
+# Copyright 2019 Google LLC
+#
+# The Play Core Library is licensed to you under the Android Software
+# Development Kit License Agreement -
+# https://developer.android.com/studio/terms ("Agreement"). By using the Play
+# Core Library, you agree to the terms of this Agreement.
+
+# Play Core Proguard Rules: Play Asset Delivery for asset packs
+
+-keep class com.google.android.play.core.assetpacks.AssetLocation {
+    public long offset();
+    public java.lang.String path();
+    public long size();
+    public java.lang.String toString();
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackState {
+    public long bytesDownloaded();
+    public int transferProgressPercentage();
+    public int errorCode();
+    public java.lang.String name();
+    public int status();
+    public java.lang.String toString();
+    public long totalBytesToDownload();
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackStates {
+    public java.util.Map packStates();
+    public java.lang.String toString();
+    public long totalBytes();
+}
+
+-keep class com.google.android.play.core.assetpacks.model.AssetPackErrorCode {
+    public static int ACCESS_DENIED;
+    public static int API_NOT_AVAILABLE;
+    public static int APP_UNAVAILABLE;
+    public static int DOWNLOAD_NOT_FOUND;
+    public static int INSUFFICIENT_STORAGE;
+    public static int INTERNAL_ERROR;
+    public static int INVALID_REQUEST;
+    public static int NETWORK_ERROR;
+    public static int NO_ERROR;
+    public static int PACK_UNAVAILABLE;
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackException {
+    public int getErrorCode();
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackLocation {
+    public java.lang.String assetsPath();
+    public int packStorageMethod();
+    public java.lang.String path();
+    public java.lang.String toString();
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackManager {
+    public com.google.android.play.core.assetpacks.AssetPackStates cancel(java.util.List);
+    public void clearListeners();
+    public com.google.android.play.core.assetpacks.AssetLocation getAssetLocation(java.lang.String, java.lang.String);
+    public com.google.android.play.core.assetpacks.AssetPackLocation getPackLocation(java.lang.String);
+    public java.util.Map getPackLocations();
+    public com.google.android.play.core.tasks.Task getPackStates(java.util.List);
+    public com.google.android.play.core.tasks.Task fetch(java.util.List);
+    public void registerListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
+    public com.google.android.play.core.tasks.Task removePack(java.lang.String);
+    public com.google.android.play.core.tasks.Task showCellularDataConfirmation(android.app.Activity);
+    public void unregisterListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackManagerFactory {
+    <init>();
+
+    public static com.google.android.play.core.assetpacks.AssetPackManager getInstance(android.content.Context);
+}
+
+-keep class com.google.android.play.core.assetpacks.AssetPackStateUpdateListener {
+    public void onStateUpdate(com.google.android.play.core.assetpacks.AssetPackState);
+}
+
+-keep class com.google.android.play.core.assetpacks.model.AssetPackStatus {
+    public static int CANCELED;
+    public static int COMPLETED;
+    public static int DOWNLOADING;
+    public static int FAILED;
+    public static int NOT_INSTALLED;
+    public static int PENDING;
+    public static int TRANSFERRING;
+    public static int UNKNOWN;
+    public static int WAITING_FOR_WIFI;
+}
+
+-keep class com.google.android.play.core.assetpacks.model.AssetPackStorageMethod {
+    public static int APK_ASSETS;
+    public static int STORAGE_FILES;
+}
+
+-keep class com.google.android.play.core.assetpacks.NativeAssetPackStateUpdateListener {
+    <init>();
+
+    public void onStateUpdate(com.google.android.play.core.assetpacks.AssetPackState);
+}
+

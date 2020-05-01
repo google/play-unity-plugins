@@ -3,6 +3,8 @@
 The following files:
 
 -   GooglePlayPlugins/com.google.play.billing/Runtime/Plugins/GooglePlayBilling.aar
+-   GooglePlayPlugins/com.google.play.assetdelivery/Proguard/asset_delivery.pgcfg
+-   GooglePlayPlugins/com.google.play.core/Proguard/common.pgcfg
 -   GooglePlayPlugins/com.google.play.core/Runtime/Plugins/playcore.aar
 
 are licensed under the

@@ -1,12 +1,13 @@
 ===============================================================================
 
-The following file:
+The following files:
 
+-   Proguard/common.pgcfg
 -   Runtime/Plugins/playcore.aar
 
-is licensed under the
+are licensed under the
 [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)
-("Agreement"). By using this file, you agree to the terms of this Agreement.
+("Agreement"). By using these files, you agree to the terms of this Agreement.
 
 ===============================================================================
 
