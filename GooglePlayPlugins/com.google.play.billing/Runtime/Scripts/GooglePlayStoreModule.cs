@@ -27,6 +27,8 @@ namespace Google.Play.Billing
     /// </summary>
     public class GooglePlayStoreModule : AbstractPurchasingModule
     {
+        public const string StoreName = "GooglePlay";
+
         private IStore _storeInstance;
 
         private static GooglePlayStoreModule _moduleInstance;
@@ -60,7 +62,7 @@ namespace Google.Play.Billing
 
         public override void Configure()
         {
-            RegisterStore("GooglePlay", InstantiateGooglePlayBilling());
+            RegisterStore(StoreName, InstantiateGooglePlayBilling());
         }
 
         private IStore InstantiateGooglePlayBilling()

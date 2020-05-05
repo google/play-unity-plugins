@@ -146,7 +146,8 @@ namespace Google.Play.Billing
             {
                 _billingUtil.RunOnMainThread(() =>
                     _callback.OnPurchaseFailed(
-                        new PurchaseFailureDescription(product.id, PurchaseFailureReason.ExistingPurchasePending,
+                        new PurchaseFailureDescription(
+                            product.storeSpecificId, PurchaseFailureReason.ExistingPurchasePending,
                             string.Format("A purchase for {0} is already in progress.",
                                 _productInPurchaseFlow.id))));
                 return;
@@ -169,7 +170,8 @@ namespace Google.Play.Billing
                     // A SKU that has ProductDefinition should appear in the inventory. If not, the issue could be
                     // transient so that it asks to try again later.
                     _callback.OnPurchaseFailed(
-                        new PurchaseFailureDescription(product.id, PurchaseFailureReason.ProductUnavailable,
+                        new PurchaseFailureDescription(product.storeSpecificId,
+                            PurchaseFailureReason.ProductUnavailable,
                             string.Format("Cannot purchase {0} now, please try again later.",
                                 _productInPurchaseFlow.id)));
                     return;
@@ -303,7 +305,7 @@ namespace Google.Play.Billing
             {
                 _billingUtil.RunOnMainThread(() =>
                     _callback.OnPurchaseFailed(
-                        new PurchaseFailureDescription(newProduct.definition.id,
+                        new PurchaseFailureDescription(newProduct.definition.storeSpecificId,
                             PurchaseFailureReason.ExistingPurchasePending,
                             string.Format("A purchase for {0} is already in progress.",
                                 _productInPurchaseFlow.id))));
@@ -319,7 +321,7 @@ namespace Google.Play.Billing
                     // A SKU that has ProductDefinition should appear in the inventory. If not, the issue could be
                     // transient so that it asks to try again later.
                     _callback.OnPurchaseFailed(
-                        new PurchaseFailureDescription(newProduct.definition.id,
+                        new PurchaseFailureDescription(newProduct.definition.storeSpecificId,
                             PurchaseFailureReason.ProductUnavailable,
                             string.Format("Cannot update subscription for {0} now, please try again later.",
                                 _productInPurchaseFlow.id)));
