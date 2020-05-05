@@ -1,6 +1,6 @@
 # Changelog for com.google.play.common
 
-## [1.0.1] - 2020-04-16
+## [1.1.0] - 2020-05-04
 ### New Features
  - Updated documentation
 
