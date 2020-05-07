@@ -2,6 +2,7 @@
 
 ## [1.1.0] - 2020-05-04
 ### New Features
+ - Updated bundletool-all.jar from 0.13.0 to 0.14.0
  - Updated documentation and menu item links
 ### Bug Fixes
  - Fixed issue #11: the package now compiles even if the Android platform isn't installed

@@ -2,6 +2,7 @@
 
 ## [1.1.0] - 2020-05-04
 ### New Features
+ - Updated playcore.aar from 1.7.1 to 1.7.2
  - Added Proguard config file
  - Updated documentation
 
