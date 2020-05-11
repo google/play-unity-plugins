@@ -122,7 +122,7 @@ namespace Google.Play.AssetDelivery.Internal
             Debug.LogFormat("Calling get asset location, assetPackName: {0}, path: {1}", assetPackName, assetPath);
             var javaAssetLocation =
                 _javaAssetPackManager.Call<AndroidJavaObject>("getAssetLocation", assetPackName, assetPath);
-            return PlayCoreHelper.IsNull(javaAssetLocation) ? null : new AssetLocation(javaAssetLocation);
+            return PlayCoreHelper.IsNull(javaAssetLocation) ? null : new AssetLocationImpl(javaAssetLocation);
         }
 
         /// <summary>

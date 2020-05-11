@@ -18,17 +18,17 @@ using System.Linq;
 namespace Google.Play.AssetDelivery.Internal
 {
     /// <summary>
-    /// Repository for active PlayAssetBundleRequests.
+    /// Repository for active requests related to Play Asset Delivery.
     /// </summary>
-    internal class PlayAssetBundleRequestRepository
+    internal class PlayRequestRepository
     {
         // Contains all active requests.
-        private Dictionary<string, PlayAssetBundleRequestImpl> _requestsByName =
-            new Dictionary<string, PlayAssetBundleRequestImpl>();
+        private Dictionary<string, PlayAssetPackRequestImpl> _requestsByName =
+            new Dictionary<string, PlayAssetPackRequestImpl>();
 
-        public void AddRequest(PlayAssetBundleRequestImpl request)
+        public void AddRequest(PlayAssetPackRequestImpl request)
         {
-            _requestsByName.Add(request.MainAssetBundleName, request);
+            _requestsByName.Add(request.AssetPackName, request);
         }
 
         public void RemoveRequest(string name)
@@ -36,12 +36,12 @@ namespace Google.Play.AssetDelivery.Internal
             _requestsByName.Remove(name);
         }
 
-        public bool TryGetRequest(string name, out PlayAssetBundleRequestImpl request)
+        public bool TryGetRequest(string name, out PlayAssetPackRequestImpl request)
         {
             return _requestsByName.TryGetValue(name, out request);
         }
 
-        public IList<PlayAssetBundleRequestImpl> GetRequestsWithStatus(AssetDeliveryStatus status)
+        public IList<PlayAssetPackRequestImpl> GetRequestsWithStatus(AssetDeliveryStatus status)
         {
             return _requestsByName.Values.Where(request => request.Status == status).ToList();
         }

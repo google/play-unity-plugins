@@ -40,7 +40,8 @@ namespace Google.Play.AssetDelivery
         }
 
         /// <summary>
-        /// Starts a <see cref="PlayAssetBundleRequest"/> to retrieve an asset pack containing an AssetBundle.
+        /// Starts a <see cref="PlayAssetBundleRequest"/> to retrieve an asset pack containing only the specified
+        /// AssetBundle. Both the AssetBundle and asset pack must share the same name.
         /// Downloads the asset pack if the latest version isn't already available on disk.
         /// After download, the contained AssetBundle is loaded into memory.
         /// </summary>
@@ -49,6 +50,17 @@ namespace Google.Play.AssetDelivery
         public static PlayAssetBundleRequest RetrieveAssetBundleAsync(string assetBundleName)
         {
             return Instance.RetrieveAssetBundleAsyncInternal(assetBundleName);
+        }
+
+        /// <summary>
+        /// Starts a <see cref="PlayAssetPackRequest"/> to retrieve the specified asset pack.
+        /// Downloads the asset pack if the latest version isn't already available on disk.
+        /// </summary>
+        /// <param name="assetPackName">The name of the requested asset pack.</param>
+        /// <returns>A request object used to monitor the asynchronous asset pack retrieval.</returns>
+        public static PlayAssetBundleRequest RetrieveAssetPackAsync(string assetPackName)
+        {
+            return Instance.RetrieveAssetPackAsyncInternal(assetPackName);
         }
 
         /// <summary>

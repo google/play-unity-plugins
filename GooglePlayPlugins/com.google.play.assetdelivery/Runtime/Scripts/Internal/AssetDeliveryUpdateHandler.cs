@@ -38,10 +38,10 @@ namespace Google.Play.AssetDelivery.Internal
         private bool _gettingPackStates;
         private AssetPackStateUpdateListener _stateUpdateListener;
         private AssetPackManager _assetPackManager;
-        private PlayAssetBundleRequestRepository _requestRepository;
+        private PlayRequestRepository _requestRepository;
 
         public static AssetDeliveryUpdateHandler CreateInScene(AssetPackManager assetPackManager,
-            PlayAssetBundleRequestRepository requestRepository)
+            PlayRequestRepository requestRepository)
         {
             var componentHolder = new GameObject();
             DontDestroyOnLoad(componentHolder);
@@ -53,7 +53,7 @@ namespace Google.Play.AssetDelivery.Internal
             return instance;
         }
 
-        private void Init(AssetPackManager assetPackManager, PlayAssetBundleRequestRepository requestRepository)
+        private void Init(AssetPackManager assetPackManager, PlayRequestRepository requestRepository)
         {
             _assetPackManager = assetPackManager;
             _requestRepository = requestRepository;

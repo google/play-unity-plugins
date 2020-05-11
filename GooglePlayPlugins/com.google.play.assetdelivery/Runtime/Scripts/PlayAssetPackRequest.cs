@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ using UnityEngine;
 namespace Google.Play.AssetDelivery
 {
     /// <summary>
-    /// An object used to monitor the asynchronous retrieval of an asset pack containing an AssetBundle via the
-    /// Play Asset Delivery system.
+    /// An object used to monitor the asynchronous retrieval of an asset pack via the Play Asset Delivery system.
     /// </summary>
-    public abstract class PlayAssetBundleRequest : CustomYieldInstruction
+    public abstract class PlayAssetPackRequest : CustomYieldInstruction
     {
         /// <summary>
         /// Progress between 0.0f and 1.0f indicating the overall download progress of this request.
@@ -29,38 +28,31 @@ namespace Google.Play.AssetDelivery
         /// Note: If this value is equal to 1.0f, it does not mean that the request has completed,
         ///       only that the DOWNLOADING stage is finished.
         /// </summary>
-        public virtual float DownloadProgress { get; protected set; }
+        public float DownloadProgress { get; protected set; }
 
         /// <summary>
         /// The error that prevented this requested from completing successfully.
         /// In the case of a successful request, this will always be <see cref="AssetDeliveryErrorCode.NoError"/>.
         /// </summary>
-        public virtual AssetDeliveryErrorCode Error { get; protected set; }
+        public AssetDeliveryErrorCode Error { get; protected set; }
 
         /// <summary>
-        /// Returns true if this request is in the <see cref="AssetDeliveryStatus.Loaded"/> or
+        /// Returns true if this request is in the <see cref="AssetDeliveryStatus.Available"/> or
         /// <see cref="AssetDeliveryStatus.Failed"/> status, false otherwise.
         /// </summary>
         public bool IsDone { get; protected set; }
 
         /// <summary>
         /// An enum indicating the status of this request (downloading, downloaded, installed etc.)
-        /// If the request completed successfully, this value should be <see cref="AssetDeliveryStatus.Loaded"/>.
+        /// If the request completed successfully, this value should be <see cref="AssetDeliveryStatus.Available"/>.
         /// If an error occured, it should be <see cref="AssetDeliveryStatus.Failed"/>.
         /// </summary>
-        public virtual AssetDeliveryStatus Status { get; protected set; }
-
-        /// <summary>
-        /// The AssetBundle loaded by this request.
-        /// This corresponds to the AssetBundle name passed into this request.
-        /// If Status is not <see cref="AssetDeliveryStatus.Loaded"/>, this value is null.
-        /// </summary>
-        public AssetBundle AssetBundle { get; protected set; }
+        public AssetDeliveryStatus Status { get; protected set; }
 
         /// <summary>
         /// Event indicating that the request is completed.
         /// </summary>
-        public event Action<PlayAssetBundleRequest> Completed = delegate { };
+        public event Action<PlayAssetPackRequest> Completed = delegate { };
 
         /// <summary>
         /// Implements CustomYieldInstruction's keepWaiting method,
@@ -72,11 +64,30 @@ namespace Google.Play.AssetDelivery
         }
 
         /// <summary>
+        /// Retrieves the location of an asset at the specified path within this asset pack.
+        /// </summary>
+        /// <param name="assetPath">The path within this asset pack pointing to the desired asset.</param>
+        /// <returns>
+        /// An <see cref="AssetLocation"/> object describing the path, offset and size of a the requested asset file
+        /// within the asset pack.
+        /// </returns>
+        public abstract AssetLocation GetAssetLocation(string assetPath);
+
+        /// <summary>
+        /// Helper method to load the AssetBundle at the specified path within this 
+        /// asset pack.
+        /// </summary>
+        /// <param name="assetBundlePath">The path within this asset pack pointing to the desired AssetBundle.</param>
+        /// <returns>
+        /// An <see cref="AssetBundleCreateRequest"/> that can be yielded on until the AssetBundle is loaded.
+        /// </returns>
+        public abstract AssetBundleCreateRequest LoadAssetBundleAsync(string assetBundlePath);
+
+        /// <summary>
         /// Cancels the request if possible, setting Status to <see cref="AssetDeliveryStatus.Failed"/> and
         /// Error to <see cref="AssetDeliveryErrorCode.Canceled"/>.
-        /// If the request is already <see cref="AssetDeliveryStatus.Loading"/>,
-        /// <see cref="AssetDeliveryStatus.Loaded"/> or <see cref="AssetDeliveryStatus.Failed"/>, then
-        /// the request is left unchanged.
+        /// If the request is already <see cref="AssetDeliveryStatus.Available"/>
+        /// or <see cref="AssetDeliveryStatus.Failed"/>, then the request is left unchanged.
         /// </summary>
         public abstract void AttemptCancel();
 

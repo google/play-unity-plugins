@@ -12,56 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Google.Play.Core.Internal;
+using System.Collections;
 using UnityEngine;
 
 namespace Google.Play.AssetDelivery.Internal
 {
     internal class PlayAssetBundleRequestImpl : PlayAssetBundleRequest
     {
-        public readonly string MainAssetBundleName;
+        internal readonly PlayAssetPackRequestImpl PackRequest;
 
-        private AssetPackManager _assetPackManager;
-        private bool _initializedInPlayCore;
-        private PlayAssetBundleRequestRepository _requestRepository;
-        private Action _onInitializedInPlayCore = delegate { };
+        private readonly AssetDeliveryUpdateHandler _updateHandler;
+        private AssetDeliveryStatus _loadingStatus;
+        private AssetDeliveryErrorCode _loadingError;
+        private float _downloadProgress;
 
-        public PlayAssetBundleRequestImpl(string mainAssetBundleName, AssetPackManager assetPackManager,
-            PlayAssetBundleRequestRepository requestRepository)
+        public PlayAssetBundleRequestImpl(PlayAssetPackRequestImpl packRequest,
+            AssetDeliveryUpdateHandler updateHandler)
         {
-            MainAssetBundleName = mainAssetBundleName;
-            _assetPackManager = assetPackManager;
-            _requestRepository = requestRepository;
+            PackRequest = packRequest;
+            _updateHandler = updateHandler;
+            _loadingStatus = AssetDeliveryStatus.Pending;
+            _loadingError = AssetDeliveryErrorCode.NoError;
+            PackRequest.Completed += OnPackRequestCompleted;
         }
 
-        public void UpdateState(AssetDeliveryStatus status, long bytesDownloaded, long totalBytesToDownload)
+        public override float DownloadProgress
         {
-            if (totalBytesToDownload == 0L)
-            {
-                bool finishedDownloading = status == AssetDeliveryStatus.Loading
-                                           || status == AssetDeliveryStatus.Loaded;
-                DownloadProgress = finishedDownloading ? 1f : 0f;
-            }
-            else
-            {
-                DownloadProgress = bytesDownloaded / (float) totalBytesToDownload;
-            }
-
-            Status = status;
+            get { return PackRequest.DownloadProgress; }
         }
 
-        public void OnInitializedInPlayCore()
+        public override AssetDeliveryStatus Status
         {
-            // Execute on the main thread in case _onInitializedInPlayCore needs to check _requestRepository.
-            PlayCoreEventHandler.HandleEvent(() =>
-            {
-                _initializedInPlayCore = true;
-                _onInitializedInPlayCore();
-            });
+            get { return PackRequest.Status == AssetDeliveryStatus.Available ? _loadingStatus : PackRequest.Status; }
         }
 
-        public void OnErrorOccured(AssetDeliveryErrorCode errorCode)
+        public override AssetDeliveryErrorCode Error
+        {
+            get { return PackRequest.Error == AssetDeliveryErrorCode.NoError ? _loadingError : PackRequest.Error; }
+        }
+
+        private void OnLoadingErrorOccured(AssetDeliveryErrorCode errorCode)
         {
             if (IsDone)
             {
@@ -69,19 +59,13 @@ namespace Google.Play.AssetDelivery.Internal
             }
 
             IsDone = true;
-            Error = errorCode;
-            Status = AssetDeliveryStatus.Failed;
+            _loadingError = errorCode;
+            _loadingStatus = AssetDeliveryStatus.Failed;
             AssetBundle = null;
             InvokeCompletedEvent();
         }
 
-        public void OnLoadingStarted()
-        {
-            DownloadProgress = 1f;
-            Status = AssetDeliveryStatus.Loading;
-        }
-
-        public void OnLoadingFinished(AssetBundle loadedAssetBundle)
+        private void OnLoadingFinished(AssetBundle loadedAssetBundle)
         {
             if (IsDone)
             {
@@ -90,51 +74,50 @@ namespace Google.Play.AssetDelivery.Internal
 
             DownloadProgress = 1f;
             AssetBundle = loadedAssetBundle;
-            Status = AssetDeliveryStatus.Loaded;
+            _loadingStatus = AssetDeliveryStatus.Loaded;
             IsDone = true;
             InvokeCompletedEvent();
         }
 
-        public override void AttemptCancel()
+        private void OnPackRequestCompleted(PlayAssetPackRequest packRequest)
         {
-            if (IsDone || Status == AssetDeliveryStatus.Loaded)
+            packRequest.Completed -= OnPackRequestCompleted;
+            if (packRequest.Error == AssetDeliveryErrorCode.NoError)
             {
-                return;
-            }
-
-            // If play core is aware of the associated pack, then we tell play core to cancel the pack download.
-            // Otherwise, we notify play core after the fetch task succeeds.
-            if (_initializedInPlayCore)
-            {
-                CancelPlayCore();
+                StartLoadingAssetBundle();
             }
             else
             {
-                DeferCancelPlayCore();
+                IsDone = true;
+                InvokeCompletedEvent();
+            }
+        }
+
+        public void StartLoadingAssetBundle()
+        {
+            _updateHandler.StartCoroutine(CoLoadAssetBundle());
+            DownloadProgress = 1f;
+            _loadingStatus = AssetDeliveryStatus.Loading;
+        }
+
+        private IEnumerator CoLoadAssetBundle()
+        {
+            // Assume that the AssetBundle name equals the asset pack name.
+            var bundleCreateRequest = PackRequest.LoadAssetBundleAsync(PackRequest.AssetPackName);
+            yield return bundleCreateRequest;
+
+            if (bundleCreateRequest.assetBundle == null)
+            {
+                OnLoadingErrorOccured(AssetDeliveryErrorCode.AssetBundleLoadingError);
+                yield break;
             }
 
-            OnErrorOccured(AssetDeliveryErrorCode.Canceled);
+            OnLoadingFinished(bundleCreateRequest.assetBundle);
         }
 
-        private void CancelPlayCore()
+        public override void AttemptCancel()
         {
-            _assetPackManager.Cancel(MainAssetBundleName).Dispose();
-        }
-
-        private void DeferCancelPlayCore()
-        {
-            _onInitializedInPlayCore = () =>
-            {
-                // Only cancel if a new request hasn't been started, to avoid cancelling the new request.
-                if (_requestRepository.ContainsRequest(MainAssetBundleName))
-                {
-                    Debug.LogFormat("Skip canceling {0}", MainAssetBundleName);
-                }
-                else
-                {
-                    CancelPlayCore();
-                }
-            };
+            PackRequest.AttemptCancel();
         }
     }
 }
