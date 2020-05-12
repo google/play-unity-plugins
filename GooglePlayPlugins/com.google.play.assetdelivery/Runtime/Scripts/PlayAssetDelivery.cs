@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using Google.Play.AssetDelivery.Internal;
 using Google.Play.Common;
 
@@ -58,9 +60,21 @@ namespace Google.Play.AssetDelivery
         /// </summary>
         /// <param name="assetPackName">The name of the requested asset pack.</param>
         /// <returns>A request object used to monitor the asynchronous asset pack retrieval.</returns>
-        public static PlayAssetBundleRequest RetrieveAssetPackAsync(string assetPackName)
+        public static PlayAssetPackRequest RetrieveAssetPackAsync(string assetPackName)
         {
             return Instance.RetrieveAssetPackAsyncInternal(assetPackName);
+        }
+
+        /// <summary>
+        /// Starts a <see cref="PlayAssetPackBatchRequest"/> to retrieve the specified asset packs.
+        /// Downloads the asset packs if the latest versions aren't already available on disk.
+        /// </summary>
+        /// <param name="assetPackNames">A list of requested asset packs.</param>
+        /// <returns>A request object used to monitor the asynchronous asset pack batch retrieval.</returns>
+        /// <exception cref="ArgumentException">Throws if assetPackNames contains duplicate entries.</exception>
+        public static PlayAssetPackBatchRequest RetrieveAssetPackBatchAsync(IList<string> assetPackNames)
+        {
+            return Instance.RetrieveAssetPackBatchAsyncInternal(assetPackNames);
         }
 
         /// <summary>

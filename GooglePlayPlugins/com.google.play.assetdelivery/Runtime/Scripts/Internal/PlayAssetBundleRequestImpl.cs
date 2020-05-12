@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -34,6 +35,21 @@ namespace Google.Play.AssetDelivery.Internal
             _loadingStatus = AssetDeliveryStatus.Pending;
             _loadingError = AssetDeliveryErrorCode.NoError;
             PackRequest.Completed += OnPackRequestCompleted;
+        }
+
+        public override event Action<PlayAssetBundleRequest> Completed
+        {
+            add
+            {
+                if (IsDone)
+                {
+                    value.Invoke(this);
+                    return;
+                }
+
+                base.Completed += value;
+            }
+            remove { base.Completed -= value; }
         }
 
         public override float DownloadProgress

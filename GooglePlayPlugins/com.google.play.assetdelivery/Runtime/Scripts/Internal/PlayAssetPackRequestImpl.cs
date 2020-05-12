@@ -42,6 +42,22 @@ namespace Google.Play.AssetDelivery.Internal
             _requestRepository = requestRepository;
         }
 
+        public override event Action<PlayAssetPackRequest> Completed
+        {
+            add
+            {
+                if (IsDone)
+                {
+                    value.Invoke(this);
+                    return;
+                }
+
+                base.Completed += value;
+            }
+            remove { base.Completed -= value; }
+        }
+
+
         public void UpdateState(AssetDeliveryStatus status, long bytesDownloaded, long totalBytesToDownload)
         {
             if (totalBytesToDownload == 0L)

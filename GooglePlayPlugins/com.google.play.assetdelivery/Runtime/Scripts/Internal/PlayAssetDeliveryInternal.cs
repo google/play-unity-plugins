@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Google.Play.Common;
 using Google.Play.Core.Internal;
 using UnityEngine;
@@ -59,33 +61,69 @@ namespace Google.Play.AssetDelivery.Internal
             }
 
             var request = CreateAssetBundleRequest(assetBundleName);
+            _requestRepository.AddRequest(request.PackRequest);
+            request.Completed += req => _requestRepository.RemoveRequest(assetBundleName);
 
-            if (IsDownloaded(assetBundleName))
-            {
-                request.PackRequest.OnPackAvailable();
-            }
-            else
-            {
-                var fetchTask = _assetPackManager.Fetch(assetBundleName);
-                fetchTask.RegisterOnSuccessCallback(javaPackStates =>
-                {
-                    request.PackRequest.OnInitializedInPlayCore();
-                    fetchTask.Dispose();
-                });
-                fetchTask.RegisterOnFailureCallback((reason, errorCode) =>
-                {
-                    Debug.LogErrorFormat("Failed to retrieve AssetBundle {0}: ", reason);
-                    request.PackRequest.OnErrorOccured(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
-                    fetchTask.Dispose();
-                });
-            }
+            InitiateRequest(request.PackRequest);
 
             return request;
         }
 
-        internal PlayAssetBundleRequest RetrieveAssetPackAsyncInternal(string assetPackName)
+        internal PlayAssetPackRequest RetrieveAssetPackAsyncInternal(string assetPackName)
         {
-            throw new NotImplementedException("RetrieveAssetPackAsyncInternal is not implemented.");
+            if (_requestRepository.ContainsRequest(assetPackName))
+            {
+                throw new ArgumentException(string.Format("There is already an active request for asset pack: {0}",
+                    assetPackName));
+            }
+
+            var request = CreateAssetPackRequest(assetPackName);
+            _requestRepository.AddRequest(request);
+            request.Completed += req => _requestRepository.RemoveRequest(assetPackName);
+
+            InitiateRequest(request);
+
+            return request;
+        }
+
+        internal PlayAssetPackBatchRequest RetrieveAssetPackBatchAsyncInternal(IList<string> assetPackNames)
+        {
+            if (assetPackNames.Count != assetPackNames.Distinct().Count())
+            {
+                throw new ArgumentException("assetPackNames contains duplicate entries");
+            }
+
+            var activePackNames = assetPackNames.Where(name => _requestRepository.ContainsRequest(name)).ToArray();
+            if (activePackNames.Length != 0)
+            {
+                throw new ArgumentException("There are already active requests for asset packs: {0}",
+                    string.Join(", ", activePackNames));
+            }
+
+            var requests = new List<PlayAssetPackRequestImpl>();
+            foreach (var assetPackName in assetPackNames)
+            {
+                var request = CreateAssetPackRequest(assetPackName);
+                _requestRepository.AddRequest(request);
+                request.Completed += req => _requestRepository.RemoveRequest(request.AssetPackName);
+                requests.Add(request);
+            }
+
+            var batchRequest = new PlayAssetPackBatchRequestImpl(requests);
+            var fetchTask = _assetPackManager.Fetch(assetPackNames.ToArray());
+            fetchTask.RegisterOnSuccessCallback(javaPackStates =>
+            {
+                batchRequest.OnInitializedInPlayCore();
+                fetchTask.Dispose();
+            });
+            fetchTask.RegisterOnFailureCallback((reason, errorCode) =>
+            {
+                Debug.LogErrorFormat("Failed to retrieve asset pack batch: {0}", reason);
+                batchRequest.OnInitializationErrorOccurred(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
+                fetchTask.Dispose();
+            });
+
+            return batchRequest;
         }
 
         internal PlayAsyncOperation<ConfirmationDialogResult, AssetDeliveryErrorCode>
@@ -163,18 +201,36 @@ namespace Google.Play.AssetDelivery.Internal
 
         private PlayAssetPackRequestImpl CreateAssetPackRequest(string assetPackName)
         {
-            var request = new PlayAssetPackRequestImpl(assetPackName, _assetPackManager, _requestRepository);
-            _requestRepository.AddRequest(request);
-            return request;
+            return new PlayAssetPackRequestImpl(assetPackName, _assetPackManager, _requestRepository);
         }
-
 
         private PlayAssetBundleRequestImpl CreateAssetBundleRequest(string assetBundleName)
         {
             var packRequest = CreateAssetPackRequest(assetBundleName);
-            var request = new PlayAssetBundleRequestImpl(packRequest, _updateHandler);
-            request.Completed += (req) => _requestRepository.RemoveRequest(assetBundleName);
-            return request;
+            return new PlayAssetBundleRequestImpl(packRequest, _updateHandler);
+        }
+
+        private void InitiateRequest(PlayAssetPackRequestImpl request)
+        {
+            if (IsDownloaded(request.AssetPackName))
+            {
+                request.OnPackAvailable();
+            }
+            else
+            {
+                var fetchTask = _assetPackManager.Fetch(request.AssetPackName);
+                fetchTask.RegisterOnSuccessCallback(javaPackStates =>
+                {
+                    request.OnInitializedInPlayCore();
+                    fetchTask.Dispose();
+                });
+                fetchTask.RegisterOnFailureCallback((reason, errorCode) =>
+                {
+                    Debug.LogErrorFormat("Failed to retrieve asset pack: {0}", reason);
+                    request.OnErrorOccured(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
+                    fetchTask.Dispose();
+                });
+            }
         }
 
         private void ProcessPackStateUpdate(AssetPackState newState)

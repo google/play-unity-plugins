@@ -58,9 +58,10 @@ namespace Google.Play.AssetDelivery
         public AssetBundle AssetBundle { get; protected set; }
 
         /// <summary>
-        /// Event indicating that the request is completed.
+        /// Event indicating that the request is completed. If an event handler is registered after the operation has
+        /// completed, and thus after this event has been invoked, then the handler will be called synchronously.
         /// </summary>
-        public event Action<PlayAssetBundleRequest> Completed = delegate { };
+        public virtual event Action<PlayAssetBundleRequest> Completed = delegate { };
 
         /// <summary>
         /// Implements CustomYieldInstruction's keepWaiting method,
