@@ -100,6 +100,8 @@ namespace Google.Play.AssetDelivery.Internal
                     string.Join(", ", activePackNames));
             }
 
+            // A subset of assetPackNames of packs that are not available on disk.
+            var unavailableAssetPackNames = new List<string>();
             var requests = new List<PlayAssetPackRequestImpl>();
             foreach (var assetPackName in assetPackNames)
             {
@@ -107,10 +109,19 @@ namespace Google.Play.AssetDelivery.Internal
                 _requestRepository.AddRequest(request);
                 request.Completed += req => _requestRepository.RemoveRequest(request.AssetPackName);
                 requests.Add(request);
+
+                if (IsDownloaded(assetPackName))
+                {
+                    request.OnPackAvailable();
+                }
+                else
+                {
+                    unavailableAssetPackNames.Add(assetPackName);
+                }
             }
 
             var batchRequest = new PlayAssetPackBatchRequestImpl(requests);
-            var fetchTask = _assetPackManager.Fetch(assetPackNames.ToArray());
+            var fetchTask = _assetPackManager.Fetch(unavailableAssetPackNames.ToArray());
             fetchTask.RegisterOnSuccessCallback(javaPackStates =>
             {
                 batchRequest.OnInitializedInPlayCore();
