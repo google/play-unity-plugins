@@ -192,13 +192,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             };
 
             // Create asset pack module directories.
-            var assetPackCount = assetPackConfig.AssetPacks.Count;
             var index = 0;
-            foreach (var entry in assetPackConfig.AssetPacks)
+            var assetPacks = assetPackConfig.DeliveredAssetPacks;
+            foreach (var entry in assetPacks)
             {
                 DisplayProgress(
-                    string.Format("Processing asset pack {0} of {1}", index + 1, assetPackCount),
-                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float) index / assetPackCount));
+                    string.Format("Processing asset pack {0} of {1}", index + 1, assetPacks.Count),
+                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float) index / assetPacks.Count));
                 index++;
 
                 var assetPackName = entry.Key;

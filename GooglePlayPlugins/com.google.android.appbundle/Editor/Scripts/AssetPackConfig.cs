@@ -33,6 +33,19 @@ namespace Google.Android.AppBundle.Editor
         public readonly Dictionary<string, AssetPack> AssetPacks = new Dictionary<string, AssetPack>();
 
         /// <summary>
+        /// A dictionary containing the subset of <see cref="AssetPacks"/> that are marked for delivery.
+        /// </summary>
+        public Dictionary<string, AssetPack> DeliveredAssetPacks
+        {
+            get
+            {
+                return AssetPacks
+                    .Where(pair => pair.Value.DeliveryMode != AssetPackDeliveryMode.DoNotPackage)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+        }
+
+        /// <summary>
         /// When asset packs for multiple texture compression formats are present, this specifies the format used
         /// when building standalone APKs for Android pre-Lollipop devices.
         /// </summary>
