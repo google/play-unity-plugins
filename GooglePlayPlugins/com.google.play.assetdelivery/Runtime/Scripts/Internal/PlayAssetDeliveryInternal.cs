@@ -49,7 +49,7 @@ namespace Google.Play.AssetDelivery.Internal
 
         internal bool IsDownloaded(string assetBundleName)
         {
-            return GetAssetLocation(assetBundleName) != null;
+            return _assetPackManager.GetPackLocation(assetBundleName) != null;
         }
 
         internal PlayAssetBundleRequest RetrieveAssetBundleAsyncInternal(string assetBundleName)
