@@ -33,23 +33,26 @@ namespace Google.Android.AppBundle.Editor
         /// - If an absolute path is provided, the file paths in the returned object will be absolute paths.
         /// - AssetBundle builds for additional texture formats will be created in siblings of this directory. For
         ///   example, for outputDirectory "a/b/c" and texture format ASTC, there will be a directory "a/b/c#tcf_astc".
-        /// - This directory and any sibling directories must be empty or not exist, otherwise an exception is thrown.
+        /// - If allowClearDirectory is false, this directory and any sibling directories must be empty or not exist,
+        ///   otherwise an exception is thrown.
         /// </summary>
         /// <param name="outputPath">The output directory for the ETC1 AssetBundles. See other notes above.</param>
         /// <param name="builds">The main argument to <see cref="BuildPipeline"/>.</param>
         /// <param name="deliveryMode">A delivery mode to apply to every asset pack in the generated config.</param>
         /// <param name="additionalTextureFormats">Texture formats to build for in addition to ETC1.</param>
         /// <param name="assetBundleOptions">Options to pass to <see cref="BuildPipeline"/>.</param>
+        /// <param name="allowClearDirectory">Allows this method to clear the contents of the output directory.</param>
         /// <returns>An <see cref="AssetPackConfig"/> containing file paths to all generated AssetBundles.</returns>
         public static AssetPackConfig BuildAssetBundles(
             string outputPath,
             AssetBundleBuild[] builds,
             AssetPackDeliveryMode deliveryMode,
             IEnumerable<MobileTextureSubtarget> additionalTextureFormats = null,
-            BuildAssetBundleOptions assetBundleOptions = BuildAssetBundleOptions.UncompressedAssetBundle)
+            BuildAssetBundleOptions assetBundleOptions = BuildAssetBundleOptions.UncompressedAssetBundle,
+            bool allowClearDirectory = false)
         {
-            var nameToTextureFormatToPath = BuildAssetBundles(
-                outputPath, builds, assetBundleOptions, MobileTextureSubtarget.ETC, additionalTextureFormats);
+            var nameToTextureFormatToPath = BuildAssetBundles(outputPath, builds, assetBundleOptions,
+                MobileTextureSubtarget.ETC, additionalTextureFormats, allowClearDirectory);
             var assetPackConfig = new AssetPackConfig();
             foreach (var compressionToPath in nameToTextureFormatToPath.Values)
             {
@@ -68,10 +71,12 @@ namespace Google.Android.AppBundle.Editor
         /// <param name="assetBundleOptions">Options to pass to <see cref="BuildPipeline"/>.</param>
         /// <param name="baseTextureFormat">The default format. Note: ETC1 is supported by all devices.</param>
         /// <param name="additionalTextureFormats">Texture formats to generate for in addition to the base.</param>
+        /// <param name="allowClearDirectory">Allows this method to clear the contents of the output directory.</param>
         /// <returns>A dictionary from AssetBundle name to TextureCompressionFormat to file outputPath.</returns>
         public static Dictionary<string, Dictionary<TextureCompressionFormat, string>> BuildAssetBundles(
             string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions,
-            MobileTextureSubtarget baseTextureFormat, IEnumerable<MobileTextureSubtarget> additionalTextureFormats)
+            MobileTextureSubtarget baseTextureFormat, IEnumerable<MobileTextureSubtarget> additionalTextureFormats,
+            bool allowClearDirectory)
         {
             if (builds == null || builds.Length == 0)
             {
@@ -91,7 +96,7 @@ namespace Google.Android.AppBundle.Editor
                 throw new ArgumentNullException("outputPath");
             }
 
-            CheckDirectory(outputPath);
+            CheckDirectory(outputPath, allowClearDirectory);
 
             // Make unique and silently remove the base format, if it was present.
             var textureSubtargets = new HashSet<MobileTextureSubtarget>(
@@ -102,7 +107,7 @@ namespace Google.Android.AppBundle.Editor
             var paths = textureSubtargets.Select(format => outputPath + GetCompressionFormatSuffix(format));
             foreach (var path in paths)
             {
-                CheckDirectory(path);
+                CheckDirectory(path, allowClearDirectory);
             }
 
             // Throws if the base format is invalid.
@@ -205,7 +210,7 @@ namespace Google.Android.AppBundle.Editor
             }
         }
 
-        private static void CheckDirectory(string path)
+        private static void CheckDirectory(string path, bool allowClearDirectory)
         {
             var directoryInfo = new DirectoryInfo(path);
             if (!directoryInfo.Exists)
@@ -213,12 +218,12 @@ namespace Google.Android.AppBundle.Editor
                 return;
             }
 
-            if (directoryInfo.GetFileSystemInfos().Any())
+            if (!allowClearDirectory && directoryInfo.GetFileSystemInfos().Any())
             {
                 throw new ArgumentException("Directory is not empty: " + path);
             }
 
-            directoryInfo.Delete();
+            directoryInfo.Delete( /* recursive= */ true);
         }
     }
 }
