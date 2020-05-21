@@ -25,13 +25,13 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
     /// </summary>
     public class DemoController : MonoBehaviour
     {
-        public List<AssetBundleDownloadDisplay> DownloadDisplays;
+        public List<AssetBundleDownloader> DownloadDisplays;
         public Image SelectionBox;
 
-        private AssetBundleDownloadDisplay _selectedDownloadDisplay;
+        private AssetBundleDownloader _selectedDownloader;
         private Dictionary<KeyCode, Action> _keyMappings;
 
-        private delegate Button ButtonFromDisplay(AssetBundleDownloadDisplay display);
+        private delegate Button ButtonFromDisplay(AssetBundleDownloader display);
 
         private IEnumerator Start()
         {
@@ -76,10 +76,10 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private void SelectAssetBundle(int index)
         {
-            _selectedDownloadDisplay = DownloadDisplays[index];
-            SelectionBox.transform.position = _selectedDownloadDisplay.transform.position;
+            _selectedDownloader = DownloadDisplays[index];
+            SelectionBox.transform.position = _selectedDownloader.transform.position;
             SelectionBox.gameObject.SetActive(true);
-            Debug.LogFormat("Selected {0}", _selectedDownloadDisplay.AssetBundleName);
+            Debug.LogFormat("Selected {0}", _selectedDownloader.AssetBundleName);
         }
 
         private void ClickRetrieveAssetBundleButton()
@@ -104,13 +104,13 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private void ClickButton(ButtonFromDisplay getButtonAction, string buttonName)
         {
-            if (_selectedDownloadDisplay == null)
+            if (_selectedDownloader == null)
             {
                 Debug.LogErrorFormat("Cannot click \"{0}\" button. No AssetBundle selected.", buttonName);
                 return;
             }
 
-            var button = getButtonAction(_selectedDownloadDisplay);
+            var button = getButtonAction(_selectedDownloader);
             if (!button.isActiveAndEnabled)
             {
                 Debug.LogErrorFormat("The \"{0}\" button is currently disabled.", buttonName);
@@ -122,7 +122,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private void QueryStatusText()
         {
-            Debug.Log(_selectedDownloadDisplay.StatusText.text);
+            Debug.Log(_selectedDownloader.Display.StatusText.text);
         }
 
         private bool AllDisplaysInitialized()

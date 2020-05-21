@@ -25,32 +25,20 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
     /// <summary>
     /// Provides controls and status displays for downloading AssetBundles via Play Asset Delivery
     /// </summary>
-    public class AssetBundleDownloadDisplay : MonoBehaviour
+    public class AssetBundleDownloader : MonoBehaviour
     {
         public string AssetBundleName;
-        public Text StatusText;
-        public Text NameText;
-        public Text RetrieveAssetBundleButtonText;
-        public Image ColorTint;
-        public LoadingBar LoadingBar;
-        public ScrollingFillAnimator ScrollingFill;
+        public DownloadDisplay Display;
         public Button RetrieveAssetBundleButton;
         public Button LoadSceneButton;
         public Button ShowCellularDialogButton;
         public Button CancelDownloadButton;
         public Button RemoveButton;
-        public RectTransform ButtonOutline;
-        public Color ErrorColor;
-        public Color SuccessColor;
-        public Color NeutralColor;
-        public List<AssetBundleDownloadDisplay> Dependencies;
+        public List<AssetBundleDownloader> Dependencies;
         public bool ShowSize;
 
         private AssetBundle _assetBundle;
         private PlayAssetBundleRequest _request;
-        private List<Button> _buttons;
-
-        private const float ActiveScrollSpeed = 2.5f;
 
         public bool IsInitialized { get; private set; }
 
@@ -62,12 +50,17 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
             CancelDownloadButton.onClick.AddListener(ButtonEventCancelDownload);
             RemoveButton.onClick.AddListener(ButtonEventRemoveAssetBundle);
 
-            _buttons = new List<Button>
-            {
-                RetrieveAssetBundleButton, LoadSceneButton, ShowCellularDialogButton, CancelDownloadButton, RemoveButton
-            };
+            Display.BindButton(CancelDownloadButton, AssetDeliveryStatus.Pending);
+            Display.BindButton(CancelDownloadButton, AssetDeliveryStatus.Retrieving);
+            Display.BindButton(ShowCellularDialogButton, AssetDeliveryStatus.WaitingForWifi);
+            Display.BindButton(RemoveButton, AssetDeliveryStatus.Loaded);
+            Display.BindButton(LoadSceneButton, AssetDeliveryStatus.Loaded);
+            Display.BindButton(RetrieveAssetBundleButton, AssetDeliveryStatus.Failed);
 
-            NameText.text = AssetBundleName;
+            Display.BindColor(Display.SuccessColor, AssetDeliveryStatus.Loaded);
+            Display.BindColor(Display.ErrorColor, AssetDeliveryStatus.Failed);
+
+            Display.SetNameText(AssetBundleName);
             SetInitialStatus();
 
             if (ShowSize)
@@ -82,7 +75,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         public void ButtonEventRetrieveAssetBundle()
         {
-            HideButtons();
+            Display.HideButtons();
             StartCoroutine(DownloadAssetBundleCo());
         }
 
@@ -127,57 +120,13 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
         {
             var dependenciesLoaded = Dependencies.Count == 0 || Dependencies.TrueForAll(dep => dep.IsLoaded());
             LoadSceneButton.interactable = IsLoaded() && dependenciesLoaded;
-            ScrollingFill.ScrollSpeed = _request == null ? 0 : ActiveScrollSpeed;
+            Display.SetScrolling(_request == null);
         }
 
         private void SetInitialStatus()
         {
-            ColorTint.color = NeutralColor;
-            LoadingBar.SetProgress(0f);
-            ShowButtons(RetrieveAssetBundleButton);
-            StatusText.text = PlayAssetDelivery.IsDownloaded(AssetBundleName)
-                ? AssetDeliveryStatus.Available.ToString()
-                : AssetDeliveryStatus.Pending.ToString();
-        }
-
-        private void SetStatus(AssetDeliveryStatus status, AssetDeliveryErrorCode error)
-        {
-            StatusText.text = status.ToString();
-
-            switch (status)
-            {
-                case AssetDeliveryStatus.Pending:
-                case AssetDeliveryStatus.Retrieving:
-                    ShowButtons(CancelDownloadButton);
-                    ColorTint.color = NeutralColor;
-                    break;
-                case AssetDeliveryStatus.WaitingForWifi:
-                    ShowButtons(ShowCellularDialogButton);
-                    ColorTint.color = NeutralColor;
-                    break;
-                case AssetDeliveryStatus.Loading:
-                    HideButtons();
-                    ColorTint.color = NeutralColor;
-                    break;
-                case AssetDeliveryStatus.Loaded:
-                    ShowButtons(LoadSceneButton, RemoveButton);
-                    ColorTint.color = SuccessColor;
-                    break;
-                case AssetDeliveryStatus.Failed:
-                    ShowButtons(RetrieveAssetBundleButton);
-                    ColorTint.color = ErrorColor;
-                    break;
-                default:
-                    HideButtons();
-                    ColorTint.color = NeutralColor;
-                    break;
-            }
-
-            if (error != AssetDeliveryErrorCode.NoError)
-            {
-                StatusText.text = string.Format("{0}: {1}", status.ToString(), error.ToString());
-                RetrieveAssetBundleButtonText.text = "Try Again";
-            }
+            Display.ShowButtons(RetrieveAssetBundleButton);
+            Display.SetInitialStatus(PlayAssetDelivery.IsDownloaded(AssetBundleName));
         }
 
         private IEnumerator DownloadAssetBundleCo()
@@ -194,19 +143,19 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
                         || asyncOperation.GetResult() != ConfirmationDialogResult.Accepted)
                     {
                         // Provide a button to re-show the dialog in case user changes their mind.
-                        SetStatus(_request.Status, _request.Error);
+                        Display.SetStatus(_request.Status, _request.Error);
                     }
 
                     yield return new WaitUntil(() => _request.Status != AssetDeliveryStatus.WaitingForWifi);
                 }
 
-                LoadingBar.SetProgress(_request.DownloadProgress);
-                SetStatus(_request.Status, _request.Error);
+                Display.SetProgress(_request.DownloadProgress);
+                Display.SetStatus(_request.Status, _request.Error);
 
                 yield return null;
             }
 
-            SetStatus(_request.Status, _request.Error);
+            Display.SetStatus(_request.Status, _request.Error);
 
             if (_request.Error != AssetDeliveryErrorCode.NoError)
             {
@@ -217,27 +166,6 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
             _assetBundle = _request.AssetBundle;
             _request = null;
-        }
-
-        private void HideButtons()
-        {
-            foreach (var button in _buttons)
-            {
-                button.gameObject.SetActive(false);
-            }
-
-            ButtonOutline.gameObject.SetActive(false);
-        }
-
-        private void ShowButtons(params Button[] buttonsToShow)
-        {
-            HideButtons();
-            foreach (var button in buttonsToShow)
-            {
-                button.gameObject.SetActive(true);
-            }
-
-            ButtonOutline.gameObject.SetActive(true);
         }
 
         private void DisplayDownloadSize()
@@ -253,21 +181,10 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
                 }
 
                 IsInitialized = true;
-                NameText.text = string.Format("{0} : {1}", AssetBundleName, FormatSize(operation.GetResult()));
+                string nameWithSize =
+                    string.Format("{0} : {1}", AssetBundleName, Display.FormatSize(operation.GetResult()));
+                Display.SetNameText(nameWithSize);
             };
-        }
-
-        private string FormatSize(long numBytes)
-        {
-            if (numBytes < 2)
-            {
-                return numBytes + " B";
-            }
-
-            string[] units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-            var unitIndex = (int) Math.Floor(Math.Log10(numBytes)) / 3;
-            double shiftedBytes = numBytes / Math.Pow(1000, unitIndex);
-            return string.Format("{0:0.##} {1}", shiftedBytes, units[unitIndex]);
         }
 
         private bool IsLoaded()
