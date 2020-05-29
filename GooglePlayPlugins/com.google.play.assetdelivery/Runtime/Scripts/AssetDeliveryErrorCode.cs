@@ -88,9 +88,15 @@ namespace Google.Play.AssetDelivery
         PlayStoreNotFound = 11,
 
         /// <summary>
-        /// Returned if <see cref="PlayAssetDelivery.ShowCellularDataConfirmation"/> is called but no asset packs are
-        /// waiting for Wi-Fi.
+        /// Returned if <see cref="PlayAssetDelivery.ShowCellularDataConfirmation"/> is called but
+        /// no asset packs are waiting for Wi-Fi.
         /// </summary>
         NetworkUnrestricted = 12,
+
+        /// <summary>
+        /// The app is not owned by any user on this device. An app is "owned" if it has been
+        /// acquired from Play.
+        /// </summary>
+        AppNotOwned = 13,
     }
 }

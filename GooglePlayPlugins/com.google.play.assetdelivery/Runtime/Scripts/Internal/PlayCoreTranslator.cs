@@ -36,6 +36,7 @@ namespace Google.Play.AssetDelivery.Internal
             public const int InsufficientStorage = -10;
             public const int PlayStoreNotFound = -11;
             public const int NetworkUnrestricted = -12;
+            public const int AppNotOwned = -13;
             public const int InternalError = -100;
         }
 
@@ -67,6 +68,7 @@ namespace Google.Play.AssetDelivery.Internal
                 {AssetPackErrorCode.InsufficientStorage, AssetDeliveryErrorCode.InsufficientStorage},
                 {AssetPackErrorCode.PlayStoreNotFound, AssetDeliveryErrorCode.PlayStoreNotFound},
                 {AssetPackErrorCode.NetworkUnrestricted, AssetDeliveryErrorCode.NetworkUnrestricted},
+                {AssetPackErrorCode.AppNotOwned, AssetDeliveryErrorCode.AppNotOwned},
             };
 
         private static readonly Dictionary<int, AssetDeliveryStatus> PlayCoreToAssetDeliveryStatuses
