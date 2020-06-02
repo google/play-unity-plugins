@@ -21,7 +21,7 @@ namespace Google.Play.Billing.Internal
     /// </summary>
     internal static class Constants
     {
-        public const string Version = "2.2.0-unity";
+        public const string Version = "3.0.0-unity";
 
         public static readonly TimeSpan BillingClientAsyncTimeout = TimeSpan.FromMilliseconds(30000);
 

@@ -42,7 +42,7 @@ namespace Google.Play.Billing.Internal
         public string introductoryPrice;
         public long introductoryPriceAmountMicros;
         public string introductoryPricePeriod;
-        public string introductoryPriceCycles;
+        public int introductoryPriceCycles;
 #pragma warning restore 649
 
         public string JsonSkuDetails { get; private set; }
