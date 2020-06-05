@@ -54,6 +54,10 @@ namespace Google.Play.AssetDelivery
             return Instance.RetrieveAssetBundleAsyncInternal(assetBundleName);
         }
 
+// The below methods are experimental and are subject to change. If you would like to try them out, enable the
+// below preprocessor definition in Player Settings.
+// See here: https://docs.unity3d.com/Manual/PlatformDependentCompilation.html
+#if PLAY_ASSET_DELIVERY_EXPERIMENTAL
         /// <summary>
         /// Starts a <see cref="PlayAssetPackRequest"/> to retrieve the specified asset pack.
         /// Downloads the asset pack if the latest version isn't already available on disk.
@@ -76,6 +80,7 @@ namespace Google.Play.AssetDelivery
         {
             return Instance.RetrieveAssetPackBatchAsyncInternal(assetPackNames);
         }
+#endif
 
         /// <summary>
         /// Starts a PlayAsyncOperation to determine the download size in bytes of the specified asset pack.

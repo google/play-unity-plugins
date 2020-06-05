@@ -149,6 +149,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private IEnumerator CoLoadAssetPackBatch()
         {
+#if PLAY_ASSET_DELIVERY_EXPERIMENTAL
             var assetPackNames = Assets.Select(a => a.AssetPackName).Distinct().ToList();
             _batchRequest = PlayAssetDelivery.RetrieveAssetPackBatchAsync(assetPackNames);
             _requestInProgress = true;
@@ -184,6 +185,12 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
             }
 
             _requestInProgress = false;
+#else
+            // Assign values to avoid unassigned variable warning.
+            _batchRequest = null;
+            _requestInProgress = false;
+            throw new Exception("Experimental Play Asset Delivery methods are disabled.");
+#endif
         }
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -199,6 +200,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private IEnumerator DownloadAssetPackCo()
         {
+#if PLAY_ASSET_DELIVERY_EXPERIMENTAL
             _request = PlayAssetDelivery.RetrieveAssetPackAsync(AssetPackName);
             _requestInProgress = true;
 
@@ -236,6 +238,12 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
             }
 
             _requestInProgress = false;
+#else
+            // Assign values to avoid unassigned variable warning.
+            _request = null;
+            _requestInProgress = false;
+            throw new Exception("Experimental Play Asset Delivery methods are disabled.");
+#endif
         }
 
         private IEnumerator LoadAssetBundleFromRequest()
