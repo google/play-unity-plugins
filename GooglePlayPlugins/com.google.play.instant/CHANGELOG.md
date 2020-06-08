@@ -1,5 +1,9 @@
 # Changelog for com.google.play.instant
 
+## [1.1.1] - 2020-06-08
+### New Features
+ - Incremented version number to match other packages
+
 ## [1.1.0] - 2020-05-04
 ### New Features
  - Added a checkbox setting for indicating that a game supports "Instant play" through the Play Games app

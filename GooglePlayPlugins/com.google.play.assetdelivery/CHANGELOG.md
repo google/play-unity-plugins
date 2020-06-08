@@ -1,5 +1,14 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.1.1] - 2020-06-08
+### New Features
+ - Added experimental methods for retrieving asset packs that contain arbitrary files
+ - Updated the Asset Delivery Demo app to utilize those experimental methods
+ - Added menu options under "Google -> Android App Bundle -> Asset Delivery Demo" to facilitate building the sample
+
+### Bug Fixes
+ - Fixed issue where asset packs marked DoNotPackage were causing build to fail
+
 ## [1.1.0] - 2020-05-04
 ### New Features
  - Added Proguard config files
