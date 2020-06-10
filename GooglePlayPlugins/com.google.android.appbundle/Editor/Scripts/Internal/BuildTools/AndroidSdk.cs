@@ -37,27 +37,31 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
-#if !UNITY_ANDROID
-            string sdkPath = null;
-#elif UNITY_2019_3_OR_NEWER
-            var sdkPath = UnityEditor.Android.AndroidExternalToolsSettings.sdkRootPath;
+#if !UNITY_2019_3_OR_NEWER
+            return SetSdkRoot(buildToolLogger, EditorPrefs.GetString(AndroidSdkRootEditorPrefsKey));
+#elif UNITY_ANDROID
+            // Guard with #if UNITY_ANDROID since UnityEditor.Android.Extensions.dll might be unavailable,
+            // e.g. on a build machine without the Android platform installed.
+            return SetSdkRoot(buildToolLogger, UnityEditor.Android.AndroidExternalToolsSettings.sdkRootPath);
 #else
-            var sdkPath = EditorPrefs.GetString(AndroidSdkRootEditorPrefsKey);
-#endif
-            if (string.IsNullOrEmpty(sdkPath))
+            // This would be an unexpected and hopefully transient error.
+            if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android)
             {
-                sdkPath = Environment.GetEnvironmentVariable(AndroidHomeEnvironmentVariableKey);
-            }
-
-            if (!Directory.Exists(sdkPath))
-            {
-                buildToolLogger.DisplayErrorDialog(
-                    "Failed to locate the Android SDK. Check Preferences -> External Tools to set the path.");
+                buildToolLogger.DisplayErrorDialog("ActiveBuildTarget disagrees with #if UNITY_ANDROID.");
                 return false;
             }
 
-            _androidSdkRoot = sdkPath;
-            return true;
+            // Handle the case where the UnityEditor.Android.Extensions.dll file may not be available by requiring that
+            // Android be the selected platform on 2019.3+.
+            const string message = "The Build Settings > Platform must be set to Android." +
+                                   "\n\nClick \"OK\" to switch the active platform to Android.";
+            if (buildToolLogger.DisplayActionableErrorDialog(message))
+            {
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
+            }
+
+            return false;
+#endif
         }
 
         /// <summary>
@@ -122,6 +126,24 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 Debug.LogFormat("Setting preference for {0} to {1}", environmentVariableKey, environmentVariableValue);
                 setPreference(environmentVariableValue);
             }
+        }
+
+        private bool SetSdkRoot(BuildToolLogger buildToolLogger, string sdkPath)
+        {
+            if (string.IsNullOrEmpty(sdkPath))
+            {
+                sdkPath = Environment.GetEnvironmentVariable(AndroidHomeEnvironmentVariableKey);
+            }
+
+            if (!Directory.Exists(sdkPath))
+            {
+                buildToolLogger.DisplayErrorDialog(
+                    "Failed to locate the Android SDK. Check Preferences -> External Tools to set the path.");
+                return false;
+            }
+
+            _androidSdkRoot = sdkPath;
+            return true;
         }
     }
 }
