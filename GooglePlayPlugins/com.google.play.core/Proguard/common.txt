@@ -62,3 +62,7 @@
 }
 
 -keep class com.google.android.play.core.common.LocalTestingException {}
+
+-keep class com.google.android.play.core.listener.StateUpdatedListener {
+    public abstract void onStateUpdate(java.lang.Object);
+}
