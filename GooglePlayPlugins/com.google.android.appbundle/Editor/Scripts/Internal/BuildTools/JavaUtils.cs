@@ -27,6 +27,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     {
         private string _javaBinaryPath;
         private string _jarBinaryPath;
+        private string _jarSignerBinaryPath;
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
@@ -51,6 +52,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 buildToolLogger.DisplayErrorDialog(
                     "Failed to locate Java's jar command. Check Preferences -> External Tools to set the JDK path.");
+                return false;
+            }
+
+            _jarSignerBinaryPath = GetBinaryPath(jdkPath, "jarsigner");
+            if (_jarSignerBinaryPath == null)
+            {
+                buildToolLogger.DisplayErrorDialog(
+                    "Failed to locate Java's jarsigner command. Check Preferences -> External Tools to set the JDK path.");
                 return false;
             }
 
@@ -86,6 +95,22 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 }
 
                 return _jarBinaryPath;
+            }
+        }
+
+        /// <summary>
+        /// Path to the jarsigner executable.
+        /// </summary>
+        public virtual string JarSignerBinaryPath
+        {
+            get
+            {
+                if (_jarSignerBinaryPath == null)
+                {
+                    throw new BuildToolNotInitializedException(this);
+                }
+
+                return _jarSignerBinaryPath;
             }
         }
 

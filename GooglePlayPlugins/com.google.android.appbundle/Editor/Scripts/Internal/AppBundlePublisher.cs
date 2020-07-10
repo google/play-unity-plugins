@@ -223,12 +223,12 @@ namespace Google.Android.AppBundle.Editor.Internal
             var androidSdkPlatform = new AndroidSdkPlatform(androidSdk);
             var androidBuildTools = new AndroidBuildTools(androidSdk);
             var apkSigner = new ApkSigner(androidBuildTools, javaUtils);
+            var jarSigner = new JarSigner(javaUtils);
             return new AppBundleBuilder(
                 new AndroidAssetPackagingTool(androidBuildTools, androidSdkPlatform),
                 new AndroidBuilder(androidSdkPlatform, apkSigner),
-                apkSigner,
                 new BundletoolHelper(javaUtils),
-                new ReleaseBuildHelper(apkSigner),
+                jarSigner,
                 workingDirectoryPath,
                 new ZipUtils(javaUtils));
         }
