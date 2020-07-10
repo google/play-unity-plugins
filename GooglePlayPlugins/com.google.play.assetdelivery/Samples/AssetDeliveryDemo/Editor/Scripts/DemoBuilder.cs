@@ -19,7 +19,6 @@ using System.Linq;
 using Google.Android.AppBundle.Editor;
 using Google.Android.AppBundle.Editor.AssetPacks;
 using Google.Android.AppBundle.Editor.Internal;
-using Google.Samples.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -89,8 +88,9 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo.Editor
                 return;
             }
 
-            var buildPlayerOptions = CommandLineBuilder.GetBuildPlayerOptions(AabFilePath, DemoSceneGuid);
             var assetPackConfig = CreateAssetPackConfig();
+            var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(AabFilePath);
+            buildPlayerOptions.scenes = new[] {AssetDatabase.GUIDToAssetPath(DemoSceneGuid)};
             if (!Bundletool.BuildBundle(buildPlayerOptions, assetPackConfig))
             {
                 throw new Exception("Asset Delivery Demo build failed");
