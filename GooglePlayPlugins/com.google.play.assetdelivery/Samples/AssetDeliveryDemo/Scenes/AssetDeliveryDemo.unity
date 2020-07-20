@@ -5051,7 +5051,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31bcf3109b614ca181a6c6d53b3b70a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DownloadDisplays:
+  InitializedDownloaders:
   - {fileID: 763644505}
   - {fileID: 1014521233}
   - {fileID: 1684192611}
@@ -5083,9 +5083,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Pages:
-  - {fileID: 1365601446}
-  - {fileID: 1712384307}
-  - {fileID: 325218800}
+  - PageRoot: {fileID: 1365601446}
+    DownloaderObjects:
+    - {fileID: 763644503}
+    - {fileID: 1014521231}
+    - {fileID: 1684192609}
+    OutputText: {fileID: 0}
+  - PageRoot: {fileID: 1712384307}
+    DownloaderObjects:
+    - {fileID: 1148519928}
+    - {fileID: 2033913982}
+    OutputText: {fileID: 1232440562}
+  - PageRoot: {fileID: 325218800}
+    DownloaderObjects:
+    - {fileID: 262765246}
+    OutputText: {fileID: 444577483}
   NextButton: {fileID: 1363947152}
   PreviousButton: {fileID: 562965553}
 --- !u!1 &729321546

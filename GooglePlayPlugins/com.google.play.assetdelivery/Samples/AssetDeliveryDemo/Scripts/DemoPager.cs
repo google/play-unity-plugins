@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +24,15 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
     /// </summary>
     public class DemoPager : MonoBehaviour
     {
-        public GameObject[] Pages;
+        [Serializable]
+        public class Page
+        {
+            public GameObject PageRoot;
+            public List<GameObject> DownloaderObjects;
+            public Text OutputText;
+        }
+
+        public Page[] Pages;
         public Button NextButton;
         public Button PreviousButton;
         private int _currentIndex;
@@ -38,11 +48,24 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
             foreach (var page in Pages)
             {
-                page.SetActive(true);
-                page.transform.localPosition = _offscreenPosition;
+                page.PageRoot.SetActive(true);
+                page.PageRoot.transform.localPosition = _offscreenPosition;
             }
 
             SetPage(_currentIndex);
+        }
+
+        public void SetPage(int pageIndex)
+        {
+            Pages[_currentIndex].PageRoot.transform.localPosition = _offscreenPosition;
+
+            _currentIndex = pageIndex;
+            Pages[_currentIndex].PageRoot.transform.localPosition = _visiblePosition;
+        }
+
+        public Page GetCurrentPage()
+        {
+            return Pages[_currentIndex];
         }
 
         private void ButtonEventNext()
@@ -53,14 +76,6 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
         private void ButtonEventPrevious()
         {
             SetPage((Pages.Length + _currentIndex - 1) % Pages.Length);
-        }
-
-        private void SetPage(int pageIndex)
-        {
-            Pages[_currentIndex].transform.localPosition = _offscreenPosition;
-
-            _currentIndex = pageIndex;
-            Pages[_currentIndex].transform.localPosition = _visiblePosition;
         }
     }
 }

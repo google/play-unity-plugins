@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,31 +24,128 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
     /// <summary>
     /// Provides functionality for the test infrastructure to control the Asset Delivery Demo via key presses.
     /// </summary>
+    [RequireComponent(typeof(DemoPager))]
     public class DemoController : MonoBehaviour
     {
-        public List<AssetBundleDownloader> DownloadDisplays;
+        private interface IDownloaderInputMapper
+        {
+            Button GetButton(KeyCode keyCode, GameObject gameObject);
+            List<KeyCode> GetKeyCodes();
+        }
+
+        private class DownloaderInputMapper<T> : IDownloaderInputMapper where T : MonoBehaviour
+        {
+            public Dictionary<KeyCode, ButtonFromDownloader<T>> KeyMapping;
+
+            /// <summary>
+            /// Gets the button mapped to the specified keyCode.
+            /// Returns null if the mapping isn't found or if the specified gameObject doesn't have a component of type
+            /// T.
+            /// </summary>
+            public Button GetButton(KeyCode keyCode, GameObject gameObject)
+            {
+                var downloader = gameObject.GetComponent<T>();
+                if (downloader == null)
+                {
+                    return null;
+                }
+
+                ButtonFromDownloader<T> action;
+                if (!KeyMapping.TryGetValue(keyCode, out action))
+                {
+                    return null;
+                }
+
+                return action.Invoke(downloader);
+            }
+
+            public List<KeyCode> GetKeyCodes()
+            {
+                return KeyMapping.Keys.ToList();
+            }
+        }
+
+        // These downloaders take some time to initialize so we monitor them and notify the test infrastructure when they
+        // are finished initializing.
+        public List<AssetBundleDownloader> InitializedDownloaders;
         public Image SelectionBox;
 
-        private AssetBundleDownloader _selectedDownloader;
-        private Dictionary<KeyCode, Action> _keyMappings;
+        private GameObject _selectedDownloaderObj;
+        private Text _selectedOutputText;
 
-        private delegate Button ButtonFromDisplay(AssetBundleDownloader display);
+        private readonly DownloaderInputMapper<AssetBundleDownloader> _assetBundleKeyMapping =
+            new DownloaderInputMapper<AssetBundleDownloader>();
+
+        private readonly DownloaderInputMapper<AssetPackDownloader> _assetPackKeyMapping =
+            new DownloaderInputMapper<AssetPackDownloader>();
+
+        private readonly DownloaderInputMapper<AssetPackBatchDownloader> _assetPackBatchKeyMapping =
+            new DownloaderInputMapper<AssetPackBatchDownloader>();
+
+        private Dictionary<KeyCode, Action> _navigationKeyMappings;
+        private List<KeyCode> _keyCodesMappedToCommands;
+
+        private List<IDownloaderInputMapper> _downloaderInputMappers;
+        private DemoPager _demoPager;
+
+        private delegate Button ButtonFromDownloader<in T>(T display);
 
         private IEnumerator Start()
         {
+            _demoPager = GetComponent<DemoPager>();
+
             // Provide an interface for the test infrastructure to call functions via key presses.
-            _keyMappings = new Dictionary<KeyCode, Action>()
+            // Create a mapping from a given numerical key code to a page index and downloader index.
+            // e.g. Pressing 5 selects the first (index 0) downloader on the third page (index 2).
+            _navigationKeyMappings = new Dictionary<KeyCode, Action>()
             {
-                {KeyCode.Alpha0, () => SelectAssetBundle(0)},
-                {KeyCode.Alpha1, () => SelectAssetBundle(1)},
-                {KeyCode.Alpha2, () => SelectAssetBundle(2)},
-                {KeyCode.Alpha3, () => SelectAssetBundle(3)},
-                {KeyCode.R, ClickRetrieveAssetBundleButton},
-                {KeyCode.L, ClickLoadSceneButton},
-                {KeyCode.C, ClickCancelDownloadButton},
-                {KeyCode.X, ClickRemoveAssetBundleButton},
-                {KeyCode.Q, QueryStatusText}
+                {KeyCode.Alpha0, () => SelectDownloader(0, 0)},
+                {KeyCode.Alpha1, () => SelectDownloader(0, 1)},
+                {KeyCode.Alpha2, () => SelectDownloader(0, 2)},
+                {KeyCode.Alpha3, () => SelectDownloader(1, 0)},
+                {KeyCode.Alpha4, () => SelectDownloader(1, 1)},
+                {KeyCode.Alpha5, () => SelectDownloader(2, 0)},
+                {KeyCode.Q, QueryStatusText},
+                {KeyCode.T, QueryOutputText}
             };
+
+            _assetBundleKeyMapping.KeyMapping = new Dictionary<KeyCode, ButtonFromDownloader<AssetBundleDownloader>>()
+            {
+                {KeyCode.R, downloader => downloader.RetrieveAssetBundleButton},
+                {KeyCode.L, downloader => downloader.LoadSceneButton},
+                {KeyCode.C, downloader => downloader.CancelDownloadButton},
+                {KeyCode.X, downloader => downloader.RemoveButton},
+            };
+
+            _assetPackKeyMapping.KeyMapping = new Dictionary<KeyCode, ButtonFromDownloader<AssetPackDownloader>>()
+            {
+                {KeyCode.R, downloader => downloader.RetrieveAssetBundleButton},
+                {KeyCode.L, downloader => downloader.LoadSceneButton},
+                {KeyCode.C, downloader => downloader.CancelDownloadButton},
+                {KeyCode.X, downloader => downloader.RemoveButton},
+                {KeyCode.O, downloader => downloader.LoadAssetBundleButton},
+            };
+
+            _assetPackBatchKeyMapping.KeyMapping =
+                new Dictionary<KeyCode, ButtonFromDownloader<AssetPackBatchDownloader>>()
+                {
+                    {KeyCode.R, downloader => downloader.RetrieveAssetPackBatchButton},
+                    {KeyCode.X, downloader => downloader.RemovePacksButton},
+                    {KeyCode.I, downloader => downloader.Assets[0].DisplayContentsButton},
+                    {KeyCode.J, downloader => downloader.Assets[1].DisplayContentsButton},
+                    {KeyCode.K, downloader => downloader.Assets[2].DisplayContentsButton},
+                };
+
+            _downloaderInputMappers = new List<IDownloaderInputMapper>()
+            {
+                _assetBundleKeyMapping,
+                _assetPackKeyMapping,
+                _assetPackBatchKeyMapping
+            };
+
+            _keyCodesMappedToCommands =
+                _downloaderInputMappers.SelectMany(controller => controller.GetKeyCodes()).ToList();
+
             Debug.Log("Initialized key mappings");
 
             while (!AllDisplaysInitialized())
@@ -65,52 +163,54 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
                 return;
             }
 
-            foreach (var keyMapping in _keyMappings)
+            foreach (var keyMapping in _navigationKeyMappings)
             {
                 if (Input.GetKeyDown(keyMapping.Key))
                 {
                     keyMapping.Value.Invoke();
                 }
             }
-        }
 
-        private void SelectAssetBundle(int index)
-        {
-            _selectedDownloader = DownloadDisplays[index];
-            SelectionBox.transform.position = _selectedDownloader.transform.position;
-            SelectionBox.gameObject.SetActive(true);
-            Debug.LogFormat("Selected {0}", _selectedDownloader.AssetBundleName);
-        }
-
-        private void ClickRetrieveAssetBundleButton()
-        {
-            ClickButton(display => display.RetrieveAssetBundleButton, "Retrieve AssetBundle");
-        }
-
-        private void ClickLoadSceneButton()
-        {
-            ClickButton(display => display.LoadSceneButton, "Load Scene");
-        }
-
-        private void ClickCancelDownloadButton()
-        {
-            ClickButton(display => display.CancelDownloadButton, "Cancel Download");
-        }
-
-        private void ClickRemoveAssetBundleButton()
-        {
-            ClickButton(display => display.RemoveButton, "Remove AssetBundle");
-        }
-
-        private void ClickButton(ButtonFromDisplay getButtonAction, string buttonName)
-        {
-            if (_selectedDownloader == null)
+            foreach (var keyCode in _keyCodesMappedToCommands)
             {
-                Debug.LogErrorFormat("Cannot click \"{0}\" button. No AssetBundle selected.", buttonName);
+                if (Input.GetKeyDown(keyCode))
+                {
+                    ProcessDownloaderCommand(keyCode);
+                }
+            }
+        }
+
+        private void ProcessDownloaderCommand(KeyCode keyCode)
+        {
+            if (_selectedDownloaderObj == null)
+            {
+                Debug.LogErrorFormat("Cannot click \"{0}\" key. No downloader selected.", keyCode);
                 return;
             }
 
-            var button = getButtonAction(_selectedDownloader);
+            var matchingButtons = _downloaderInputMappers
+                .Select(mapping => mapping.GetButton(keyCode, _selectedDownloaderObj))
+                .Where(mapping => mapping != null);
+
+            foreach (var button in matchingButtons)
+            {
+                ClickButton(button, button.name);
+            }
+        }
+
+        private void SelectDownloader(int pageIndex, int downloaderIndex)
+        {
+            _demoPager.SetPage(pageIndex);
+            var currentPage = _demoPager.GetCurrentPage();
+            _selectedDownloaderObj = currentPage.DownloaderObjects[downloaderIndex];
+            _selectedOutputText = currentPage.OutputText;
+
+            SelectionBox.transform.position = _selectedDownloaderObj.transform.position;
+            SelectionBox.gameObject.SetActive(true);
+        }
+
+        private void ClickButton(Button button, string buttonName)
+        {
             if (!button.isActiveAndEnabled)
             {
                 Debug.LogErrorFormat("The \"{0}\" button is currently disabled.", buttonName);
@@ -122,12 +222,36 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private void QueryStatusText()
         {
-            Debug.Log(_selectedDownloader.Display.StatusText.text);
+            if (_selectedDownloaderObj == null)
+            {
+                Debug.LogError("Cannot query status because there is no downloader selected.");
+                return;
+            }
+
+            var display = _selectedDownloaderObj.GetComponent<DownloadDisplay>();
+            if (display == null)
+            {
+                Debug.LogError("Cannot query status because the selected object has no DownloadDisplay.");
+                return;
+            }
+
+            Debug.Log(display.StatusText.text);
+        }
+
+        private void QueryOutputText()
+        {
+            if (_selectedOutputText == null)
+            {
+                Debug.LogError("Cannot query output text box because there is no selected text box");
+                return;
+            }
+
+            Debug.Log(_selectedOutputText.text);
         }
 
         private bool AllDisplaysInitialized()
         {
-            return DownloadDisplays.TrueForAll((display) => display.IsInitialized);
+            return InitializedDownloaders.TrueForAll((display) => display.IsInitialized);
         }
     }
 }
