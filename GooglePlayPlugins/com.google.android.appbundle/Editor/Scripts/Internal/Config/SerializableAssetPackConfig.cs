@@ -22,6 +22,9 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
     {
         public List<SerializableAssetPack> assetPacks = new List<SerializableAssetPack>();
 
+        public List<SerializableMultiTargetingAssetPack> targetedAssetPacks =
+            new List<SerializableMultiTargetingAssetPack>();
+
         public List<SerializableMultiTargetingAssetBundle> assetBundles =
             new List<SerializableMultiTargetingAssetBundle>();
 

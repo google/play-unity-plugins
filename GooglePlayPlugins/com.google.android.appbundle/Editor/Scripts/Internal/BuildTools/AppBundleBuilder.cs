@@ -205,6 +205,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 var assetPackName = entry.Key;
                 var assetPack = entry.Value;
                 configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetBundleFilePath != null;
+                configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetPackDirectoryPath != null;
                 configParams.containsInstallTimeAssetPack |=
                     assetPack.DeliveryMode == AssetPackDeliveryMode.InstallTime;
 
@@ -410,6 +411,25 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 // Copy asset pack files into the module's "assets" folder, inside an "assetpack" folder.
                 var outputDirectory = destinationAssetsDirectory.CreateSubdirectory(AssetPackFolder);
                 CopyFilesRecursively(sourceAssetsDirectory, outputDirectory);
+            }
+            else if (assetPack.CompressionFormatToAssetPackDirectoryPath != null)
+            {
+                // Copy asset pack files into the module's "assets" folder, inside an "assetpack#tcf_xxx" folder.
+                foreach (var compressionAndDirectoryPath in assetPack.CompressionFormatToAssetPackDirectoryPath)
+                {
+                    var sourceAssetsDirectory = new DirectoryInfo(compressionAndDirectoryPath.Value);
+                    if (!sourceAssetsDirectory.Exists)
+                    {
+                        // TODO: check this earlier.
+                        DisplayBuildError("Missing directory for " + assetPackName, sourceAssetsDirectory.FullName);
+                        return false;
+                    }
+
+                    var targetedAssetsFolderName =
+                        AssetPackFolder + TextureTargetingTools.GetTargetingSuffix(compressionAndDirectoryPath.Key);
+                    var outputDirectory = destinationAssetsDirectory.CreateSubdirectory(targetedAssetsFolderName);
+                    CopyFilesRecursively(sourceAssetsDirectory, outputDirectory);
+                }
             }
             else
             {

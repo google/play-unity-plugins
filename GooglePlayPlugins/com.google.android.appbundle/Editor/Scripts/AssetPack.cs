@@ -26,6 +26,7 @@ namespace Google.Android.AppBundle.Editor
         private string _assetBundleFilePath;
         private string _assetPackDirectoryPath;
         private Dictionary<TextureCompressionFormat, string> _compressionFormatToAssetBundleFilePath;
+        private Dictionary<TextureCompressionFormat, string> _compressionFormatToAssetPackDirectoryPath;
 
         /// <summary>
         /// Indicates how this asset pack will be delivered.
@@ -37,8 +38,9 @@ namespace Google.Android.AppBundle.Editor
         /// Delivery APIs.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetPackDirectoryPath"/> or
-        /// <see cref="CompressionFormatToAssetBundleFilePath"/> are non-null.
+        /// Thrown on set if either <see cref="AssetPackDirectoryPath"/>,
+        /// <see cref="CompressionFormatToAssetBundleFilePath"/> or
+        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
         /// </exception>
         public string AssetBundleFilePath
         {
@@ -55,6 +57,11 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("CompressionFormatToAssetBundleFilePath is already set.");
                 }
 
+                if (_compressionFormatToAssetPackDirectoryPath != null)
+                {
+                    throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
+                }
+
                 _assetBundleFilePath = value;
             }
         }
@@ -63,8 +70,9 @@ namespace Google.Android.AppBundle.Editor
         /// Location on disk of a folder containing raw asset files.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetBundleFilePath"/> or
-        /// <see cref="CompressionFormatToAssetBundleFilePath"/> are non-null.
+        /// Thrown on set if either <see cref="AssetBundleFilePath"/>,
+        /// <see cref="CompressionFormatToAssetBundleFilePath"/> or
+        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
         /// </exception>
         public string AssetPackDirectoryPath
         {
@@ -81,6 +89,11 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("CompressionFormatToAssetBundleFilePath is already set.");
                 }
 
+                if (_compressionFormatToAssetPackDirectoryPath != null)
+                {
+                    throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
+                }
+
                 _assetPackDirectoryPath = value;
             }
         }
@@ -92,8 +105,8 @@ namespace Google.Android.AppBundle.Editor
         /// be delivered.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetBundleFilePath"/> or <see cref="AssetPackDirectoryPath"/> are
-        /// non-null.
+        /// Thrown on set if either <see cref="AssetBundleFilePath"/>, <see cref="AssetPackDirectoryPath"/> or
+        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
         /// </exception>
         public Dictionary<TextureCompressionFormat, string> CompressionFormatToAssetBundleFilePath
         {
@@ -110,7 +123,46 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("AssetPackDirectoryPath is already set.");
                 }
 
+                if (_compressionFormatToAssetPackDirectoryPath != null)
+                {
+                    throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
+                }
+
                 _compressionFormatToAssetBundleFilePath = value;
+            }
+        }
+
+        /// <summary>
+        /// Dictionary from <see cref="TextureCompressionFormat"/> to the location on disk of a folder containing
+        /// raw asset files.
+        /// When using Play Asset Delivery APIs, only the folder for the device's preferred texture compression format
+        /// will be delivered.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown on set if either <see cref="AssetBundleFilePath"/>, <see cref="AssetPackDirectoryPath"/> or
+        /// <see cref="CompressionFormatToAssetBundleFilePath"/> are non-null.
+        /// </exception>
+        public Dictionary<TextureCompressionFormat, string> CompressionFormatToAssetPackDirectoryPath
+        {
+            get { return _compressionFormatToAssetPackDirectoryPath; }
+            set
+            {
+                if (_assetBundleFilePath != null)
+                {
+                    throw new ArgumentException("AssetBundleFilePath is already set.");
+                }
+
+                if (_assetPackDirectoryPath != null)
+                {
+                    throw new ArgumentException("AssetPackDirectoryPath is already set.");
+                }
+
+                if (_compressionFormatToAssetBundleFilePath != null)
+                {
+                    throw new ArgumentException("CompressionFormatToAssetBundleFilePath is already set.");
+                }
+
+                _compressionFormatToAssetPackDirectoryPath = value;
             }
         }
     }

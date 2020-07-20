@@ -97,8 +97,46 @@ namespace Google.Android.AppBundle.Editor
         }
 
         /// <summary>
+        /// Package the specified raw assets in the specified folders, keyed by <see cref="TextureCompressionFormat"/>,
+        /// in an <see cref="AssetPack"/> with the specified delivery mode.
+        /// When using Play Asset Delivery APIs, only the folder for the device's preferred texture compression format
+        /// will be delivered.
+        /// </summary>
+        /// <param name="assetPackName">The name of the asset pack.</param>
+        /// <param name="compressionFormatToAssetPackDirectoryPath">
+        /// A dictionary from <see cref="TextureCompressionFormat"/> to the path of directories of files that will be
+        /// directly copied into the asset pack during app bundle creation.</param>
+        /// <param name="deliveryMode">The <see cref="AssetPackDeliveryMode"/> for the asset pack.</param>
+        /// <exception cref="ArgumentException">If the dictionary or asset pack name is invalid.</exception>
+        public void AddAssetsFolders(
+            string assetPackName,
+            IDictionary<TextureCompressionFormat, string> compressionFormatToAssetPackDirectoryPath,
+            AssetPackDeliveryMode deliveryMode)
+        {
+            if (compressionFormatToAssetPackDirectoryPath.Count == 0)
+            {
+                throw new ArgumentException("Dictionary should contain at least one path");
+            }
+
+            if (compressionFormatToAssetPackDirectoryPath.All(kvp => kvp.Key != TextureCompressionFormat.Default))
+            {
+                throw new ArgumentException("Dictionary should contain at least one Default compression path");
+            }
+
+            CheckAssetPackName(assetPackName);
+            AssetPacks[assetPackName] = new AssetPack
+            {
+                DeliveryMode = deliveryMode,
+                CompressionFormatToAssetPackDirectoryPath =
+                    new Dictionary<TextureCompressionFormat, string>(compressionFormatToAssetPackDirectoryPath)
+            };
+        }
+
+        /// <summary>
         /// Package the specified AssetBundle files, which vary only by <see cref="TextureCompressionFormat"/>, in an
         /// <see cref="AssetPack"/> with the specified delivery mode.
+        /// When using Play Asset Delivery APIs, only the AssetBundle for the device's preferred texture compression
+        /// format will be delivered.
         /// </summary>
         /// <param name="compressionFormatToAssetBundleFilePath">
         /// A dictionary from <see cref="TextureCompressionFormat"/> to AssetBundle files.</param>

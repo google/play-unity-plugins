@@ -82,6 +82,24 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                         name = name, DeliveryMode = assetPack.DeliveryMode, path = assetPack.AssetPackDirectoryPath
                     });
                 }
+
+                if (assetPack.CompressionFormatToAssetPackDirectoryPath != null)
+                {
+                    var multiTargetingAssetPack = new SerializableMultiTargetingAssetPack
+                    {
+                        name = name, DeliveryMode = assetPack.DeliveryMode
+                    };
+                    foreach (var compressionEntry in assetPack.CompressionFormatToAssetPackDirectoryPath)
+                    {
+                        multiTargetingAssetPack.paths.Add(new SerializableTargetedDirectoryPath
+                        {
+                            path = compressionEntry.Value,
+                            TextureCompressionFormat = compressionEntry.Key
+                        });
+                    }
+
+                    config.targetedAssetPacks.Add(multiTargetingAssetPack);
+                }
             }
 
             return config;
@@ -117,6 +135,14 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             foreach (var pack in config.assetPacks)
             {
                 assetPackConfig.AddAssetsFolder(pack.name, pack.path, pack.DeliveryMode);
+            }
+
+            foreach (var pack in config.targetedAssetPacks)
+            {
+                var compressionFormatToAssetPackDirectoryPath =
+                    pack.paths.ToDictionary(item => item.TextureCompressionFormat, item => item.path);
+                assetPackConfig.AddAssetsFolders(pack.name, compressionFormatToAssetPackDirectoryPath,
+                    pack.DeliveryMode);
             }
 
             return assetPackConfig;
