@@ -1,5 +1,10 @@
 # Changelog for com.google.android.appbundle
 
+
+## [1.2.0] - 2020-07-27
+### New Features
+ - Updated bundletool-all.jar from 0.14.0 to 1.0.0
+
 ## [1.1.1] - 2020-06-08
 ### Bug Fixes
  - Clear the EditorUserBuildSettings.exportAsGoogleAndroidProject flag for AAB builds and Build & Run
