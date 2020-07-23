@@ -33,6 +33,7 @@
 -keep class com.google.android.play.core.assetpacks.model.AssetPackErrorCode {
     public static int ACCESS_DENIED;
     public static int API_NOT_AVAILABLE;
+    public static int APP_NOT_OWNED;
     public static int APP_UNAVAILABLE;
     public static int DOWNLOAD_NOT_FOUND;
     public static int INSUFFICIENT_STORAGE;

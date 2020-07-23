@@ -66,3 +66,11 @@
 -keep class com.google.android.play.core.listener.StateUpdatedListener {
     public abstract void onStateUpdate(java.lang.Object);
 }
+
+-keep @interface android.support.annotation.NonNull
+-keep @interface android.support.annotation.Nullable
+
+-keep class com.google.android.play.core.common.PlayCoreVersion {
+    public static void addVersion(java.lang.String, java.lang.String, int);
+}
+
