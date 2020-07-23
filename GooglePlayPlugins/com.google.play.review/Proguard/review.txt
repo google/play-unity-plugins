@@ -25,3 +25,4 @@
   public com.google.android.play.core.tasks.Task requestReviewFlow();
   public com.google.android.play.core.tasks.Task launchReviewFlow(android.app.Activity, com.google.android.play.core.review.ReviewInfo);
 }
+

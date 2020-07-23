@@ -1,0 +1,11 @@
+{
+    "name": "Google.Play.Review",
+    "references": [
+        "Google.Play.Common",
+        "Google.Play.Core"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ]
+}
