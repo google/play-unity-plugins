@@ -1,5 +1,10 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.2.0] - 2020-07-27
+### New Features
+ - Removed experimental flags around new asset pack APIs added in 1.1.1
+ - Updated new asset pack APIs to gracefully handle existing asset pack requests
+
 ## [1.1.1] - 2020-06-08
 ### New Features
  - Added experimental methods for retrieving asset packs that contain arbitrary files

@@ -1,9 +1,11 @@
 # Changelog for com.google.android.appbundle
 
-
 ## [1.2.0] - 2020-07-27
 ### New Features
+ - Fixed issue #26: Add support for packaging raw assets targeted by texture format
  - Updated bundletool-all.jar from 0.14.0 to 1.0.0
+### Bug Fixes
+ - Support signing app bundles larger than 4GB by switching to jarsigner
 
 ## [1.1.1] - 2020-06-08
 ### Bug Fixes
