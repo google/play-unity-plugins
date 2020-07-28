@@ -54,13 +54,12 @@ namespace Google.Play.AssetDelivery
             return Instance.RetrieveAssetBundleAsyncInternal(assetBundleName);
         }
 
-// The below methods are experimental and are subject to change. If you would like to try them out, enable the
-// below preprocessor definition in Player Settings.
-// See here: https://docs.unity3d.com/Manual/PlatformDependentCompilation.html
-#if PLAY_ASSET_DELIVERY_EXPERIMENTAL
         /// <summary>
         /// Starts a <see cref="PlayAssetPackRequest"/> to retrieve the specified asset pack.
         /// Downloads the asset pack if the latest version isn't already available on disk.
+        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b> loaded into
+        /// memory. To load them, see <see cref="PlayAssetPackRequest.GetAssetLocation"/> or
+        /// <see cref="PlayAssetPackRequest.LoadAssetBundleAsync"/>.
         /// </summary>
         /// <param name="assetPackName">The name of the requested asset pack.</param>
         /// <returns>A request object used to monitor the asynchronous asset pack retrieval.</returns>
@@ -72,6 +71,8 @@ namespace Google.Play.AssetDelivery
         /// <summary>
         /// Starts a <see cref="PlayAssetPackBatchRequest"/> to retrieve the specified asset packs.
         /// Downloads the asset packs if the latest versions aren't already available on disk.
+        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b> loaded into
+        /// memory.
         /// </summary>
         /// <param name="assetPackNames">A list of requested asset packs.</param>
         /// <returns>A request object used to monitor the asynchronous asset pack batch retrieval.</returns>
@@ -80,7 +81,6 @@ namespace Google.Play.AssetDelivery
         {
             return Instance.RetrieveAssetPackBatchAsyncInternal(assetPackNames);
         }
-#endif
 
         /// <summary>
         /// Starts a PlayAsyncOperation to determine the download size in bytes of the specified asset pack.
@@ -95,16 +95,16 @@ namespace Google.Play.AssetDelivery
         /// Starts a PlayAsyncOperation to delete the specified asset pack from internal storage.
         /// If the specified asset pack is currently being retrieved or transferring, this method will not cancel the
         /// process. If the specified asset pack contains an AssetBundle that is already loaded into memory, it will
-        /// not be unloaded.
+        /// <b>not</b> be unloaded.
         /// </summary>
         /// <returns>
         /// If the files are deleted successfully, or if the files don't exist, the returned operation will
         /// complete successfully.
         /// Otherwise, the operation will complete with an error code.
         /// </returns>
-        public static PlayAsyncOperation<VoidResult, AssetDeliveryErrorCode> RemoveAssetPack(string assetBundleName)
+        public static PlayAsyncOperation<VoidResult, AssetDeliveryErrorCode> RemoveAssetPack(string assetPackName)
         {
-            return Instance.RemoveAssetPackInternal(assetBundleName);
+            return Instance.RemoveAssetPackInternal(assetPackName);
         }
 
         /// <summary>

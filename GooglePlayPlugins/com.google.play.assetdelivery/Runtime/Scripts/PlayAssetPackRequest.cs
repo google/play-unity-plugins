@@ -75,12 +75,12 @@ namespace Google.Play.AssetDelivery
         public abstract AssetLocation GetAssetLocation(string assetPath);
 
         /// <summary>
-        /// Helper method to load the AssetBundle at the specified path within this 
-        /// asset pack.
+        /// Loads the AssetBundle located at the specified path within this asset pack.
         /// </summary>
         /// <param name="assetBundlePath">The path within this asset pack pointing to the desired AssetBundle.</param>
         /// <returns>
-        /// An <see cref="AssetBundleCreateRequest"/> that can be yielded on until the AssetBundle is loaded.
+        /// An <a href="https://docs.unity3d.com/ScriptReference/AssetBundleCreateRequest.html">
+        /// AssetBundleCreateRequest</a> that can be yielded on until the AssetBundle is loaded.
         /// </returns>
         public abstract AssetBundleCreateRequest LoadAssetBundleAsync(string assetBundlePath);
 

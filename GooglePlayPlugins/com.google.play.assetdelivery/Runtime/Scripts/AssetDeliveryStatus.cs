@@ -30,7 +30,8 @@ namespace Google.Play.AssetDelivery
         Retrieving = 1,
 
         /// <summary>
-        /// Asset pack is available on disk but the contained AssetBundle hasn't been loaded.
+        /// Asset pack is available on disk. For <see cref="PlayAssetPackRequest"/>s this indicates that the request is
+        /// complete.
         /// </summary>
         Available = 2,
 
@@ -40,7 +41,8 @@ namespace Google.Play.AssetDelivery
         Loading = 3,
 
         /// <summary>
-        /// Contained AssetBundle has finished loading, assets can now be loaded.
+        /// Contained AssetBundle has finished loading, assets can now be loaded. For
+        /// <see cref="PlayAssetBundleRequest"/>s this indicates that the request is complete.
         /// </summary>
         Loaded = 4,
 
