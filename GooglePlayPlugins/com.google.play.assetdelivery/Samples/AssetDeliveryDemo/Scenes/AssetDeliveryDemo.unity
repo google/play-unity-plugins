@@ -1611,7 +1611,7 @@ GameObject:
   - component: {fileID: 262765250}
   - component: {fileID: 262765248}
   m_Layer: 0
-  m_Name: AssetPackBatchView
+  m_Name: batchexample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5433,7 +5433,7 @@ GameObject:
   - component: {fileID: 763644505}
   - component: {fileID: 763644506}
   m_Layer: 0
-  m_Name: AssetBundleView
+  m_Name: gamepad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6861,7 +6861,7 @@ GameObject:
   - component: {fileID: 1014521233}
   - component: {fileID: 1014521234}
   m_Layer: 0
-  m_Name: AssetBundleView
+  m_Name: controllerexample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7578,7 +7578,7 @@ GameObject:
   - component: {fileID: 1148519931}
   - component: {fileID: 1148519930}
   m_Layer: 0
-  m_Name: AssetPackView
+  m_Name: galaxyexample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10865,7 +10865,7 @@ GameObject:
   - component: {fileID: 1684192611}
   - component: {fileID: 1684192612}
   m_Layer: 0
-  m_Name: AssetBundleView
+  m_Name: nonexistent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12789,7 +12789,7 @@ GameObject:
   - component: {fileID: 2033913985}
   - component: {fileID: 2033913984}
   m_Layer: 0
-  m_Name: AssetPackView
+  m_Name: assetfiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

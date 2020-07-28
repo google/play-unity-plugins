@@ -207,6 +207,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
             SelectionBox.transform.position = _selectedDownloaderObj.transform.position;
             SelectionBox.gameObject.SetActive(true);
+            Debug.Log("Selected " + _selectedDownloaderObj.name);
         }
 
         private void ClickButton(Button button, string buttonName)
