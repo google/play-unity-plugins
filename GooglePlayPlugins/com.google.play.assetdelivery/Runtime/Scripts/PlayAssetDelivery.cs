@@ -49,6 +49,9 @@ namespace Google.Play.AssetDelivery
         /// </summary>
         /// <param name="assetBundleName">The name of the requested AssetBundle.</param>
         /// <returns>A request object used to monitor the asynchronous AssetBundle retrieval.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown if there is already an active request with the specified name.
+        /// </exception>
         public static PlayAssetBundleRequest RetrieveAssetBundleAsync(string assetBundleName)
         {
             return Instance.RetrieveAssetBundleAsyncInternal(assetBundleName);

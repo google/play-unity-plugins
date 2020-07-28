@@ -61,7 +61,7 @@ namespace Google.Play.AssetDelivery.Internal
             }
 
             var request = CreateAssetBundleRequest(assetBundleName);
-            _requestRepository.AddRequest(request.PackRequest);
+            _requestRepository.AddAssetBundleRequest(request);
             request.Completed += req => _requestRepository.RemoveRequest(assetBundleName);
 
             InitiateRequest(request.PackRequest);
@@ -71,13 +71,22 @@ namespace Google.Play.AssetDelivery.Internal
 
         internal PlayAssetPackRequest RetrieveAssetPackAsyncInternal(string assetPackName)
         {
-            if (_requestRepository.ContainsRequest(assetPackName))
+            if (_requestRepository.ContainsAssetBundleRequest(assetPackName))
             {
-                throw new ArgumentException(string.Format("There is already an active request for asset pack: {0}",
+                throw new ArgumentException(string.Format(
+                    "Cannot create a new PlayAssetPackRequest because there is already an active " +
+                    "PlayAssetBundleRequest for asset bundle: {0}",
                     assetPackName));
             }
 
-            var request = CreateAssetPackRequest(assetPackName);
+            PlayAssetPackRequestImpl request;
+            if (_requestRepository.TryGetRequest(assetPackName, out request))
+            {
+                Debug.LogFormat("Returning existing active request for {0}", assetPackName);
+                return request;
+            }
+
+            request = CreateAssetPackRequest(assetPackName);
             _requestRepository.AddRequest(request);
             request.Completed += req => _requestRepository.RemoveRequest(assetPackName);
 
@@ -93,11 +102,15 @@ namespace Google.Play.AssetDelivery.Internal
                 throw new ArgumentException("assetPackNames contains duplicate entries");
             }
 
-            var activePackNames = assetPackNames.Where(name => _requestRepository.ContainsRequest(name)).ToArray();
-            if (activePackNames.Length != 0)
+            var activeAssetBundleRequestNames = assetPackNames
+                .Where(name => _requestRepository.ContainsAssetBundleRequest(name))
+                .ToArray();
+
+            if (activeAssetBundleRequestNames.Length != 0)
             {
-                throw new ArgumentException("There are already active requests for asset packs: {0}",
-                    string.Join(", ", activePackNames));
+                throw new ArgumentException("Cannot create a new PlayAssetPackBatchRequests because there are " +
+                                            "already PlayAssetBundleRequests for AssetBundles: {0}",
+                    string.Join(", ", activeAssetBundleRequestNames));
             }
 
             // A subset of assetPackNames of packs that are not available on disk.
@@ -105,7 +118,14 @@ namespace Google.Play.AssetDelivery.Internal
             var requests = new List<PlayAssetPackRequestImpl>();
             foreach (var assetPackName in assetPackNames)
             {
-                var request = CreateAssetPackRequest(assetPackName);
+                PlayAssetPackRequestImpl request;
+                if (_requestRepository.TryGetRequest(assetPackName, out request))
+                {
+                    requests.Add(request);
+                    continue;
+                }
+
+                request = CreateAssetPackRequest(assetPackName);
                 _requestRepository.AddRequest(request);
                 request.Completed += req => _requestRepository.RemoveRequest(request.AssetPackName);
                 requests.Add(request);

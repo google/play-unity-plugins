@@ -101,7 +101,7 @@ namespace Google.Play.AssetDelivery.Internal
                 return;
             }
 
-            var activeRequestBundleNames = _requestRepository.GetActiveAssetBundleNames();
+            var activeRequestBundleNames = _requestRepository.GetActiveAssetPackNames();
             if (activeRequestBundleNames.Length == 0)
             {
                 // No requests to update.

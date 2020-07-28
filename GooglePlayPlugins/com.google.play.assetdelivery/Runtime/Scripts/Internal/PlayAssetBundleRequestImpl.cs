@@ -67,7 +67,7 @@ namespace Google.Play.AssetDelivery.Internal
             get { return PackRequest.Error == AssetDeliveryErrorCode.NoError ? _loadingError : PackRequest.Error; }
         }
 
-        private void OnLoadingErrorOccured(AssetDeliveryErrorCode errorCode)
+        private void OnLoadingErrorOccurred(AssetDeliveryErrorCode errorCode)
         {
             if (IsDone)
             {
@@ -109,7 +109,7 @@ namespace Google.Play.AssetDelivery.Internal
             }
         }
 
-        public void StartLoadingAssetBundle()
+        private void StartLoadingAssetBundle()
         {
             _updateHandler.StartCoroutine(CoLoadAssetBundle());
             DownloadProgress = 1f;
@@ -124,7 +124,7 @@ namespace Google.Play.AssetDelivery.Internal
 
             if (bundleCreateRequest.assetBundle == null)
             {
-                OnLoadingErrorOccured(AssetDeliveryErrorCode.AssetBundleLoadingError);
+                OnLoadingErrorOccurred(AssetDeliveryErrorCode.AssetBundleLoadingError);
                 yield break;
             }
 

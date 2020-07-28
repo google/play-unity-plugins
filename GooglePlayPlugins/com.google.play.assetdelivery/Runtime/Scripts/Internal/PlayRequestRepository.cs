@@ -22,9 +22,25 @@ namespace Google.Play.AssetDelivery.Internal
     /// </summary>
     internal class PlayRequestRepository
     {
-        // Contains all active requests.
+        /// <summary>
+        /// Contains all active requests, including the <see cref="PlayAssetPackRequestImpl"/> contained within active
+        /// <see cref="PlayAssetBundleRequestImpl"/>.
+        /// </summary>
         private Dictionary<string, PlayAssetPackRequestImpl> _requestsByName =
             new Dictionary<string, PlayAssetPackRequestImpl>();
+
+        /// <summary>
+        /// Contains all active asset bundle requests. Every entry should have a corresponding entry in _requestsByName
+        /// for assetBundleRequest.PackRequest.
+        /// </summary>
+        private Dictionary<string, PlayAssetBundleRequestImpl> _assetBundleRequestsByName =
+            new Dictionary<string, PlayAssetBundleRequestImpl>();
+
+        public void AddAssetBundleRequest(PlayAssetBundleRequestImpl assetBundleRequest)
+        {
+            AddRequest(assetBundleRequest.PackRequest);
+            _assetBundleRequestsByName.Add(assetBundleRequest.PackRequest.AssetPackName, assetBundleRequest);
+        }
 
         public void AddRequest(PlayAssetPackRequestImpl request)
         {
@@ -34,6 +50,12 @@ namespace Google.Play.AssetDelivery.Internal
         public void RemoveRequest(string name)
         {
             _requestsByName.Remove(name);
+            _assetBundleRequestsByName.Remove(name);
+        }
+
+        public bool TryGetAssetBundleRequest(string name, out PlayAssetBundleRequestImpl assetBundleRequest)
+        {
+            return _assetBundleRequestsByName.TryGetValue(name, out assetBundleRequest);
         }
 
         public bool TryGetRequest(string name, out PlayAssetPackRequestImpl request)
@@ -46,9 +68,14 @@ namespace Google.Play.AssetDelivery.Internal
             return _requestsByName.Values.Where(request => request.Status == status).ToList();
         }
 
-        public string[] GetActiveAssetBundleNames()
+        public string[] GetActiveAssetPackNames()
         {
             return _requestsByName.Keys.ToArray();
+        }
+
+        public bool ContainsAssetBundleRequest(string name)
+        {
+            return _assetBundleRequestsByName.ContainsKey(name);
         }
 
         public bool ContainsRequest(string name)
