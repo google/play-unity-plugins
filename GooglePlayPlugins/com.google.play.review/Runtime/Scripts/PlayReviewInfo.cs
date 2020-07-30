@@ -17,7 +17,8 @@ using UnityEngine;
 namespace Google.Play.Review
 {
     /// <summary>
-    /// This class exists to avoid exposing the AndroidJavaObject in the API.
+    /// A wrapper around the Java ReviewInfo class. This class contains internal state needed to
+    /// launch a review flow, but has no publicly visible information.
     /// </summary>
     public class PlayReviewInfo
     {
