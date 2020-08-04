@@ -144,7 +144,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
             };
 
             _keyCodesMappedToCommands =
-                _downloaderInputMappers.SelectMany(controller => controller.GetKeyCodes()).ToList();
+                _downloaderInputMappers.SelectMany(controller => controller.GetKeyCodes()).Distinct().ToList();
 
             Debug.Log("Initialized key mappings");
 
