@@ -26,7 +26,7 @@ namespace Google.Play.Instant.Editor.Internal
     {
         public const string WindowTitle = "Play Instant Build Settings";
         private const int WindowMinWidth = 400;
-        private const int WindowMinHeight = 240;
+        private const int WindowMinHeight = 260;
         private const int FieldWidth = 175;
         private static readonly string[] PlatformOptions = {"Installed", "Instant"};
 
@@ -123,7 +123,7 @@ namespace Google.Play.Instant.Editor.Internal
                 EditorGUILayout.LabelField(
                     "Check this box to indicate that this is a full experience instant game that is eligible for " +
                     "\"Instant play\" featuring in the Play Games app. Leave the box unchecked if this is a trial or " +
-                    "demo instant game.",
+                    "demo instant game.\nNote: This feature isn't compatible with Play Asset Delivery.",
                     descriptionTextStyle);
                 if (GUILayout.Button("Learn More", GUILayout.Width(90)))
                 {

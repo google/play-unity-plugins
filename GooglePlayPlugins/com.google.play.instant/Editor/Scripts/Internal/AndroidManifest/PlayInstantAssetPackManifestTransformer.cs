@@ -17,6 +17,7 @@ using Google.Android.AppBundle.Editor.Internal;
 using Google.Android.AppBundle.Editor.Internal.AndroidManifest;
 using Google.Android.AppBundle.Editor.Internal.BuildTools;
 using UnityEditor;
+using UnityEngine;
 
 namespace Google.Play.Instant.Editor.Internal.AndroidManifest
 {
@@ -59,6 +60,14 @@ namespace Google.Play.Instant.Editor.Internal.AndroidManifest
             if (!_isInstant)
             {
                 return null;
+            }
+
+            if (PlayInstantBuildConfig.PlayGamesEnabled)
+            {
+                return
+                    "\n\nAsset packs aren't compatible with full Instant play games. As a workaround, deselect the " +
+                    "\"Full Instant play game\" checkbox and contact the Instant play team via " +
+                    "http://g.co/play/instant";
             }
 
             var error = AndroidManifestHelper.ConvertAssetPackManifestToInstant(document);
