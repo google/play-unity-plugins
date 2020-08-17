@@ -123,7 +123,7 @@ namespace Google.Play.Instant.Editor.Internal
                 EditorGUILayout.LabelField(
                     "Check this box to indicate that this is a full experience instant game that is eligible for " +
                     "\"Instant play\" featuring in the Play Games app. Leave the box unchecked if this is a trial or " +
-                    "demo instant game.\nNote: This feature isn't compatible with Play Asset Delivery.",
+                    "demo instant game.",
                     descriptionTextStyle);
                 if (GUILayout.Button("Learn More", GUILayout.Width(90)))
                 {
