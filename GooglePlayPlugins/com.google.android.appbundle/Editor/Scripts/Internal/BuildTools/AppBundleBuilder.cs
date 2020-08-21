@@ -259,10 +259,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 moduleFiles.Add(zipFilePath);
             }
 
-            // If the .aab file exists, EditorUtility.SaveFilePanel() has already prompted for whether to overwrite.
-            // Therefore, prevent Bundletool from throwing an IllegalArgumentException that "File already exists."
-            File.Delete(aabFilePath);
-
             DisplayProgress("Running bundletool", ProgressRunBundletool);
             var buildBundleErrorMessage =
                 _bundletool.BuildBundle(aabFilePath, moduleFiles, bundleMetadata, configParams);

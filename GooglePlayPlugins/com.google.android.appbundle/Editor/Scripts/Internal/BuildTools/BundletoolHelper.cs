@@ -203,8 +203,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         }
 
         /// <summary>
-        /// Builds an Android App Bundle at the specified location containing the specified modules, with optional
-        /// targeting done by texture compression format.
+        /// Builds an Android App Bundle at the specified location, overwriting an existing file if necessary. The
+        /// bundle will contain the specified modules, with optional targeting done by texture compression format.
         /// </summary>
         /// <param name="outputFile">The output Android App Bundle (AAB) file.</param>
         /// <param name="moduleFiles">The modules to build inside the bundle.</param>
@@ -227,7 +227,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             // TODO: fix bundletool support for quoted paths around moduleFiles.
             return Run(
-                "build-bundle --config={0} --modules={1} --output={2}{3}",
+                "build-bundle --overwrite --config={0} --modules={1} --output={2}{3}",
                 CommandLine.QuotePath(bundleConfigJsonFile),
                 string.Join(",", moduleFiles.ToArray()),
                 CommandLine.QuotePath(outputFile),
@@ -265,8 +265,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         public virtual string InstallApkSet(string apkSetFile, string adbPath)
         {
             return Run("install-apks --adb={0} --apks={1}",
-              CommandLine.QuotePath(adbPath),
-              CommandLine.QuotePath(apkSetFile));
+                CommandLine.QuotePath(adbPath),
+                CommandLine.QuotePath(apkSetFile));
         }
 
         private string Run(string bundletoolCommand, params object[] args)
