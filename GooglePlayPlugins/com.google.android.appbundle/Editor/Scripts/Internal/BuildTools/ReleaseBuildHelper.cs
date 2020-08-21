@@ -29,11 +29,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private const string Il2CppRequiredDescription =
             "\n\nNote: the IL2CPP Scripting Backend is required to build ARM64 libraries.";
 
-        private readonly ApkSigner _apkSigner;
+        private readonly JarSigner _jarSigner;
 
-        public ReleaseBuildHelper(ApkSigner apkSigner)
+        public ReleaseBuildHelper(JarSigner jarSigner)
         {
-            _apkSigner = apkSigner;
+            _jarSigner = jarSigner;
         }
 
         // TODO: add check for PlayerSettings.productName
@@ -49,7 +49,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             // Try to determine whether this is intended to be a release build.
-            if (_apkSigner.UseDebugKeystore() || EditorUserBuildSettings.development)
+            if (!_jarSigner.UseCustomKeystore || EditorUserBuildSettings.development)
             {
                 // Seems like a debug build, so no need to do release build checks.
                 return true;

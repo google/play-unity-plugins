@@ -70,7 +70,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             Debug.Log("APK must be re-signed for APK Signature Scheme V2...");
-            var signingResult = _apkSigner.SignApk(apkPath);
+            var signingResult = _apkSigner.Sign(apkPath);
             if (signingResult == null)
             {
                 Debug.Log("Re-signed with APK Signature Scheme V2.");

@@ -22,8 +22,6 @@ using System.Text.RegularExpressions;
 using Google.Android.AppBundle.Editor.Internal.PlayServices;
 using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
@@ -32,10 +30,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     /// </summary>
     public class JarSigner : IBuildTool
     {
-        private static readonly string AndroidDebugKeystore = Path.Combine(".android", "debug.keystore");
-
         private readonly JavaUtils _javaUtils;
 
+        private bool _useCustomKeystore;
         private string _keystoreName;
         private string _keystorePass;
         private string _keyaliasName;
@@ -69,71 +66,56 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             _keystorePass = PlayerSettings.Android.keystorePass;
             _keyaliasName = PlayerSettings.Android.keyaliasName;
             _keyaliasPass = PlayerSettings.Android.keyaliasPass;
+#if UNITY_2019_1_OR_NEWER
+            _useCustomKeystore = PlayerSettings.Android.useCustomKeystore;
+#else
+            _useCustomKeystore = !string.IsNullOrEmpty(_keystoreName) && !string.IsNullOrEmpty(_keyaliasName);
+#endif
 
             return true;
         }
 
         /// <summary>
-        /// Returns true if JarSigner will sign the app with the Android debug keystore, false otherwise.
+        /// Returns true if the Android Player Settings have a Custom Keystore configured, false otherwise.
         /// </summary>
-        public virtual bool UseDebugKeystore()
+        public bool UseCustomKeystore
         {
-            return string.IsNullOrEmpty(_keystoreName) || string.IsNullOrEmpty(_keyaliasName);
+            get { return _useCustomKeystore; }
         }
 
         /// <summary>
-        /// Synchronously calls the jarsigner tool to sign the specified ZIP file.
+        /// Synchronously calls the jarsigner tool to sign the specified ZIP file using a custom keystore.
         /// This can be used to sign Android App Bundles.
         /// </summary>
         /// <returns>An error message if there was a problem running jarsigner, or null if successful.</returns>
-        public virtual string SignZip(string zipFilePath)
+        public string Sign(string zipFilePath)
         {
-            string keystoreName;
-            string keystorePass;
-            string keyaliasName;
-            string keyaliasPass;
-
-            if (UseDebugKeystore())
+            if (!_useCustomKeystore)
             {
-                Debug.Log("No keystore and/or no keyalias specified. Signing using Android debug keystore.");
-                var homePath =
-                    Application.platform == RuntimePlatform.WindowsEditor
-                        ? Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%")
-                        : Environment.GetEnvironmentVariable("HOME");
-                if (string.IsNullOrEmpty(homePath))
-                {
-                    return "Failed to locate directory that contains Android debug keystore.";
-                }
-
-                keystoreName = Path.Combine(homePath, AndroidDebugKeystore);
-                keystorePass = "android";
-                keyaliasName = "androiddebugkey";
-                keyaliasPass = "android";
-            }
-            else
-            {
-                keystoreName = _keystoreName;
-                keystorePass = _keystorePass;
-                keyaliasName = _keyaliasName;
-                keyaliasPass = _keyaliasPass;
+                throw new InvalidOperationException("Unexpected request to sign without a custom keystore");
             }
 
-            if (!File.Exists(keystoreName))
+            if (string.IsNullOrEmpty(_keystoreName))
             {
-                return string.Format("Failed to locate keystore file: {0}", keystoreName);
+                return "Unable to sign since the keystore file path is unspecified";
+            }
+
+            if (!File.Exists(_keystoreName))
+            {
+                return string.Format("Failed to locate keystore file: {0}", _keystoreName);
             }
 
             var arguments = string.Format(
                 "-keystore {0} {1} {2}",
-                CommandLine.QuotePath(keystoreName),
+                CommandLine.QuotePath(_keystoreName),
                 CommandLine.QuotePath(zipFilePath),
-                CommandLine.QuotePath(keyaliasName));
+                CommandLine.QuotePath(_keyaliasName));
 
             var promptToPasswordDictionary = new Dictionary<string, string>
             {
-                {"Enter Passphrase for keystore:", keystorePass},
+                {"Enter Passphrase for keystore:", _keystorePass},
                 // Example keyalias password prompt: "Enter key password for myalias:"
-                {"Enter key password for .+:", keyaliasPass}
+                {"Enter key password for .+:", _keyaliasPass}
             };
             var responder = new JarSignerResponder(promptToPasswordDictionary);
             var result = CommandLine.Run(_javaUtils.JarSignerBinaryPath, arguments, ioHandler: responder.AggregateLine);

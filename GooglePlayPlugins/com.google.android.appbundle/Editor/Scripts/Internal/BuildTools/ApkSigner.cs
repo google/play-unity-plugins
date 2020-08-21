@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !UNITY_2018_1_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,23 +25,23 @@ using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+#endif
 
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
     /// <summary>
-    /// Provides methods that call the Android SDK build tool "apksigner" to verify whether an APK complies with
-    /// <a href="https://source.android.com/security/apksigning/v2">APK Signature Scheme V2</a> and to re-sign
-    /// the APK if not. Instant apps require Signature Scheme V2 starting with Android O, however some Unity versions
-    /// do not produce compliant APKs. Without this "adb install --ephemeral" on an Android O device will fail with
-    /// "INSTALL_PARSE_FAILED_NO_CERTIFICATES: No APK Signature Scheme v2 signature in ephemeral package".
+    /// Provides methods on 2017.4 and earlier that call the Android SDK build tool "apksigner" to verify whether an APK
+    /// complies with <a href="https://source.android.com/security/apksigning/v2">APK Signature Scheme V2</a> and to
+    /// re-sign the APK if not. Instant apps require Signature Scheme V2 starting with Android Oreo, however some Unity
+    /// versions do not produce compliant APKs. Without this "adb install --ephemeral" on an Android Oreo+ device will
+    /// fail with "INSTALL_PARSE_FAILED_NO_CERTIFICATES: No APK Signature Scheme v2 signature in ephemeral package".
     /// </summary>
     public class ApkSigner : IBuildTool
     {
-        private static readonly string AndroidDebugKeystore = Path.Combine(".android", "debug.keystore");
-
         private readonly AndroidBuildTools _androidBuildTools;
         private readonly JavaUtils _javaUtils;
 
+        private string _apkSignerJarPath;
         private string _keystoreName;
         private string _keystorePass;
         private string _keyaliasName;
@@ -57,16 +58,27 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
+#if UNITY_2018_1_OR_NEWER
+            return true;
+#else
             if (!_androidBuildTools.Initialize(buildToolLogger) || !_javaUtils.Initialize(buildToolLogger))
             {
                 return false;
             }
 
-            if (GetApkSignerJarPath() == null)
+            var newestBuildToolsPath = _androidBuildTools.GetNewestBuildToolsPath();
+            if (newestBuildToolsPath == null)
             {
                 buildToolLogger.DisplayErrorDialog(
-                    "Unable to locate apksigner. Check that a recent version of Android SDK " +
-                    "Build-Tools is installed and check the Console log for more details on the error.");
+                    "Unable to locate an Android SDK \"build-tools\" directory that contains apksigner.");
+                return false;
+            }
+
+            _apkSignerJarPath = Path.Combine(newestBuildToolsPath, Path.Combine("lib", "apksigner.jar"));
+            if (!File.Exists(_apkSignerJarPath))
+            {
+                buildToolLogger.DisplayErrorDialog(
+                    string.Format("Unable to locate apksigner at the expected path: {0}", _apkSignerJarPath));
                 return false;
             }
 
@@ -77,16 +89,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             _keyaliasPass = PlayerSettings.Android.keyaliasPass;
 
             return true;
+#endif
         }
 
-        /// <summary>
-        /// Returns true if ApkSigner will sign the app with the Android debug keystore, false otherwise.
-        /// </summary>
-        public virtual bool UseDebugKeystore()
-        {
-            return string.IsNullOrEmpty(_keystoreName) || string.IsNullOrEmpty(_keyaliasName);
-        }
-
+#if !UNITY_2018_1_OR_NEWER
         /// <summary>
         /// Synchronously calls the apksigner tool to verify whether the specified APK uses APK Signature Scheme V2.
         /// </summary>
@@ -95,7 +101,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         {
             var arguments = string.Format(
                 "-jar {0} verify {1}",
-                CommandLine.QuotePath(GetApkSignerJarPath()),
+                CommandLine.QuotePath(_apkSignerJarPath),
                 CommandLine.QuotePath(apkPath));
 
             var result = CommandLine.Run(_javaUtils.JavaBinaryPath, arguments);
@@ -114,19 +120,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Synchronously calls the apksigner tool to sign the specified APK using APK Signature Scheme V2.
         /// </summary>
         /// <returns>An error message if there was a problem running apksigner, or null if successful.</returns>
-        public virtual string SignApk(string apkFilePath)
-        {
-            return SignFile(apkFilePath, string.Empty);
-        }
-
-        private string SignFile(string filePath, string additionalArguments)
+        public virtual string Sign(string apkFilePath)
         {
             string keystoreName;
             string keystorePass;
             string keyaliasName;
             string keyaliasPass;
-
-            if (UseDebugKeystore())
+            if (string.IsNullOrEmpty(_keystoreName) || string.IsNullOrEmpty(_keyaliasName))
             {
                 Debug.Log("No keystore and/or no keyalias specified. Signing using Android debug keystore.");
                 var homePath =
@@ -138,7 +138,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     return "Failed to locate directory that contains Android debug keystore.";
                 }
 
-                keystoreName = Path.Combine(homePath, AndroidDebugKeystore);
+                keystoreName = Path.Combine(homePath, Path.Combine(".android", "debug.keystore"));
                 keystorePass = "android";
                 keyaliasName = "androiddebugkey";
                 keyaliasPass = "android";
@@ -156,17 +156,16 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return string.Format("Failed to locate keystore file: {0}", keystoreName);
             }
 
-            // Sign the file {4} using key {2} contained in keystore file {1} using additional arguments {3}.
+            // Sign the file {3} using key {2} contained in keystore file {1}.
             // ApkSignerResponder will provide passwords using stdin; this is the default for apksigner
             // so there is no need to specify "--ks-pass" or "--key-pass" arguments.
             // ApkSignerResponder will encode the passwords with UTF8, so we specify "--pass-encoding utf-8" here.
             var arguments = string.Format(
-                "-jar {0} sign --ks {1} --ks-key-alias {2} --pass-encoding utf-8 {3}{4}",
-                CommandLine.QuotePath(GetApkSignerJarPath()),
+                "-jar {0} sign --ks {1} --ks-key-alias {2} --pass-encoding utf-8 {3}",
+                CommandLine.QuotePath(_apkSignerJarPath),
                 CommandLine.QuotePath(keystoreName),
                 CommandLine.QuotePath(keyaliasName),
-                additionalArguments,
-                CommandLine.QuotePath(filePath));
+                CommandLine.QuotePath(apkFilePath));
 
             var promptToPasswordDictionary = new Dictionary<string, string>
             {
@@ -178,24 +177,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             var responder = new ApkSignerResponder(promptToPasswordDictionary);
             var result = CommandLine.Run(_javaUtils.JavaBinaryPath, arguments, ioHandler: responder.AggregateLine);
             return result.exitCode == 0 ? null : result.message;
-        }
-
-        private string GetApkSignerJarPath()
-        {
-            var newestBuildToolsPath = _androidBuildTools.GetNewestBuildToolsPath();
-            if (newestBuildToolsPath == null)
-            {
-                return null;
-            }
-
-            var apkSignerJarPath = Path.Combine(newestBuildToolsPath, Path.Combine("lib", "apksigner.jar"));
-            if (File.Exists(apkSignerJarPath))
-            {
-                return apkSignerJarPath;
-            }
-
-            Debug.LogErrorFormat("Failed to locate apksigner.jar at path: {0}", apkSignerJarPath);
-            return null;
         }
 
         /// <summary>
@@ -241,5 +222,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 stdin.BaseStream.Flush();
             }
         }
+#endif
     }
 }
