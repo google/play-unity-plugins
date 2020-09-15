@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "com.google.android.appbundle": "1.2.1",
-    "com.unity.purchasing": "2.0.6"
+    "com.unity.purchasing": "2.1.1"
   }
 }

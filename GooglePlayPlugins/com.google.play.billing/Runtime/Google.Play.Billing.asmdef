@@ -1,5 +1,8 @@
 {
     "name": "Google.Play.Billing",
+    "references": [
+        "UnityEngine.Purchasing"
+    ],
     "includePlatforms": [
         "Android",
         "Editor"
