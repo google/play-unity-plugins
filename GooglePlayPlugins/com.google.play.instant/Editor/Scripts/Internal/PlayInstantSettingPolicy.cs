@@ -99,6 +99,16 @@ namespace Google.Play.Instant.Editor.Internal
                         return true;
                     }),
 
+                new PlayInstantSettingPolicy(
+                    "Split Application Binary should be disabled",
+                    "Instant apps don't support APK Expansion (OBB) Files.",
+                    () => !PlayerSettings.Android.useAPKExpansionFiles,
+                    () =>
+                    {
+                        PlayerSettings.Android.useAPKExpansionFiles = false;
+                        return true;
+                    }),
+
 #if UNITY_2017_2_OR_NEWER
                 new PlayInstantSettingPolicy(
                     "Android Multithreaded Rendering should be disabled",
