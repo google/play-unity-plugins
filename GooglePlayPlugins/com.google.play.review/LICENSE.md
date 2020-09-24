@@ -2,7 +2,7 @@
 
 The following file:
 
--   Proguard/review.pgcfg
+-   Proguard/review.txt
 
 is licensed under the
 [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)

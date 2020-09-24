@@ -2,6 +2,7 @@
 
 The following file:
 
+-   Proguard/billing.txt
 -   Runtime/Plugins/GooglePlayBilling.aar
 
 is licensed under the

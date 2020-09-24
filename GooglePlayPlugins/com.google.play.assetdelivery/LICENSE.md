@@ -2,7 +2,7 @@
 
 The following file:
 
--   Proguard/asset_delivery.pgcfg
+-   Proguard/asset_delivery.txt
 
 is licensed under the
 [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)

@@ -2,7 +2,7 @@
 
 The following files:
 
--   Proguard/common.pgcfg
+-   Proguard/common.txt
 -   Runtime/Plugins/playcore.aar
 
 are licensed under the

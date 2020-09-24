@@ -2,10 +2,12 @@
 
 The following files:
 
+-   GooglePlayPlugins/com.google.play.assetdelivery/Proguard/asset_delivery.txt
+-   GooglePlayPlugins/com.google.play.billing/Proguard/billing.txt
 -   GooglePlayPlugins/com.google.play.billing/Runtime/Plugins/GooglePlayBilling.aar
--   GooglePlayPlugins/com.google.play.assetdelivery/Proguard/asset_delivery.pgcfg
--   GooglePlayPlugins/com.google.play.core/Proguard/common.pgcfg
+-   GooglePlayPlugins/com.google.play.core/Proguard/common.txt
 -   GooglePlayPlugins/com.google.play.core/Runtime/Plugins/playcore.aar
+-   GooglePlayPlugins/com.google.play.review/Proguard/review.txt
 
 are licensed under the
 [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)
