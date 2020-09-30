@@ -15,7 +15,11 @@
 namespace Google.Play.Billing
 {
     /// <summary>
-    /// Proration modes during SKU replacement supported by Google Play.
+    /// Proration modes during SKU replacement supported by Google Play. Please refer to
+    /// https://developer.android.com/google/play/billing/subs#change for instructions and examples.
+    ///
+    /// Reserved enum: 4. Note that the Deferred mode is not supported here because it is not compatible with the
+    /// Unity IAP. More details can be found at: https://issuetracker.google.com/168990998.
     /// </summary>
     public enum GooglePlayStoreProrationMode
     {
@@ -38,10 +42,5 @@ namespace Google.Play.Billing
         /// cycle stays the same.
         /// </summary>
         ImmediateWithoutProration = 3,
-
-        /// <summary>
-        /// Replacement takes effect when the old plan expires, and the new price will be charged at the same time.
-        /// </summary>
-        Deferred = 4,
     }
 }
