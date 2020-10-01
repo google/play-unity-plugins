@@ -1,5 +1,9 @@
 # Changelog for com.google.play.common
 
+## [1.3.0] - 2020-09-30
+### New Features
+ - Incremented version number to match other packages
+
 ## [1.2.0] - 2020-07-27
 ### New Features
  - Incremented version number to match other packages

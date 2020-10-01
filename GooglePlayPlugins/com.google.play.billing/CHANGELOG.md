@@ -4,7 +4,7 @@
 ### New Features
  - Added support for Unity IAP 2.1.0+ on Unity 2018.4+
  - Note: Removed Google.Play.Billing.asmdef for Unity 2018.3 and earlier, so there will no longer be a Google.Play.Billing.dll generated on these versions
- ### Bug Fixes
+### Bug Fixes
  - Fixed issue #33: remove "Deferred" mode in updateSubscription API as this mode is not compatible with Unity IAP
 
 ## [3.0.0] - 2020-06-08

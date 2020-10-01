@@ -5,8 +5,9 @@ The following file:
 -   Proguard/asset_delivery.txt
 
 is licensed under the
-[Android Software Development Kit License Agreement](https://developer.android.com/studio/terms)
-("Agreement"). By using this file, you agree to the terms of this Agreement.
+[Play Core Software Development Kit Terms of Service](https://developer.android.com/guide/playcore/license).
+By using this file, you agree to the Play Core Software Development Kit Terms of
+Service.
 
 ===============================================================================
 

@@ -1,5 +1,9 @@
 # Changelog for com.google.play.instant
 
+## [1.3.0] - 2020-09-30
+### New Features
+ - Prevent building instant apps when "Split Application Binary" is enabled
+
 ## [1.2.0] - 2020-07-27
 ### New Features
  - Incremented version number to match other packages

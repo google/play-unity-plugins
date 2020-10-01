@@ -4,10 +4,8 @@
 ### New Features
  - Updated bundletool-all.jar from 1.0.0 to 1.2.0
 ### Bug Fixes
- - Skip signing app bundles if no signing key is configured, instead of using a debug key
-   (This reduces build time and provides a workaround if jarsigner is freezing)
- - Switch build-bundle to use new "--overwrite" flag (Fixes an issue on some
-   systems where the build would fail unless an existing .aab was present)
+ - Skip signing app bundles if no signing key is configured, instead of using a debug key (This reduces build time and provides a workaround if jarsigner is freezing)
+ - Switch build-bundle to use new "--overwrite" flag (Fixes an issue on some systems where the build would fail unless an existing .aab was present)
 
 ## [1.2.0] - 2020-07-27
 ### New Features
