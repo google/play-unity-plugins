@@ -18,6 +18,7 @@ using Google.Android.AppBundle.Editor.Internal;
 using Google.Android.AppBundle.Editor.Internal.BuildTools;
 using Google.Android.AppBundle.Editor.Internal.PlayServices;
 using Google.Android.AppBundle.Editor.Internal.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace Google.Play.Instant.Editor.Internal
@@ -27,9 +28,10 @@ namespace Google.Play.Instant.Editor.Internal
     /// </summary>
     public class PlayInstantRunner : IBuildAndRunExtension
     {
-        private const string InstantAppsSdkDisplayName = "Google Play Instant Development SDK";
-        private const string InstantAppsSdkPackageName = "extras;google;instantapps";
-        private const string InstantAppsJarPath = "extras/google/instantapps/tools/ia.jar";
+        // Paths where the ia.jar may potentially be found.
+        private const string PackagePath = "com.google.play.instant/Editor/Tools/ia.jar";
+        private const string PackagesPath = "Packages/" + PackagePath;
+        private const string PluginPath = "Assets/GooglePlayPlugins/" + PackagePath;
 
         bool IBuildAndRunExtension.ShouldOverride()
         {
@@ -63,9 +65,10 @@ namespace Google.Play.Instant.Editor.Internal
                 return;
             }
 
-            var jarPath = GetInstantAppJarPath(androidSdk, buildToolLogger);
+            var jarPath = IaJarPath;
             if (jarPath == null)
             {
+                buildToolLogger.DisplayErrorDialog("Build and Run failed to locate ia.jar file");
                 return;
             }
 
@@ -105,25 +108,36 @@ namespace Google.Play.Instant.Editor.Internal
             window.Show();
         }
 
-        private static string GetInstantAppJarPath(AndroidSdk androidSdk, BuildToolLogger buildToolLogger)
+        /// <summary>
+        /// Returns the absolute path to the ia.jar packaged with the plugin.
+        /// Returning the absolute path handles cases where Unity treats relative paths
+        /// differently than the command line. For example Unity treats the Packages/
+        /// folder as a symlink to Library/PackageCache while the command line does not.
+        /// </summary>
+        private static string IaJarPath
         {
-            var jarPath = Path.Combine(androidSdk.RootPath, InstantAppsJarPath);
-            if (File.Exists(jarPath))
+            get
             {
-                return jarPath;
-            }
+                // GUIDToAssetPath throws an exception if called on a non-main thread. To catch this case early, we
+                // define this variable here, rather than below, where it is used.
+                var guidPath = AssetDatabase.GUIDToAssetPath("c052bb994bc2b4a92a30f18d8e390a51");
 
-            Debug.LogErrorFormat("Build and Run failed to locate ia.jar file at: {0}", jarPath);
-            var message =
-                string.Format(
-                    "Failed to locate version 1.2 or later of the {0}.\n\nClick \"OK\" to install the {0}.",
-                    InstantAppsSdkDisplayName);
-            if (buildToolLogger.DisplayActionableErrorDialog(message))
-            {
-                AndroidSdkPackageInstaller.InstallPackage(InstantAppsSdkPackageName, InstantAppsSdkDisplayName);
-            }
+                string relativePath = null;
+                if (File.Exists(PackagesPath))
+                {
+                    relativePath = PackagesPath;
+                }
+                else if (File.Exists(PluginPath))
+                {
+                    relativePath = PluginPath;
+                }
+                else if (!string.IsNullOrEmpty(guidPath) && guidPath.EndsWith(".jar") && File.Exists(guidPath))
+                {
+                    relativePath = guidPath;
+                }
 
-            return null;
+                return relativePath == null ? null : Path.GetFullPath(relativePath);
+            }
         }
     }
 }

@@ -3,6 +3,9 @@
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Prevent building instant apps when "Split Application Binary" is enabled
+ - Include ia.jar from Google Play Instant Development SDK 1.9.0
+### Bug Fixes
+ - Fix Build & Run for Unity 2019.3+ using Android SDK installed with Unity
 
 ## [1.2.0] - 2020-07-27
 ### New Features
