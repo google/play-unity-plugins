@@ -56,7 +56,9 @@ namespace Google.Play.Instant.Editor.Internal
             var androidBuilder = new AndroidBuilder(androidSdkPlatform, apkSigner);
             var playInstantBuildHelper = new PlayInstantBuildHelper(isInstantRequired: true);
 
-            if (!androidBuilder.Initialize(buildToolLogger) || !playInstantBuildHelper.Initialize(buildToolLogger))
+            if (!androidBuilder.Initialize(buildToolLogger)
+                || !playInstantBuildHelper.Initialize(buildToolLogger)
+                || !javaUtils.Initialize(buildToolLogger))
             {
                 return;
             }

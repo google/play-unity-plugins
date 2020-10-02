@@ -25,12 +25,18 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     /// </summary>
     public class JavaUtils : IBuildTool
     {
+        private bool _isInitialized;
         private string _javaBinaryPath;
         private string _jarBinaryPath;
         private string _jarSignerBinaryPath;
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
+            if (_isInitialized)
+            {
+                return true;
+            }
+
             var jdkPath = GetJdkPath();
             if (jdkPath == null)
             {
@@ -63,6 +69,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return false;
             }
 
+            _isInitialized = true;
             return true;
         }
 
