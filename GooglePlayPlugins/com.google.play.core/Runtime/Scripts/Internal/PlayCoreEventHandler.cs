@@ -29,7 +29,7 @@ namespace Google.Play.Core.Internal
         // This must be called from Main thread.
         public static void CreateInScene()
         {
-            var obj = new GameObject {name = "PlayAssetDeliveryEventHandler"};
+            var obj = new GameObject {name = "PlayCoreEventHandler"};
             DontDestroyOnLoad(obj);
             obj.AddComponent<PlayCoreEventHandler>();
         }
@@ -62,8 +62,6 @@ namespace Google.Play.Core.Internal
         {
             if (_instance != null)
             {
-                Debug.LogWarning("An instance of PlayAssetDeliveryEventHandler is already present in the scene. " +
-                                 "Self-destructing...");
                 Destroy(this);
                 return;
             }

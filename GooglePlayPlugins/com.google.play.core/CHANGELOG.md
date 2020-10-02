@@ -4,6 +4,8 @@
 ### New Features
  - Updated playcore.aar from 1.8.0 to 1.8.2
  - Updated Play Core library license to https://developer.android.com/guide/playcore/license
+### Bug Fixes
+ - Removed unnecessary warning
 
 ## [1.2.0] - 2020-07-27
 ### New Features
