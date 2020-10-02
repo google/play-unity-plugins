@@ -2,6 +2,7 @@
 
 ## [3.1.0] - 2020-09-30
 ### New Features
+ - Included Google Play Billing Libary [version 3.0.1](https://developer.android.com/google/play/billing/billing_library_releases_notes)
  - Added support for Unity IAP 2.1.0+ on Unity 2018.4+
  - Note: Removed Google.Play.Billing.asmdef for Unity 2018.3 and earlier, so there will no longer be a Google.Play.Billing.dll generated on these versions
 ### Bug Fixes
