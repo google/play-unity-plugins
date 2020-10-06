@@ -7,10 +7,8 @@
 # Play Billing Library Proguard Rules:
 
 # Keep the AIDL interface
--keep class com.android.vending.billing.**
--keepclassmembers class com.android.vending.billing.** { *; }
+-keep class com.android.vending.billing.** { *; }
 
 # Keep the PBL public APIs
--keep class com.android.billingclient.api.**
--keepclassmembers class com.android.billingclient.api.** { *; }
+-keep class com.android.billingclient.api.** { *; }
 
