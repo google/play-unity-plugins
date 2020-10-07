@@ -21,7 +21,6 @@ namespace Google.Play.AssetDelivery
 {
     /// <summary>
     /// Provides methods for retrieving asset packs via the Play Asset Delivery system.
-    /// Manages in-progress <see cref="PlayAssetBundleRequest"/>s.
     /// </summary>
     public static class PlayAssetDelivery
     {
@@ -33,19 +32,22 @@ namespace Google.Play.AssetDelivery
         }
 
         /// <summary>
-        /// Returns whether or not the the latest version of an asset pack is available on disk.
+        /// Returns whether or not the the latest version of the specified asset pack is available on disk.
         /// </summary>
         /// <param name="assetPackName">The name of the desired asset pack.</param>
+        /// <returns>True if the asset pack is available on disk and false if not.</returns>
         public static bool IsDownloaded(string assetPackName)
         {
             return Instance.IsDownloaded(assetPackName);
         }
 
         /// <summary>
-        /// Starts a <see cref="PlayAssetBundleRequest"/> to retrieve an asset pack containing only the specified
-        /// AssetBundle. Both the AssetBundle and asset pack must share the same name.
-        /// Downloads the asset pack if the latest version isn't already available on disk.
-        /// After download, the contained AssetBundle is loaded into memory.
+        /// Starts a <see cref="PlayAssetBundleRequest"/> to retrieve an asset pack containing only
+        /// the specified AssetBundle.
+        /// Both the AssetBundle and asset pack must share the same name. Downloads the asset pack if
+        /// the latest version isn't already available on disk.
+        ///
+        /// After download, the contained AssetBundle is loaded into memory before the request completes.
         /// </summary>
         /// <param name="assetBundleName">The name of the requested AssetBundle.</param>
         /// <returns>A request object used to monitor the asynchronous AssetBundle retrieval.</returns>
@@ -60,9 +62,10 @@ namespace Google.Play.AssetDelivery
         /// <summary>
         /// Starts a <see cref="PlayAssetPackRequest"/> to retrieve the specified asset pack.
         /// Downloads the asset pack if the latest version isn't already available on disk.
-        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b> loaded into
-        /// memory. To load them, see <see cref="PlayAssetPackRequest.GetAssetLocation"/> or
-        /// <see cref="PlayAssetPackRequest.LoadAssetBundleAsync"/>.
+        ///
+        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b>
+        /// loaded into memory. To load them see <see cref="PlayAssetPackRequest.GetAssetLocation"/>
+        /// or <see cref="PlayAssetPackRequest.LoadAssetBundleAsync"/>.
         /// </summary>
         /// <param name="assetPackName">The name of the requested asset pack.</param>
         /// <returns>A request object used to monitor the asynchronous asset pack retrieval.</returns>
@@ -74,8 +77,11 @@ namespace Google.Play.AssetDelivery
         /// <summary>
         /// Starts a <see cref="PlayAssetPackBatchRequest"/> to retrieve the specified asset packs.
         /// Downloads the asset packs if the latest versions aren't already available on disk.
-        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b> loaded into
-        /// memory.
+        ///
+        /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b>
+        /// loaded into memory. To load them use <see cref="PlayAssetPackRequest.GetAssetLocation"/>
+        /// or <see cref="PlayAssetPackRequest.LoadAssetBundleAsync"/> on the values of the
+        /// <see cref="PlayAssetPackBatchRequest.Requests"/> dictionary.
         /// </summary>
         /// <param name="assetPackNames">A list of requested asset packs.</param>
         /// <returns>A request object used to monitor the asynchronous asset pack batch retrieval.</returns>
@@ -96,13 +102,13 @@ namespace Google.Play.AssetDelivery
 
         /// <summary>
         /// Starts a PlayAsyncOperation to delete the specified asset pack from internal storage.
-        /// If the specified asset pack is currently being retrieved or transferring, this method will not cancel the
-        /// process. If the specified asset pack contains an AssetBundle that is already loaded into memory, it will
-        /// <b>not</b> be unloaded.
+        /// If the specified asset pack is currently being retrieved, this method will not cancel the
+        /// retrieval. If the specified asset pack contains any AssetBundles that are already loaded into
+        /// memory, the AssetBundles will <b>not</b> be unloaded.
         /// </summary>
         /// <returns>
-        /// If the files are deleted successfully, or if the files don't exist, the returned operation will
-        /// complete successfully.
+        /// An async operation object used to monitor the asset pack removal. If the files are deleted
+        /// successfully or if the files don't exist, the returned operation will complete successfully.
         /// Otherwise, the operation will complete with an error code.
         /// </returns>
         public static PlayAsyncOperation<VoidResult, AssetDeliveryErrorCode> RemoveAssetPack(string assetPackName)
@@ -112,14 +118,14 @@ namespace Google.Play.AssetDelivery
 
         /// <summary>
         /// Shows a confirmation dialog for all currently downloading asset packs that are
-        /// <see cref="AssetDeliveryStatus.WaitingForWifi"/>. If the user accepts the dialog, then those
-        /// Asset packs are downloaded over cellular data.
+        /// <see cref="AssetDeliveryStatus.WaitingForWifi"/>.
+        /// If the user accepts the dialog, then those asset packs are downloaded over cellular data.
         ///
         /// A <see cref="PlayAssetBundleRequest"/> is set to <see cref="AssetDeliveryStatus.WaitingForWifi"/> if
-        /// the user is currently not on a wifi connection and the AssetBundle is large or the user has set
-        /// their download preference in the Play Store to only download apps over wifi. By showing this
+        /// the user is currently not on a Wi-Fi connection and the AssetBundle is large or the user has set
+        /// their download preference in the Play Store to only download apps over Wi-Fi. By showing this
         /// dialog, the app can ask the user if they accept downloading the asset packs over cellular data
-        /// instead of waiting for wifi.
+        /// instead of waiting for Wi-Fi.
         /// </summary>
         /// <returns>
         /// A <see cref="PlayAsyncOperation{ConfirmationDialogResult, AssetDeliveryErrorCode}"/> that completes
