@@ -148,7 +148,10 @@ namespace Google.Play.Common.LoadingScreen
 
         private static bool IsNetworkError(UnityWebRequest request)
         {
-#if UNITY_2017_1_OR_NEWER
+#if UNITY_2020_2_OR_NEWER
+            return request.result == UnityWebRequest.Result.ConnectionError ||
+                   request.result == UnityWebRequest.Result.ProtocolError;
+#elif UNITY_2017_1_OR_NEWER
             return request.isHttpError || request.isNetworkError;
 #else
             return request.isError;
