@@ -26,7 +26,9 @@ namespace Google.Play.Review
 
         public ReviewManager()
         {
+#if !UNITY_EDITOR
             _reviewPlayCoreTaskManager = new ReviewPlayCoreTaskManager();
+#endif
         }
 
         /// <summary>
@@ -37,7 +39,13 @@ namespace Google.Play.Review
         /// </summary>
         public PlayAsyncOperation<PlayReviewInfo, ReviewErrorCode> RequestReviewFlow()
         {
+#if UNITY_EDITOR
+            var operation = new ReviewAsyncOperation<PlayReviewInfo>();
+            operation.SetResult(new PlayReviewInfo(null));
+            return operation;
+#else
             return RequestReviewFlowInternal();
+#endif
         }
 
         /// <summary>
@@ -48,9 +56,16 @@ namespace Google.Play.Review
         public PlayAsyncOperation<VoidResult, ReviewErrorCode> LaunchReviewFlow(
             PlayReviewInfo reviewInfo)
         {
+#if UNITY_EDITOR
+            var operation = new ReviewAsyncOperation<VoidResult>();
+            operation.SetResult(new VoidResult());
+            return operation;
+#else
             return LaunchReviewFlowInternal(reviewInfo);
+#endif
         }
 
+#if !UNITY_EDITOR
         private PlayAsyncOperation<PlayReviewInfo, ReviewErrorCode> RequestReviewFlowInternal()
         {
             var operation = new ReviewAsyncOperation<PlayReviewInfo>();
@@ -85,5 +100,6 @@ namespace Google.Play.Review
             });
             return operation;
         }
+#endif
     }
 }
