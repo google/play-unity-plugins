@@ -174,6 +174,11 @@ namespace Google.Play.Billing.Internal
         public IEnumerable<Purchase> ParseJavaPurchaseList(AndroidJavaObject javaPurchasesList)
         {
             var parsedPurchasesList = new List<Purchase>();
+            if (javaPurchasesList == null)
+            {
+                return parsedPurchasesList;
+            }
+
             var size = javaPurchasesList.Call<int>("size");
             for (var i = 0; i < size; i++)
             {
