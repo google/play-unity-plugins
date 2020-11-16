@@ -51,6 +51,13 @@ namespace Google.Android.AppBundle.Editor
         /// </summary>
         public TextureCompressionFormat DefaultTextureCompressionFormat = TextureCompressionFormat.Default;
 
+
+        /// <summary>
+        /// When asset packs for multiple device tiers are present, this specifies the tier used
+        /// when building standalone APKs for Android pre-Lollipop devices.
+        /// </summary>
+        public DeviceTier DefaultDeviceTier = DeviceTier.None;
+
         /// <summary>
         /// Package the specified AssetBundle file in its own <see cref="AssetPack"/> with the specified delivery mode.
         /// The name of the created asset pack will match that of the specified AssetBundle file.
@@ -133,6 +140,36 @@ namespace Google.Android.AppBundle.Editor
         }
 
         /// <summary>
+        /// Package the specified raw assets in the specified folders, keyed by <see cref="DeviceTier"/>,
+        /// in an <see cref="AssetPack"/> with the specified delivery mode.
+        /// When using Play Asset Delivery APIs, only the AssetBundle for the device's tier will be delivered.
+        /// </summary>
+        /// <param name="assetPackName">The name of the asset pack.</param>
+        /// <param name="deviceTierToAssetPackDirectoryPath">
+        /// A dictionary from <see cref="DeviceTier"/> to the path of directories of files that will be
+        /// directly copied into the asset pack during app bundle creation.</param>
+        /// <param name="deliveryMode">The <see cref="AssetPackDeliveryMode"/> for the asset pack.</param>
+        /// <exception cref="ArgumentException">If the dictionary or asset pack name is invalid.</exception>
+        public void AddAssetsFolders(
+            string assetPackName,
+            IDictionary<DeviceTier, string> deviceTierToAssetPackDirectoryPath,
+            AssetPackDeliveryMode deliveryMode)
+        {
+            if (deviceTierToAssetPackDirectoryPath.Count == 0)
+            {
+                throw new ArgumentException("Dictionary should contain at least one path");
+            }
+
+            CheckAssetPackName(assetPackName);
+            AssetPacks[assetPackName] = new AssetPack
+            {
+                DeliveryMode = deliveryMode,
+                DeviceTierToAssetPackDirectoryPath =
+                    new Dictionary<DeviceTier, string>(deviceTierToAssetPackDirectoryPath)
+            };
+        }
+
+        /// <summary>
         /// Package the specified AssetBundle files, which vary only by <see cref="TextureCompressionFormat"/>, in an
         /// <see cref="AssetPack"/> with the specified delivery mode.
         /// When using Play Asset Delivery APIs, only the AssetBundle for the device's preferred texture compression
@@ -168,6 +205,39 @@ namespace Google.Android.AppBundle.Editor
                 DeliveryMode = deliveryMode,
                 CompressionFormatToAssetBundleFilePath =
                     new Dictionary<TextureCompressionFormat, string>(compressionFormatToAssetBundleFilePath)
+            };
+        }
+
+        /// <summary>
+        /// Package the specified AssetBundle files, which vary only by <see cref="DeviceTier"/>, in an
+        /// <see cref="AssetPack"/> with the specified delivery mode.
+        /// When using Play Asset Delivery APIs, only the AssetBundle for the device's tier will be delivered.
+        /// </summary>
+        /// <param name="deviceTierToAssetBundleFilePath">
+        /// A dictionary from <see cref="DeviceTier"/> to AssetBundle files.</param>
+        /// <param name="deliveryMode">The <see cref="AssetPackDeliveryMode"/> for the asset pack.</param>
+        /// <exception cref="FileNotFoundException">If any AssetBundle file doesn't exist.</exception>
+        public void AddAssetBundles(
+            IDictionary<DeviceTier, string> deviceTierToAssetBundleFilePath,
+            AssetPackDeliveryMode deliveryMode)
+        {
+            if (deviceTierToAssetBundleFilePath.Count == 0)
+            {
+                throw new ArgumentException("Dictionary should contain at least one AssetBundle");
+                ;
+            }
+
+            var assetPackName = GetAssetPackName(deviceTierToAssetBundleFilePath.Values.First());
+            if (deviceTierToAssetBundleFilePath.Any(kvp => assetPackName != GetAssetPackName(kvp.Value)))
+            {
+                throw new ArgumentException("All AssetBundles in the Dictionary must have the same name");
+            }
+
+            AssetPacks[assetPackName] = new AssetPack
+            {
+                DeliveryMode = deliveryMode,
+                DeviceTierToAssetBundleFilePath =
+                    new Dictionary<DeviceTier, string>(deviceTierToAssetBundleFilePath)
             };
         }
 

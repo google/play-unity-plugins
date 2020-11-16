@@ -63,6 +63,49 @@ namespace Google.Android.AppBundle.Editor
         }
 
         /// <summary>
+        /// Run one or more AssetBundle builds for the specified device tiers.
+        /// Notes about the <see cref="outputPath"/> parameter:
+        /// - If a relative path is provided, the file paths in the returned AssetPackConfig will be relative paths.
+        /// - If an absolute path is provided, the file paths in the returned object will be absolute paths.
+        /// - AssetBundle builds for device tiers will be created in siblings of this directory. For
+        ///   example, for outputDirectory "a/b/c" and device tier HIGH, there will be a directory "a/b/c#tier_high".
+        /// - If allowClearDirectory is false, this directory and any sibling directories must be empty or not exist,
+        ///   otherwise an exception is thrown.
+        /// </summary>
+        /// <param name="outputPath">The output directory for AssetBundles. See other notes above.</param>
+        /// <param name="deliveryMode">A delivery mode to apply to every asset pack in the generated config.</param>
+        /// <param name="deviceTierToBuilds">A dictionary from Device Tier to asset bundle builds. All device tiers
+        /// should contains the same asset bundle names.</param>
+        /// <param name="defaultDeviceTier">Default device tier to be used for standalone APKs.</param>
+        /// <param name="assetBundleOptions">Options to pass to <see cref="BuildPipeline"/>.</param>
+        /// <param name="allowClearDirectory">Allows this method to clear the contents of the output directory.</param>
+        /// <returns>An <see cref="AssetPackConfig"/> containing file paths to all generated AssetBundles.</returns>
+        public static AssetPackConfig BuildAssetBundlesDeviceTier(
+            string outputPath,
+            AssetPackDeliveryMode deliveryMode,
+            Dictionary<DeviceTier, AssetBundleBuild[]> deviceTierToBuilds,
+            DeviceTier defaultDeviceTier,
+            BuildAssetBundleOptions assetBundleOptions = BuildAssetBundleOptions.UncompressedAssetBundle,
+            bool allowClearDirectory = false)
+        {
+            if (!deviceTierToBuilds.Keys.Contains(defaultDeviceTier))
+            {
+                throw new ArgumentException("Default device tier not present in deviceTierToBuilds.");
+            }
+
+            var nameToDeviceTierToPath = BuildAssetBundlesDeviceTier(outputPath, deviceTierToBuilds,
+                assetBundleOptions, allowClearDirectory);
+            var assetPackConfig = new AssetPackConfig();
+            foreach (var deviceTierToPath in nameToDeviceTierToPath.Values)
+            {
+                assetPackConfig.AddAssetBundles(deviceTierToPath, deliveryMode);
+            }
+
+            assetPackConfig.DefaultDeviceTier = defaultDeviceTier;
+            return assetPackConfig;
+        }
+
+        /// <summary>
         /// Run one or more AssetBundle builds with the specified texture compression formats.
         /// This variant allows for overriding the base format and provides a different return type.
         /// </summary>
@@ -117,6 +160,65 @@ namespace Google.Android.AppBundle.Editor
                 outputPath, builds, assetBundleOptions, baseTextureFormat, textureSubtargets);
         }
 
+        /// <summary>
+        /// Run one or more AssetBundle builds for each device tier.
+        /// </summary>
+        /// <param name="outputPath">The output directory for base AssetBundles. See the other method for notes.</param>
+        /// <param name="deviceTierToBuilds">A dictionary from Device Tier to asset bundle builds. All device tiers
+        /// should contains the same asset bundle names.</param>
+        /// <param name="assetBundleOptions">Options to pass to <see cref="BuildPipeline"/>.</param>
+        /// <param name="allowClearDirectory">Allows this method to clear the contents of the output directory.</param>
+        /// <returns>A dictionary from AssetBundle name to DeviceTier to file outputPath.</returns>
+        public static Dictionary<string, Dictionary<DeviceTier, string>> BuildAssetBundlesDeviceTier(
+            string outputPath, Dictionary<DeviceTier, AssetBundleBuild[]> deviceTierToBuilds,
+            BuildAssetBundleOptions assetBundleOptions,
+            bool allowClearDirectory)
+        {
+            if (deviceTierToBuilds == null || deviceTierToBuilds.Count == 0)
+            {
+                throw new ArgumentException("DeviceTierToBuild parameter cannot be null or empty");
+            }
+
+            if (deviceTierToBuilds.Values.Any(builds => builds == null || builds.Length == 0))
+            {
+                throw new ArgumentException("AssetBundleBuilds value cannot be null or empty");
+            }
+
+            var assetBundleNames = deviceTierToBuilds.Values.First().Select(build => build.assetBundleName).ToList();
+
+            if (deviceTierToBuilds.Values.Any(builds =>
+                !(builds.Length == assetBundleNames.Count() &&
+                  builds.Select(build => build.assetBundleName).Except(assetBundleNames).ToList().Count == 0)))
+            {
+                throw new ArgumentException("AssetBundleBuild names cannot differ across device tiers.");
+            }
+
+            foreach (var assetBundleName in assetBundleNames)
+            {
+                if (!AndroidAppBundle.IsValidModuleName(assetBundleName))
+                {
+                    throw new ArgumentException("Invalid AssetBundle name: " + assetBundleName);
+                }
+            }
+
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                throw new ArgumentNullException("outputPath");
+            }
+
+            CheckDirectory(outputPath, allowClearDirectory);
+
+            var tiers = new HashSet<DeviceTier>(deviceTierToBuilds.Keys);
+            var paths = tiers.Select(tier => outputPath + DeviceTierTargetingTools.GetTargetingSuffix(tier));
+            foreach (var path in paths)
+            {
+                CheckDirectory(path, allowClearDirectory);
+            }
+
+            return BuildAssetBundlesDeviceTierInternal(
+                outputPath, assetBundleOptions, deviceTierToBuilds, assetBundleNames);
+        }
+
         // The internal method assumes all parameter preconditions have already been checked.
         private static Dictionary<string, Dictionary<TextureCompressionFormat, string>> BuildAssetBundlesInternal(
             string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions,
@@ -157,6 +259,29 @@ namespace Google.Android.AppBundle.Editor
             }
         }
 
+        private static Dictionary<string, Dictionary<DeviceTier, string>> BuildAssetBundlesDeviceTierInternal(
+            string outputPath, BuildAssetBundleOptions assetBundleOptions,
+            Dictionary<DeviceTier, AssetBundleBuild[]> deviceTierToBuilds, IEnumerable<string> assetBundleNames)
+        {
+            // Use a dictionary to capture the generated AssetBundles' file names.
+            var nameToDeviceTierToPath = assetBundleNames.ToDictionary(
+                bundleName => bundleName, _ => new Dictionary<DeviceTier, string>());
+            foreach (var deviceTier in deviceTierToBuilds.Keys)
+            {
+                var tierBuilds = deviceTierToBuilds[deviceTier];
+                // Build AssetBundles in the the base format's directory.
+                BuildAssetBundles(outputPath, tierBuilds, assetBundleOptions);
+
+                // Then move the files to a new directory with the device tier suffix.
+                var outputPathWithSuffix = outputPath + DeviceTierTargetingTools.GetTargetingSuffix(deviceTier);
+                Directory.Move(outputPath, outputPathWithSuffix);
+
+                UpdateDictionaryDeviceTier(nameToDeviceTierToPath, outputPathWithSuffix, deviceTier);
+            }
+
+            return nameToDeviceTierToPath;
+        }
+
         private static void BuildAssetBundles(
             string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions)
         {
@@ -178,6 +303,21 @@ namespace Google.Android.AppBundle.Editor
             {
                 var filePath = Path.Combine(outputPath, entry.Key);
                 entry.Value[textureCompressionFormat] = filePath;
+                if (!File.Exists(filePath))
+                {
+                    throw new InvalidOperationException(string.Format("Missing AssetBundle file: " + filePath));
+                }
+            }
+        }
+
+        private static void UpdateDictionaryDeviceTier(
+            Dictionary<string, Dictionary<DeviceTier, string>> nameToDeviceTierToPath,
+            string outputPath, DeviceTier deviceTier)
+        {
+            foreach (var entry in nameToDeviceTierToPath)
+            {
+                var filePath = Path.Combine(outputPath, entry.Key);
+                entry.Value[deviceTier] = filePath;
                 if (!File.Exists(filePath))
                 {
                     throw new InvalidOperationException(string.Format("Missing AssetBundle file: " + filePath));
