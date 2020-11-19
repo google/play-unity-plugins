@@ -13,27 +13,12 @@ Although it is possible to `git clone` this repository into the **Assets**
 folder of your Unity project, in general it is preferable to import a released
 version.
 
-The steps you need to follow vary depending on the version of Unity you are
-using:
-
-### For Unity 5.6 to 2018.3
-
 To import the plugins, follow these steps:
 
 1.  Download the latest release from this project's
     [releases page](//github.com/google/play-unity-plugins/releases).
 1.  Import the `.unitypackage` file by selecting the Unity IDE menu option
     **Assets > Import package > Custom Package** and importing all items.
-
-### For Unity 2018.4 and above
-
-For these Unity versions, the plugins are distributed as packages through
-[Unity's Package Manager](//docs.unity3d.com/Manual/Packages.html). To import
-one or more plugins, follow these steps:
-
-1.  Set up the
-    [Game Package Registry for Unity](//developer.android.com/games/develop/build-in-unity#download-registry).
-1.  Select packages in the Unity Package Manager and click **Install**.
 
 ## Feature plugins
 
