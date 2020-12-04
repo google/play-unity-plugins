@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
 using UnityEngine.Rendering;
 
@@ -82,11 +84,16 @@ namespace Google.Play.Instant.Editor.Internal
 #endif
 
                 new PlayInstantSettingPolicy(
-                    "Graphics API should be OpenGLES2 only",
-                    "Pre-Oreo devices only support instant apps using GLES2. " +
+                    "Graphics API should be GLES2 for minSdkVersion < 26",
+                    "Pre-Oreo devices only support instant apps using OpenGLES2. " +
                     "Removing unused Graphics APIs reduces APK size.",
                     () =>
                     {
+                        if ((int) PlayerSettings.Android.minSdkVersion >= 26)
+                        {
+                            return true;
+                        }
+
                         var graphicsDeviceTypes = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
                         return !PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android) &&
                                graphicsDeviceTypes.Length == 1 &&
@@ -94,8 +101,33 @@ namespace Google.Play.Instant.Editor.Internal
                     },
                     () =>
                     {
-                        PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
-                        PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, new[] {GraphicsDeviceType.OpenGLES2});
+                        // On headless build machines we don't want to show a dialog, so assume which change to make.
+                        if (WindowUtils.IsHeadlessMode())
+                        {
+                            SetGraphicsApiGles2();
+                            return true;
+                        }
+
+                        // Otherwise, there are 2 possible fixes, so ask which is preferred.
+                        var result = EditorUtility.DisplayDialogComplex("Update Graphics APIs",
+                            "Pre-Oreo devices only support instant apps using OpenGLES2. " +
+                            "Update Graphics APIs to OpenGLES2 only or change the Android minimum SDK to 26.",
+                            "Set GLES2", "Cancel", "Set MinSdk 26");
+                        switch (result)
+                        {
+                            case 0:
+                                SetGraphicsApiGles2();
+                                break;
+                            case 1:
+                                // Cancel: do nothing, though this may result in a console log message.
+                                break;
+                            case 2:
+                                PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+                                break;
+                            default:
+                                throw new Exception("Unexpected DisplayDialogComplex result: " + result);
+                        }
+
                         return true;
                     }),
 
@@ -216,6 +248,12 @@ namespace Google.Play.Instant.Editor.Internal
 #endif
 
             return policies;
+        }
+
+        private static void SetGraphicsApiGles2()
+        {
+            PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
+            PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, new[] {GraphicsDeviceType.OpenGLES2});
         }
     }
 }
