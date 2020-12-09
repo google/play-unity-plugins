@@ -1,5 +1,11 @@
 # Changelog for com.google.android.appbundle
 
+## [1.3.1] - 2020-12-10
+### New Features
+ - Updated bundletool-all.jar from 1.2.0 to 1.4.0
+### Bug Fixes
+ - Fixed issue #74 by updating bundletool
+
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Updated bundletool-all.jar from 1.0.0 to 1.2.0
