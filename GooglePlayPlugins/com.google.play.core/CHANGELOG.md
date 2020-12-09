@@ -1,8 +1,8 @@
 # Changelog for com.google.play.core
 
-## [1.3.1] - 2020-10-27
+## [1.3.1] - 2020-12-10
 ### New Features
- - Updated playcore.aar from 1.8.2 to 1.8.3
+ - Updated playcore.aar from 1.8.2 to 1.9.0
 
 ## [1.3.0] - 2020-09-30
 ### New Features
