@@ -109,7 +109,7 @@ namespace Google.Android.AppBundle.Editor.Internal
             };
 
             var appBundleBuilder = CreateAppBundleBuilder();
-            var tempOutputFilePath = Path.Combine(GetTempFolder(), "temp.aab");
+            var tempOutputFilePath = Path.Combine(appBundleBuilder.WorkingDirectoryPath, "temp.aab");
             var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(tempOutputFilePath);
             var assetPackConfig = AssetPackConfigSerializer.LoadConfig();
             Build(appBundleBuilder, buildPlayerOptions, assetPackConfig, buildSettings);
@@ -244,7 +244,7 @@ namespace Google.Android.AppBundle.Editor.Internal
 
         private static string GetTempFolder()
         {
-            return Path.Combine(Path.GetTempPath(), "play-unity-build");
+            return Path.Combine(Path.GetTempPath(), "play-unity-build", Path.GetRandomFileName());
         }
 
         private static BundletoolBuildMode GetBuildMode()
