@@ -122,14 +122,17 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
                 // TODO: consider checking the folder name for "#tcf".
                 if (assetBundles.Count == 1 &&
-                    assetBundles[0].TextureCompressionFormat == TextureCompressionFormat.Default)
+                    assetBundles[0].TextureCompressionFormat == TextureCompressionFormat.Default
+                )
                 {
                     assetPackConfig.AddAssetBundle(assetBundles[0].path, multiTargetingAssetBundle.DeliveryMode);
                     continue;
                 }
 
-                var dictionary = assetBundles.ToDictionary(item => item.TextureCompressionFormat, item => item.path);
-                assetPackConfig.AddAssetBundles(dictionary, multiTargetingAssetBundle.DeliveryMode);
+                var dictionaryTextureCompression =
+                    assetBundles 
+                        .ToDictionary(item => item.TextureCompressionFormat, item => item.path);
+                assetPackConfig.AddAssetBundles(dictionaryTextureCompression, multiTargetingAssetBundle.DeliveryMode);
             }
 
             foreach (var pack in config.assetPacks)
@@ -140,9 +143,10 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             foreach (var pack in config.targetedAssetPacks)
             {
                 var compressionFormatToAssetPackDirectoryPath =
-                    pack.paths.ToDictionary(item => item.TextureCompressionFormat, item => item.path);
-                assetPackConfig.AddAssetsFolders(pack.name, compressionFormatToAssetPackDirectoryPath,
-                    pack.DeliveryMode);
+                    pack.paths
+                        .ToDictionary(item => item.TextureCompressionFormat, item => item.path);
+                assetPackConfig.AddAssetsFolders(
+                    pack.name, compressionFormatToAssetPackDirectoryPath, pack.DeliveryMode);
             }
 
             return assetPackConfig;
