@@ -22,6 +22,12 @@ namespace Google.Play.Review
     /// </summary>
     public class ReviewManager
     {
+        /// <summary>
+        /// Translation of Java ReviewErrorCode from:
+        /// <a
+        /// href="https://developer.android.com/reference/com/google/android/play/core/review/model/ReviewErrorCode"></a>
+        /// </summary>
+        private const int JavaReviewErrorCodePlayNotFound = -1;
         private readonly ReviewPlayCoreTaskManager _reviewPlayCoreTaskManager;
 
         public ReviewManager()
@@ -77,7 +83,11 @@ namespace Google.Play.Review
             });
             requestFlowTask.RegisterOnFailureCallback((reason, errorCode) =>
             {
-                operation.SetError(ReviewErrorCode.ErrorRequestingFlow);
+                if (errorCode == JavaReviewErrorCodePlayNotFound) {
+                    operation.SetError(ReviewErrorCode.PlayStoreNotFound);
+                } else {
+                    operation.SetError(ReviewErrorCode.ErrorRequestingFlow);
+                }
                 requestFlowTask.Dispose();
             });
             return operation;
