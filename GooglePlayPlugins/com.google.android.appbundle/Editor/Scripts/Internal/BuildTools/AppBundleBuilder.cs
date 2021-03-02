@@ -284,6 +284,19 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 Debug.LogFormat("Skipped signing since a Custom Keystore isn't configured in Android Player Settings");
             }
 
+            // Move symbols zip to aabFilePath
+            var androidPlayerDirectory = Path.GetDirectoryName(androidPlayerFilePath);
+            var symbolsFiles = Directory.GetFiles(androidPlayerDirectory, "*.symbols.zip");
+            if (symbolsFiles.Length > 0)
+            {
+                var symbolsDestinationDirectory = Path.GetDirectoryName(aabFilePath);
+                foreach (var symbolFile in symbolsFiles)
+                {
+                    var symbolDestFilePath = Path.Combine(symbolsDestinationDirectory, Path.GetFileName(symbolFile));
+                    File.Move(symbolFile, symbolDestFilePath);
+                }
+            }
+
             Debug.LogFormat("Finished building app bundle: {0}", aabFilePath);
             _finishedAabFilePath = aabFilePath;
             _buildStatus = BuildStatus.Succeeding;
