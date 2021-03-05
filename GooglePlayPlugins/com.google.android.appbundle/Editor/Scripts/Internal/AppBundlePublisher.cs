@@ -109,7 +109,7 @@ namespace Google.Android.AppBundle.Editor.Internal
             };
 
             var appBundleBuilder = CreateAppBundleBuilder();
-            var tempOutputFilePath = Path.Combine(GetTempFolder(), "temp.aab");
+            var tempOutputFilePath = Path.Combine(appBundleBuilder.WorkingDirectoryPath, "temp.aab");
             var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(tempOutputFilePath);
             var assetPackConfig = AssetPackConfigSerializer.LoadConfig();
             Build(appBundleBuilder, buildPlayerOptions, assetPackConfig, buildSettings);
@@ -244,7 +244,11 @@ namespace Google.Android.AppBundle.Editor.Internal
 
         private static string GetTempFolder()
         {
-            return Path.Combine(Path.GetTempPath(), "play-unity-build");
+            // Create a new temp folder with each build. Some developers prefer a random path here since there may be
+            // multiple builds running concurrently, e.g. on an automated build machine. See Issue #69.
+            // Note: this plugin doesn't clear out old temporary build folders, so disk usage will grow over time.
+            // Note: we use the 2 argument Path.Combine() to support .NET 3.
+            return Path.Combine(Path.Combine(Path.GetTempPath(), "play-unity-build"), Path.GetRandomFileName());
         }
 
         private static BundletoolBuildMode GetBuildMode()
