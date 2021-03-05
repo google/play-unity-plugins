@@ -37,10 +37,7 @@ namespace Google.Play.AssetDelivery
         ///     The app version code isn't published in the Play Store. Note: an older version may exist.
         ///   </description></item>
         ///   <item><description>
-        ///     The user doesn't own the app, i.e. hasn't installed it in the Play Store.
-        ///   </description></item>
-        ///   <item><description>
-        ///     The user doesn't have access to the app, e.g. alpha track.
+        ///     The app is only available on a testing track that the user doesn't have access to.
         ///   </description></item>
         /// </list>
         /// </para>
@@ -58,7 +55,7 @@ namespace Google.Play.AssetDelivery
         NetworkError = 3,
 
         /// <summary>
-        /// Download not permitted under current device circumstances (e.g. in background).
+        /// Download not permitted under current device circumstances, for example the app is running in the background.
         /// </summary>
         AccessDenied = 4,
 
@@ -94,8 +91,8 @@ namespace Google.Play.AssetDelivery
         NetworkUnrestricted = 12,
 
         /// <summary>
-        /// The app is not owned by any user on this device. An app is "owned" if it has been
-        /// acquired from Play.
+        /// The app isn't owned by any user on this device. An app is "owned" if it has been
+        /// acquired from the Play Store.
         /// </summary>
         AppNotOwned = 13,
     }
