@@ -67,17 +67,29 @@ may not use this package.
 Refer to the [documentation](//developer.android.com/google/play/billing/unity)
 for more information.
 
-### Play In-app Review
+### Play In-App Review
 
 *com.google.play.review*
 
-Play In-app Review lets you prompt users to submit Play Store ratings and
+Play In-App Review lets you prompt users to submit Play Store ratings and
 reviews without the inconvenience of leaving your game.
 
 Refer to the
 [documentation](//developer.android.com/guide/playcore/in-app-review/unity)
 and
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Review)
+for more information.
+
+### Play In-App Update
+
+*com.google.play.appupdate*
+
+Play In-App Update lets you keep your app up-to-date on your users’ devices
+and enables them to try new features, as well as benefit from performance
+improvements and bug fixes.
+
+Refer to the
+[documentation](//developer.android.com/guide/playcore/in-app-updates)
 for more information.
 
 ### Play Instant
