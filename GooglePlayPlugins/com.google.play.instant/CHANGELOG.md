@@ -1,5 +1,9 @@
 # Changelog for com.google.play.instant
 
+## [1.4.0] - 2021-03-08
+### Bug Fixes
+ - Fixed issue #70: don't require GLES2 for instant apps with min SDK 26+
+
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Prevent building instant apps when "Split Application Binary" is enabled

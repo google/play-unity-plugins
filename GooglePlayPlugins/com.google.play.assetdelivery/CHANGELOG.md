@@ -1,5 +1,9 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.4.0] - 2021-03-08
+### Bug Fixes
+ - Minor documentation updates
+
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Updated Play Core library license to https://developer.android.com/guide/playcore/license

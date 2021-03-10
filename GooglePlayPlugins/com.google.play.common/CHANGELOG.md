@@ -1,5 +1,9 @@
 # Changelog for com.google.play.common
 
+## [1.4.0] - 2021-03-08
+### Bug Fixes
+ - Fixed a build error in 2020.2 related to isHttpError/isNetworkError
+
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Incremented version number to match other packages

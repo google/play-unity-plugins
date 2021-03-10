@@ -1,10 +1,12 @@
 # Changelog for com.google.android.appbundle
 
-## [1.4.0] - 2020-03-08
+## [1.4.0] - 2021-03-08
 ### New Features
  - Updated bundletool-all.jar from 1.2.0 to 1.5.0
 ### Bug Fixes
- - Fixed issue #74 by updating bundletool
+ - Fixed issue #69: add a random name to temporary build path
+ - Fixed issue #74: update bundletool-all.jar with fix
+ - Fixed issue #82: pass "-Duser.language=en" to jarsigner
 
 ## [1.3.0] - 2020-09-30
 ### New Features

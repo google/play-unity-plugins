@@ -1,6 +1,6 @@
 # Changelog for com.google.play.billing
 
-## [3.1.2] - 2021-03-05
+## [3.1.2] - 2021-03-08
 ### New Features
  - Included Google Play Billing Libary [version 3.0.3](https://developer.android.com/google/play/billing/billing_library_releases_notes)
 ### Bug Fixes

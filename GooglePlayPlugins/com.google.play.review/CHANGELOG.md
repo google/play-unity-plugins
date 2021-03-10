@@ -1,8 +1,8 @@
 # Changelog for com.google.play.review
 
-## [1.3.1] - 2020-09-30
+## [1.4.0] - 2021-03-08
 ### New Features
- - Adds an error code to indicate that the Play Store app is either not installed or not the official version
+ - Added an error code to indicate that the Play Store app is either not installed or not the official version
 
 ## [1.3.0] - 2020-09-30
 ### New Features
