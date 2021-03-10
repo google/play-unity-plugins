@@ -5,7 +5,22 @@
 The Google Play Plugins for Unity provide C# APIs for accessing various Play
 services at runtime from within the Unity Engine. These plugins also provide
 various Unity Editor features for building an app that can be published on
-[Google Play Console](//play.google.com/apps/publish).
+[Google Play Console](//play.google.com/console).
+
+## Version support
+
+These plugins officially support Unity version 2017.4.40 or newer, though they
+were written to be code compatible with Unity versions 5.6.7 or newer.
+
+[In August 2019 Google Play started requiring that any apps published with 32
+bit native libraries also provide 64 bit native
+libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html)
+An exception was made at the time enabling apps built with Unity 5.6.7 and
+earlier to still be published on the Google Play Console until August 2021,
+which is fast approaching.
+
+Note: In June 2021 we will remove any plugin code that enables compilation of
+Unity 2017.4.16 or earlier (including Unity 5.6.7).
 
 ## Download and import the plugins
 
@@ -75,8 +90,7 @@ Play In-App Review lets you prompt users to submit Play Store ratings and
 reviews without the inconvenience of leaving your game.
 
 Refer to the
-[documentation](//developer.android.com/guide/playcore/in-app-review/unity)
-and
+[documentation](//developer.android.com/guide/playcore/in-app-review/unity) and
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Review)
 for more information.
 
@@ -84,13 +98,13 @@ for more information.
 
 *com.google.play.appupdate*
 
-Play In-App Update lets you keep your app up-to-date on your users’ devices
-and enables them to try new features, as well as benefit from performance
+Play In-App Update lets you keep your app up-to-date on your users’ devices and
+enables them to try new features, as well as benefit from performance
 improvements and bug fixes.
 
 Refer to the
-[documentation](//developer.android.com/guide/playcore/in-app-updates)
-for more information.
+[documentation](//developer.android.com/guide/playcore/in-app-updates) for more
+information.
 
 ### Play Instant
 
