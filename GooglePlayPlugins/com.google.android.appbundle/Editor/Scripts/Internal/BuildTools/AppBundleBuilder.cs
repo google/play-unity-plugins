@@ -56,6 +56,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private const float ProgressRunBundletool = 0.7f;
         private const int ProgressBarWaitHandleTimeoutMs = 100;
 
+        // For simplicity we use the same filename when building an APK or an AAB.
+        // Note: AAB builds fail if we use a .apk file extension, but APK builds can use any extension.
+        private const string AndroidPlayerFileName = "tmp.aab";
+        private const string AndroidPlayerFilePrefix = "tmp";
+
         /// <summary>
         /// The folder where to store the asset pack, inside the "assets" folder of an Android App Bundle module.
         /// This intermediate folder name can be suffixed with a texture compression format targeting (e.g: #tcf_astc),
@@ -80,6 +85,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private bool _isGradleBuild;
         private AndroidSdkVersions _minSdkVersion;
         private string _packageName;
+        private int _versionCode;
+        private string _versionName;
         private PostBuildCallback _createBundleAsyncOnSuccess = delegate { };
         private IEnumerable<IAssetPackManifestTransformer> _assetPackManifestTransformers;
 
@@ -104,10 +111,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
+            // Cache information that is only accessible from the main thread.
             _isGradleBuild = EditorUserBuildSettings.androidBuildSystem == AndroidBuildSystem.Gradle;
-            // Cache minSdkVersion because PlayerSettings.Android is only accessible from the main thread.
             _minSdkVersion = PlayerSettings.Android.minSdkVersion;
             _packageName = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
+            _versionCode = PlayerSettings.Android.bundleVersionCode;
+            _versionName = PlayerSettings.bundleVersion;
 
             _assetPackManifestTransformers = AssetPackManifestTransformerRegistry.Registry.ConstructInstances();
             var initializedManifestTransformers = true;
@@ -129,13 +138,18 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             get { return _workingDirectoryPath; }
         }
 
+        private string AndroidPlayerFilePath
+        {
+            get { return Path.Combine(_workingDirectoryPath, AndroidPlayerFileName); }
+        }
+
         /// <summary>
         /// Builds an Android Player with the specified options.
         /// Note: the specified <see cref="BuildPlayerOptions.locationPathName"/> field is ignored and the
         /// Android Player is written to a temporary file whose path is returned as a string.
         /// </summary>
-        /// <returns>The path to the file if the build succeeded, or null if it failed or was cancelled.</returns>
-        public virtual string BuildAndroidPlayer(BuildPlayerOptions buildPlayerOptions)
+        /// <returns>True if the build succeeded, or false if it failed or was cancelled.</returns>
+        public virtual bool BuildAndroidPlayer(BuildPlayerOptions buildPlayerOptions)
         {
             var workingDirectory = new DirectoryInfo(_workingDirectoryPath);
             if (workingDirectory.Exists)
@@ -150,13 +164,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 AndroidAppBundle.EnableNativeBuild();
             }
 
-            var androidPlayerFilePath = Path.Combine(workingDirectory.FullName, "tmp.aab");
-            Debug.LogFormat("Building Android Player: {0}", androidPlayerFilePath);
+            Debug.LogFormat("Building Android Player: {0}", AndroidPlayerFilePath);
             // This Android Player is an intermediate build artifact, so use a temporary path for the output file path.
             var updatedBuildPlayerOptions = new BuildPlayerOptions
             {
                 assetBundleManifestPath = buildPlayerOptions.assetBundleManifestPath,
-                locationPathName = androidPlayerFilePath,
+                locationPathName = AndroidPlayerFilePath,
                 options = buildPlayerOptions.options,
                 scenes = buildPlayerOptions.scenes,
                 target = buildPlayerOptions.target,
@@ -169,14 +182,31 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             // Do not use BuildAndSign since this signature won't be used.
-            return _androidBuilder.Build(updatedBuildPlayerOptions) ? androidPlayerFilePath : null;
+            var buildSucceeded = _androidBuilder.Build(updatedBuildPlayerOptions);
+            if (!buildSucceeded)
+            {
+                return false;
+            }
+
+            if (!File.Exists(AndroidPlayerFilePath))
+            {
+                // If the build is canceled late, sometimes the build "succeeds" but the file is missing.
+                // Since this may be intentional, don't display an onscreen error dialog. However, just
+                // in case the build wasn't canceled, print a warning instead of silently failing.
+                Debug.LogWarningFormat(
+                    "The Android Player file \"{0}\"is missing, possibly because of a late build cancellation.",
+                    AndroidPlayerFilePath);
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
-        /// Synchronously builds an Android App Bundle at the specified path using the specified Android Player.
+        /// Synchronously builds an AAB at the specified path.
         /// </summary>
         /// <returns>True if the build succeeded, false if it failed or was cancelled.</returns>
-        public bool CreateBundle(string aabFilePath, string androidPlayerFilePath, AssetPackConfig assetPackConfig)
+        public bool CreateBundle(string aabFilePath, AssetPackConfig assetPackConfig)
         {
             if (_buildStatus != BuildStatus.Running)
             {
@@ -221,7 +251,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             // Create base module directory.
             var baseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseModuleName);
             IList<string> bundleMetadata;
-            if (!CreateBaseModule(baseDirectory, androidPlayerFilePath, out bundleMetadata))
+            if (!CreateBaseModule(baseDirectory, out bundleMetadata))
             {
                 return false;
             }
@@ -284,6 +314,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 Debug.LogFormat("Skipped signing since a Custom Keystore isn't configured in Android Player Settings");
             }
 
+            MoveSymbolsZipFile(aabFilePath);
+
             Debug.LogFormat("Finished building app bundle: {0}", aabFilePath);
             _finishedAabFilePath = aabFilePath;
             _buildStatus = BuildStatus.Succeeding;
@@ -291,16 +323,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         }
 
         /// <summary>
-        /// Asynchronously builds an Android App Bundle at the specified path using the specified Android Player.
+        /// Asynchronously builds an AAB at the specified path.
         /// </summary>
         /// <param name="aabFilePath">Path to the AAB file that should be built.</param>
-        /// <param name="androidPlayerFilePath">Path to an existing Android Player ZIP file.</param>
         /// <param name="assetPackConfig">Indicates asset packs to include in the AAB.</param>
         /// <param name="onSuccess">
         /// Callback that fires with the final aab file location, when the bundle creation succeeds.
         /// </param>
-        public void CreateBundleAsync(string aabFilePath, string androidPlayerFilePath,
-            AssetPackConfig assetPackConfig, PostBuildCallback onSuccess)
+        public void CreateBundleAsync(string aabFilePath, AssetPackConfig assetPackConfig, PostBuildCallback onSuccess)
         {
             _progressBarWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
             EditorApplication.update += HandleUpdate;
@@ -309,7 +339,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 try
                 {
-                    CreateBundle(aabFilePath, androidPlayerFilePath, assetPackConfig);
+                    CreateBundle(aabFilePath, assetPackConfig);
                 }
                 catch (Exception ex)
                 {
@@ -443,6 +473,39 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return true;
         }
 
+        private void MoveSymbolsZipFile(string aabFilePath)
+        {
+            var outputDirectoryPath = Path.GetDirectoryName(aabFilePath);
+            if (_workingDirectoryPath == outputDirectoryPath)
+            {
+                // If the temporary player file and final output file are in the same directory, don't move the symbols.
+                // (This is likely a Build & Run.)
+                return;
+            }
+
+            var symbolsFilePath = Path.Combine(_workingDirectoryPath, GetSymbolsFileName(AndroidPlayerFilePrefix));
+            if (!File.Exists(symbolsFilePath))
+            {
+                // The file won't exist for Mono builds or if EditorUserBuildSettings.androidCreateSymbolsZip is false.
+                return;
+            }
+
+            var outputSymbolsFileName = GetSymbolsFileName(Path.GetFileNameWithoutExtension(aabFilePath));
+            var outputSymbolsFilePath = Path.Combine(outputDirectoryPath, outputSymbolsFileName);
+            if (File.Exists(outputSymbolsFilePath))
+            {
+                // If the symbols file already exists, we need to delete it first.
+                File.Delete(outputSymbolsFilePath);
+            }
+
+            File.Move(symbolsFilePath, outputSymbolsFilePath);
+        }
+
+        private string GetSymbolsFileName(string prefix)
+        {
+            return string.Format("{0}-{1}-v{2}.symbols.zip", prefix, _versionName, _versionCode);
+        }
+
         private static void CopyFilesRecursively(DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
         {
             foreach (var sourceSubdirectory in sourceDirectory.GetDirectories())
@@ -481,15 +544,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return doc;
         }
 
-        private bool CreateBaseModule(
-            DirectoryInfo baseWorkingDirectory, string androidPlayerFilePath, out IList<string> bundleMetadata)
+        private bool CreateBaseModule(DirectoryInfo baseWorkingDirectory, out IList<string> bundleMetadata)
         {
             string zipFilePath;
             var sourceDirectoryInfo = baseWorkingDirectory.CreateSubdirectory("source");
             if (UseNativeAppBundleSupport)
             {
                 DisplayProgress(CreatingBaseModuleMessage, ProgressCreateBaseModule);
-                zipFilePath = androidPlayerFilePath;
+                zipFilePath = AndroidPlayerFilePath;
             }
             else
             {
@@ -500,7 +562,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 DisplayProgress(CreatingBaseModuleMessage + messageSuffix, ProgressCreateBaseModule);
                 zipFilePath = Path.Combine(baseWorkingDirectory.FullName, "AndroidPlayer.zip");
 
-                var aaptErrorMessage = _androidAssetPackagingTool.Convert(androidPlayerFilePath, zipFilePath);
+                var aaptErrorMessage = _androidAssetPackagingTool.Convert(AndroidPlayerFilePath, zipFilePath);
                 if (aaptErrorMessage != null)
                 {
                     DisplayBuildError("aapt2 convert", aaptErrorMessage);

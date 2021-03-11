@@ -31,7 +31,6 @@ namespace Google.Android.AppBundle.Editor.Internal
         private class AppBundleBuildSettings
         {
             public string aabFilePath;
-            public string androidPlayerFilePath;
             public bool requirePrerequisiteChecks;
             public bool runOnDevice;
         }
@@ -150,27 +149,15 @@ namespace Google.Android.AppBundle.Editor.Internal
 
             buildSettings.aabFilePath = buildPlayerOptions.locationPathName;
             Debug.LogFormat("Building app bundle: {0}", buildSettings.aabFilePath);
-            buildSettings.androidPlayerFilePath = appBundleBuilder.BuildAndroidPlayer(buildPlayerOptions);
-            if (buildSettings.androidPlayerFilePath == null)
+            bool buildSucceeded = appBundleBuilder.BuildAndroidPlayer(buildPlayerOptions);
+            if (!buildSucceeded)
             {
-                return false;
-            }
-
-            if (!File.Exists(buildSettings.androidPlayerFilePath))
-            {
-                // If the build is canceled late, sometimes the build "succeeds" but the file is missing.
-                // Since this may be intentional, don't display an onscreen error dialog. However, just
-                // in case the build wasn't canceled, print a warning instead of silently failing.
-                Debug.LogWarningFormat(
-                    "The Android Player file \"{0}\"is missing, possibly because of a late build cancellation.",
-                    buildSettings.androidPlayerFilePath);
                 return false;
             }
 
             if (IsBatchMode)
             {
-                return appBundleBuilder.CreateBundle(
-                    buildSettings.aabFilePath, buildSettings.androidPlayerFilePath, assetPackConfig);
+                return appBundleBuilder.CreateBundle(buildSettings.aabFilePath, assetPackConfig);
             }
 
 #if UNITY_2018_3_OR_NEWER
@@ -194,8 +181,7 @@ namespace Google.Android.AppBundle.Editor.Internal
                 buildSettings.runOnDevice
                     ? (AppBundleBuilder.PostBuildCallback) RunBundle
                     : EditorUtility.RevealInFinder;
-            appBundleBuilder.CreateBundleAsync(
-                buildSettings.aabFilePath, buildSettings.androidPlayerFilePath, assetPackConfig, callback);
+            appBundleBuilder.CreateBundleAsync(buildSettings.aabFilePath, assetPackConfig, callback);
         }
 
         private static void RunBundle(string aabFile)
