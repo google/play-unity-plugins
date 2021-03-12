@@ -32,7 +32,6 @@ namespace Google.Play.Common.LoadingScreen
         public float ScrollSpeed = 2.5f;
 
         private RawImage _image;
-        private Vector2 _textureOffset;
         private RectTransform _rectTransform;
 
         private void Update()

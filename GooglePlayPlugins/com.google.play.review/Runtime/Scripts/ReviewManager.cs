@@ -28,7 +28,10 @@ namespace Google.Play.Review
         /// href="https://developer.android.com/reference/com/google/android/play/core/review/model/ReviewErrorCode"></a>
         /// </summary>
         private const int JavaReviewErrorCodePlayNotFound = -1;
+
+#if !UNITY_EDITOR
         private readonly ReviewPlayCoreTaskManager _reviewPlayCoreTaskManager;
+#endif
 
         public ReviewManager()
         {

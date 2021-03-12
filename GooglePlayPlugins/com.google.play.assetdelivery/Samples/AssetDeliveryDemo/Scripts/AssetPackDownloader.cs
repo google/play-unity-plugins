@@ -45,7 +45,6 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
         private AssetBundle _assetBundle;
         private PlayAssetPackRequest _request;
-        private List<Button> _buttons;
         private bool _requestInProgress;
 
         public bool IsInitialized { get; private set; }

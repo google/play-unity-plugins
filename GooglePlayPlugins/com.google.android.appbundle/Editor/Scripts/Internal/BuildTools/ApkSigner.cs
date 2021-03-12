@@ -41,11 +41,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private readonly AndroidBuildTools _androidBuildTools;
         private readonly JavaUtils _javaUtils;
 
+#if !UNITY_2018_1_OR_NEWER
         private string _apkSignerJarPath;
         private string _keystoreName;
         private string _keystorePass;
         private string _keyaliasName;
         private string _keyaliasPass;
+#endif
 
         /// <summary>
         /// Constructor.

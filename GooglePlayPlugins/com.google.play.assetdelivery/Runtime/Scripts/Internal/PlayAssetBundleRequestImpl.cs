@@ -25,7 +25,6 @@ namespace Google.Play.AssetDelivery.Internal
         private readonly AssetDeliveryUpdateHandler _updateHandler;
         private AssetDeliveryStatus _loadingStatus;
         private AssetDeliveryErrorCode _loadingError;
-        private float _downloadProgress;
 
         public PlayAssetBundleRequestImpl(PlayAssetPackRequestImpl packRequest,
             AssetDeliveryUpdateHandler updateHandler)
