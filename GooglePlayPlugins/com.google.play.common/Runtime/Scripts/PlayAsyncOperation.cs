@@ -47,8 +47,8 @@ namespace Google.Play.Common
         public virtual event Action<PlayAsyncOperation<TResult, TError>> Completed = delegate { };
 
         /// <summary>
-        /// Implements CustomYieldInstruction's keepWaiting method,
-        /// so that this request can be yielded on, in a coroutine, until it is done.
+        /// Implements the <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction-keepWaiting.html">CustomYieldInstruction.keepWaiting</a>
+        /// property so that this request can be yielded on in a coroutine.
         /// </summary>
         public override bool keepWaiting
         {

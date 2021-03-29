@@ -18,7 +18,8 @@ using UnityEngine;
 namespace Google.Play.AppUpdate
 {
     /// <summary>
-    /// An object used to monitor an ongoing in-app update.
+    /// A <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction.html">CustomYieldInstruction</a>
+    /// used to monitor an ongoing in-app update.
     /// </summary>
     public abstract class AppUpdateRequest : CustomYieldInstruction
     {
@@ -48,7 +49,7 @@ namespace Google.Play.AppUpdate
         /// <summary>
         /// Returns a value between 0 and 1 indicating the overall download progress of a flexible update flow.
         /// Note: If this value is 1, it doesn't mean that the update has completed, only that the
-        /// DOWNLOADING stage has finished.
+        /// Downloading stage has finished.
         ///
         /// Note: always returns 0 for an immediate update flow.
         /// </summary>
@@ -65,8 +66,8 @@ namespace Google.Play.AppUpdate
         public ulong TotalBytesToDownload { get; protected set; }
 
         /// <summary>
-        /// Implements the <see cref="CustomYieldInstruction"/> keepWaiting method so that this request can be yielded
-        /// on in a coroutine.
+        /// Implements the <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction-keepWaiting.html">CustomYieldInstruction.keepWaiting</a>
+        /// property so that this request can be yielded on in a coroutine.
         /// </summary>
         public override bool keepWaiting
         {
