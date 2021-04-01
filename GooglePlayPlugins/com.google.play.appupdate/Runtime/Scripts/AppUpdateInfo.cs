@@ -68,15 +68,15 @@ namespace Google.Play.AppUpdate
         {
             get
             {
-                int? clientVersionStalenessDays = null;
                 var clientVersionStalenessDaysJavaObject =
                     _javaAppUpdateInfo.Call<AndroidJavaObject>("clientVersionStalenessDays");
-                if (!PlayCoreHelper.IsNull(clientVersionStalenessDaysJavaObject))
+                if (PlayCoreHelper.IsNull(clientVersionStalenessDaysJavaObject))
                 {
-                    clientVersionStalenessDays = clientVersionStalenessDaysJavaObject.GetRawObject().ToInt32();
+                    return null;
                 }
 
-                return clientVersionStalenessDays;
+                // Convert the java.lang.Integer object to an int primitive.
+                return clientVersionStalenessDaysJavaObject.Call<int>("intValue");
             }
         }
 
