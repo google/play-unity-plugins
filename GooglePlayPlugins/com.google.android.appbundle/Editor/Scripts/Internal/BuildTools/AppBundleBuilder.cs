@@ -125,7 +125,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 initializedManifestTransformers &= transformer.Initialize(buildToolLogger);
             }
 
-            return initializedManifestTransformers
+            return CheckUnityVersion(buildToolLogger)
+                   && initializedManifestTransformers
                    && _androidAssetPackagingTool.Initialize(buildToolLogger)
                    && _androidBuilder.Initialize(buildToolLogger)
                    && _jarSigner.Initialize(buildToolLogger)
@@ -611,6 +612,20 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private bool SuggestNativeAppBundleSupport
         {
             get { return !_isGradleBuild && AndroidAppBundle.HasNativeBuildSupport(); }
+        }
+
+        // Don't support certain versions of Unity due to the "Failed to load 'libmain.so'" crash.
+        // See https://github.com/google/play-unity-plugins/issues/80 and
+        // https://issuetracker.unity3d.com/issues/android-app-installed-using-apk-from-app-bundle-option-in-android-studio-fails-to-run
+        private static bool CheckUnityVersion(BuildToolLogger buildToolLogger)
+        {
+#if UNITY_2020_2 || UNITY_2020_3_0 || UNITY_2020_3_1 || UNITY_2020_3_2 || UNITY_2021_1_0 || UNITY_2021_1_1
+            buildToolLogger.DisplayErrorDialog(
+                "Apps built as AABs with this version of Unity may crash at runtime. Upgrade to 2020.3.3f1, 2021.1.2f1, or later to avoid this issue.");
+            return false;
+#else
+            return true;
+#endif
         }
 
         private static void ArrangeFilesForAssetPack(DirectoryInfo source, DirectoryInfo destination)
