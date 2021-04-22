@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,10 +24,44 @@ using UnityEditor.Build.Reporting;
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
     /// <summary>
+    /// Report containing the results of an <see cref="AndroidBuilder"/> build.
+    /// </summary>
+    public class AndroidBuildResult
+    {
+        /// <summary>
+        /// Returns true if Android Player build Succeeded, otherwise false.
+        /// </summary>
+        public bool Succeeded
+        {
+            get { return !Cancelled && ErrorMessage == null; }
+        }
+
+        /// <summary>
+        /// Returns true if the Android Player build was cancelled before it finished.
+        /// </summary>
+        public bool Cancelled { get; internal set; }
+
+        /// <summary>
+        /// If non-null, the build failed and this message may indicate the cause.
+        /// </summary>
+        public string ErrorMessage { get; internal set; }
+
+#if UNITY_2018_1_OR_NEWER
+        /// <summary>
+        /// Contains the BuildReport generated during the creation of the Android Player.
+        /// </summary>
+        public BuildReport Report { get; internal set; }
+#endif
+    }
+
+    /// <summary>
     /// Provides methods for building an Android app for distribution on Google Play.
     /// </summary>
     public class AndroidBuilder : IBuildTool
     {
+        // This string is returned by pre-2018.1's BuildPipeline.BuildPlayer() when a build is cancelled.
+        private const string BuildCancelledMessage = "Building Player was cancelled";
+
         private readonly AndroidSdkPlatform _androidSdkPlatform;
         private readonly ApkSigner _apkSigner;
 
@@ -52,7 +87,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// <returns>True if the build succeeded, false if it failed or was cancelled.</returns>
         public virtual bool BuildAndSign(BuildPlayerOptions buildPlayerOptions)
         {
-            if (!Build(buildPlayerOptions))
+            var androidBuildResult = Build(buildPlayerOptions);
+            if (!androidBuildResult.Succeeded)
             {
                 return false;
             }
@@ -87,8 +123,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Builds an APK or AAB based on the specified options.
         /// Displays warning/error dialogs if there are issues during the build.
         /// </summary>
-        /// <returns>True if the build succeeded, false if it failed or was cancelled.</returns>
-        public virtual bool Build(BuildPlayerOptions buildPlayerOptions)
+        public virtual AndroidBuildResult Build(BuildPlayerOptions buildPlayerOptions)
         {
             if (_buildToolLogger == null)
             {
@@ -105,64 +140,84 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 throw new ArgumentException("The build target group must be Android.", "buildPlayerOptions");
             }
 
-            var buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
-#if UNITY_2018_1_OR_NEWER
-            var totalErrors = buildReport.summary.totalErrors;
-            switch (buildReport.summary.result)
+            // Note: the type of the variable below differs by version. On 2018+ it's BuildReport. On pre-2018 it's
+            // string: if the string is null, the build was successful, otherwise it's a build error message.
+            var buildReportOrErrorMessage = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            var androidBuildResult = GetAndroidBuildResult(buildReportOrErrorMessage);
+            if (androidBuildResult.Cancelled)
             {
-                case BuildResult.Cancelled:
-                    Debug.Log("Build cancelled");
-                    return false;
-                case BuildResult.Succeeded:
-                    Debug.Log("Build succeeded");
-                    return HandleBuildPlayerSucceeded(totalErrors);
-                case BuildResult.Failed:
-                    _buildToolLogger.DisplayErrorDialog(string.Format("Build failed with {0} error(s)", totalErrors));
-                    return false;
-                default:
-                    _buildToolLogger.DisplayErrorDialog("Build failed with unknown error");
-                    return false;
-            }
-#else
-            if (string.IsNullOrEmpty(buildReport))
-            {
-                return true;
+                // Don't display an error message dialog if the user asked to cancel, just log to the Console.
+                Debug.Log(BuildCancelledMessage);
+                return androidBuildResult;
             }
 
-            // Check for intended build cancellation.
-            if (buildReport == "Building Player was cancelled")
+            if (androidBuildResult.Succeeded && !File.Exists(buildPlayerOptions.locationPathName))
             {
-                Debug.Log(buildReport);
+                // Sometimes the build "succeeds" but the AAB/APK file is missing.
+                androidBuildResult.ErrorMessage =
+                    string.Format(
+                        "The Android Player file \"{0}\" is missing, possibly because of a late cancellation.",
+                        buildPlayerOptions.locationPathName);
+#if UNITY_2018_1_OR_NEWER
+                androidBuildResult.ErrorMessage += " TotalErrors=" + buildReportOrErrorMessage.summary.totalErrors;
+#endif
+            }
+
+            if (androidBuildResult.Succeeded)
+            {
+                Debug.Log("Android Player build succeeded");
             }
             else
             {
-                _buildToolLogger.DisplayErrorDialog(buildReport);
+                _buildToolLogger.DisplayErrorDialog(androidBuildResult.ErrorMessage);
             }
 
-            return false;
-#endif
+            return androidBuildResult;
         }
 
 #if UNITY_2018_1_OR_NEWER
-        // This method is in an #if block since it's only called for 2018.1+
-        private static bool HandleBuildPlayerSucceeded(int totalErrors)
+        private static AndroidBuildResult GetAndroidBuildResult(BuildReport buildReport)
         {
-            if (totalErrors == 0)
+            var androidBuildResult = new AndroidBuildResult();
+            androidBuildResult.Report = buildReport;
+            switch (buildReport.summary.result)
             {
-                return true;
+                case BuildResult.Succeeded:
+                    // Do nothing.
+                    break;
+                case BuildResult.Cancelled:
+                    androidBuildResult.Cancelled = true;
+                    break;
+                case BuildResult.Failed:
+                    androidBuildResult.ErrorMessage =
+                        string.Format("Build failed with {0} error(s)", buildReport.summary.totalErrors);
+                    break;
+                case BuildResult.Unknown:
+                    androidBuildResult.ErrorMessage = "Build failed with unknown result";
+                    break;
+                default:
+                    androidBuildResult.ErrorMessage =
+                        "Build failed with unexpected result: " + buildReport.summary.result;
+                    break;
             }
 
-            var messagePrefix = string.Format("BuildPlayer \"succeeded\" with {0} error(s). ", totalErrors);
-#if UNITY_2018_4_OR_NEWER
-            // BuildPlayer can succeed and yet have non-zero totalErrors on some versions of Unity.
-            Debug.LogWarning(messagePrefix + "Assuming success.");
-            return true;
+            return androidBuildResult;
+        }
 #else
-            // BuildPlayer can fail and yet return BuildResult Succeeded on some versions of Unity.
-            // No need to display an error dialog since Unity should already have done this.
-            Debug.LogError(messagePrefix + "Assuming failure.");
-            return false;
-#endif
+        private static AndroidBuildResult GetAndroidBuildResult(string errorMessage)
+        {
+            var androidBuildResult = new AndroidBuildResult();
+            if (errorMessage == BuildCancelledMessage)
+            {
+                androidBuildResult.Cancelled = true;
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                // Assume that a null or empty error message string indicates success.
+                androidBuildResult.ErrorMessage = errorMessage;
+            }
+
+            return androidBuildResult;
         }
 #endif
     }

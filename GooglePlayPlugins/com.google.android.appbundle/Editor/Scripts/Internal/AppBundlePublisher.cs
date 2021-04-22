@@ -16,9 +16,16 @@ using System;
 using System.IO;
 using Google.Android.AppBundle.Editor.AssetPacks;
 using Google.Android.AppBundle.Editor.Internal.BuildTools;
-using Google.Android.AppBundle.Editor.Internal.Config;
 using UnityEditor;
+#if !UNITY_2018_3_OR_NEWER
+using Google.Android.AppBundle.Editor.Internal.Config;
+#endif
+#if UNITY_2018_2_OR_NEWER
 using UnityEngine;
+#endif
+#if UNITY_2018_4_OR_NEWER && !NET_LEGACY
+using System.Threading.Tasks;
+#endif
 
 namespace Google.Android.AppBundle.Editor.Internal
 {
@@ -27,12 +34,12 @@ namespace Google.Android.AppBundle.Editor.Internal
     /// </summary>
     public static class AppBundlePublisher
     {
-        [Serializable]
         private class AppBundleBuildSettings
         {
-            public string aabFilePath;
-            public bool requirePrerequisiteChecks;
+            public BuildPlayerOptions buildPlayerOptions;
+            public AssetPackConfig assetPackConfig;
             public bool runOnDevice;
+            public bool forceSynchronousBuild;
         }
 
 #if !UNITY_2018_3_OR_NEWER
@@ -43,31 +50,69 @@ namespace Google.Android.AppBundle.Editor.Internal
         [Serializable]
         private class AppBundlePostBuildTask : PostBuildTask
         {
-            public AppBundleBuildSettings buildSettings;
             public SerializableAssetPackConfig serializableAssetPackConfig;
             public string workingDirectoryPath;
+            public string aabFilePath;
+            public bool runOnDevice;
 
             public override void RunPostBuildTask()
             {
                 var buildToolLogger = new BuildToolLogger();
-                var assetPackConfig = SerializationHelper.Deserialize(serializableAssetPackConfig);
                 var appBundleBuilder = CreateAppBundleBuilder(workingDirectoryPath);
-                if (appBundleBuilder.Initialize(buildToolLogger))
-                {
-                    CreateBundleAsync(appBundleBuilder, buildSettings, assetPackConfig);
-                }
-                else
+                if (!appBundleBuilder.Initialize(buildToolLogger))
                 {
                     buildToolLogger.DisplayErrorDialog("Failed to initialize AppBundleBuilder in post-build task.");
+                    return;
                 }
+
+                var assetPackConfig = SerializationHelper.Deserialize(serializableAssetPackConfig);
+                CreateBundleAsync(appBundleBuilder, aabFilePath, assetPackConfig, runOnDevice);
             }
         }
 #endif
 
         private static IBuildModeProvider _buildModeProvider;
 
+#if UNITY_2018_4_OR_NEWER && !NET_LEGACY
+        /// <summary>
+        /// Builds an Android App Bundle given the specified configuration.
+        /// </summary>
+        public static async Task<AndroidBuildReport> BuildTask(AndroidBuildOptions androidBuildOptions)
+        {
+            var appBundleBuilder = CreateAppBundleBuilder();
+            if (!appBundleBuilder.Initialize(new BuildToolLogger()))
+            {
+                throw new Exception("Failed to initialize AppBundleBuilder");
+            }
+
+            return await appBundleBuilder.CreateBundleWithTask(androidBuildOptions, IsBatchMode);
+        }
+#endif
+
+        /// <summary>
+        /// Builds an Android App Bundle given the specified configuration.
+        /// </summary>
+        public static bool Build(
+            BuildPlayerOptions buildPlayerOptions, AssetPackConfig assetPackConfig, bool forceSynchronousBuild)
+        {
+            var appBundleBuilder = CreateAppBundleBuilder();
+            if (!appBundleBuilder.Initialize(new BuildToolLogger()))
+            {
+                return false;
+            }
+
+            var buildSettings = new AppBundleBuildSettings
+            {
+                buildPlayerOptions = buildPlayerOptions,
+                assetPackConfig = assetPackConfig ?? new AssetPackConfig(),
+                forceSynchronousBuild = forceSynchronousBuild
+            };
+            return Build(appBundleBuilder, buildSettings);
+        }
+
         /// <summary>
         /// Builds an Android App Bundle at a location specified in a file save dialog.
+        /// The AAB will include asset packs configured in Asset Delivery Settings.
         /// </summary>
         public static void Build()
         {
@@ -87,47 +132,32 @@ namespace Google.Android.AppBundle.Editor.Internal
 
             var buildSettings = new AppBundleBuildSettings
             {
-                requirePrerequisiteChecks = false,
-                runOnDevice = false
+                buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(aabFilePath),
+                assetPackConfig = AssetPackConfigSerializer.LoadConfig()
             };
-
-            var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(aabFilePath);
-            var assetPackConfig = AssetPackConfigSerializer.LoadConfig();
-            Build(appBundleBuilder, buildPlayerOptions, assetPackConfig, buildSettings);
+            Build(appBundleBuilder, buildSettings);
         }
 
         /// <summary>
         /// Builds an Android App Bundle to a temp directory and then runs it on device.
+        /// The AAB will include asset packs configured in Asset Delivery Settings.
         /// </summary>
         public static void BuildAndRun()
         {
+            var appBundleBuilder = CreateAppBundleBuilder();
+            if (!appBundleBuilder.Initialize(new BuildToolLogger()))
+            {
+                return;
+            }
+
+            var tempOutputFilePath = Path.Combine(appBundleBuilder.WorkingDirectoryPath, "temp.aab");
             var buildSettings = new AppBundleBuildSettings
             {
-                requirePrerequisiteChecks = true,
+                buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(tempOutputFilePath),
+                assetPackConfig = AssetPackConfigSerializer.LoadConfig(),
                 runOnDevice = true
             };
-
-            var appBundleBuilder = CreateAppBundleBuilder();
-            var tempOutputFilePath = Path.Combine(appBundleBuilder.WorkingDirectoryPath, "temp.aab");
-            var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(tempOutputFilePath);
-            var assetPackConfig = AssetPackConfigSerializer.LoadConfig();
-            Build(appBundleBuilder, buildPlayerOptions, assetPackConfig, buildSettings);
-        }
-
-        /// <summary>
-        /// Builds an Android App Bundle given the specified <see cref="BuildPlayerOptions"/>.
-        /// </summary>
-        /// <returns>True if the build succeeded, false if it failed or was cancelled.</returns>
-        public static bool Build(BuildPlayerOptions buildPlayerOptions, AssetPackConfig assetPackConfig)
-        {
-            var buildSettings = new AppBundleBuildSettings
-            {
-                requirePrerequisiteChecks = true,
-                runOnDevice = false
-            };
-
-            var appBundleBuilder = CreateAppBundleBuilder();
-            return Build(appBundleBuilder, buildPlayerOptions, assetPackConfig, buildSettings);
+            Build(appBundleBuilder, buildSettings);
         }
 
         /// <summary>
@@ -139,49 +169,45 @@ namespace Google.Android.AppBundle.Editor.Internal
             _buildModeProvider = buildModeProvider;
         }
 
-        private static bool Build(AppBundleBuilder appBundleBuilder, BuildPlayerOptions buildPlayerOptions,
-            AssetPackConfig assetPackConfig, AppBundleBuildSettings buildSettings)
+        private static bool Build(AppBundleBuilder appBundleBuilder, AppBundleBuildSettings buildSettings)
         {
-            if (buildSettings.requirePrerequisiteChecks && !appBundleBuilder.Initialize(new BuildToolLogger()))
+            var androidBuildResult = appBundleBuilder.BuildAndroidPlayer(buildSettings.buildPlayerOptions);
+            if (!androidBuildResult.Succeeded)
             {
                 return false;
             }
 
-            buildSettings.aabFilePath = buildPlayerOptions.locationPathName;
-            Debug.LogFormat("Building app bundle: {0}", buildSettings.aabFilePath);
-            bool buildSucceeded = appBundleBuilder.BuildAndroidPlayer(buildPlayerOptions);
-            if (!buildSucceeded)
+            var aabFilePath = buildSettings.buildPlayerOptions.locationPathName;
+            if (IsBatchMode || buildSettings.forceSynchronousBuild)
             {
-                return false;
-            }
-
-            if (IsBatchMode)
-            {
-                return appBundleBuilder.CreateBundle(buildSettings.aabFilePath, assetPackConfig);
+                var errorMessage = appBundleBuilder.CreateBundle(aabFilePath, buildSettings.assetPackConfig);
+                return errorMessage == null;
             }
 
 #if UNITY_2018_3_OR_NEWER
-            CreateBundleAsync(appBundleBuilder, buildSettings, assetPackConfig);
+            CreateBundleAsync(appBundleBuilder, aabFilePath, buildSettings.assetPackConfig, buildSettings.runOnDevice);
 #else
             var task = new AppBundlePostBuildTask
             {
-                buildSettings = buildSettings,
-                serializableAssetPackConfig = SerializationHelper.Serialize(assetPackConfig),
-                workingDirectoryPath = appBundleBuilder.WorkingDirectoryPath
+                serializableAssetPackConfig = SerializationHelper.Serialize(buildSettings.assetPackConfig),
+                workingDirectoryPath = appBundleBuilder.WorkingDirectoryPath,
+                aabFilePath = aabFilePath,
+                runOnDevice = buildSettings.runOnDevice
             };
             PostBuildRunner.RunTask(task);
 #endif
+            // This return value should be ignored since the build is being finished asynchronously.
             return true;
         }
 
         private static void CreateBundleAsync(
-            AppBundleBuilder appBundleBuilder, AppBundleBuildSettings buildSettings, AssetPackConfig assetPackConfig)
+            AppBundleBuilder appBundleBuilder, string aabFilePath, AssetPackConfig assetPackConfig, bool runOnDevice)
         {
             var callback =
-                buildSettings.runOnDevice
+                runOnDevice
                     ? (AppBundleBuilder.PostBuildCallback) RunBundle
                     : EditorUtility.RevealInFinder;
-            appBundleBuilder.CreateBundleAsync(buildSettings.aabFilePath, assetPackConfig, callback);
+            appBundleBuilder.CreateBundleAsync(aabFilePath, assetPackConfig, callback);
         }
 
         private static void RunBundle(string aabFile)

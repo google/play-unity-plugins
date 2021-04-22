@@ -31,6 +31,16 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             return (TextureCompressionFormat) Enum.Parse(typeof(TextureCompressionFormat), textureCompressionFormat);
         }
 
+        /// <summary>
+        /// Returns a deep copy of the specified <see cref="AssetPackConfig"/>.
+        /// </summary>
+        /// <param name="assetPackConfig">The AssetPackConfig to copy.</param>
+        /// <returns>A new copy of the original AssetPackConfig.</returns>
+        public static AssetPackConfig DeepCopy(AssetPackConfig assetPackConfig)
+        {
+            return Deserialize(Serialize(assetPackConfig));
+        }
+
         public static SerializableAssetPackConfig Serialize(AssetPackConfig assetPackConfig)
         {
             var config = new SerializableAssetPackConfig
