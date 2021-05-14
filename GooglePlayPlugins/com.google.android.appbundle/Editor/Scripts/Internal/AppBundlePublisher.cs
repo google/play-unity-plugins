@@ -85,7 +85,7 @@ namespace Google.Android.AppBundle.Editor.Internal
                 throw new Exception("Failed to initialize AppBundleBuilder");
             }
 
-            return await appBundleBuilder.CreateBundleWithTask(androidBuildOptions, IsBatchMode);
+            return await appBundleBuilder.CreateBundleWithTask(androidBuildOptions);
         }
 #endif
 

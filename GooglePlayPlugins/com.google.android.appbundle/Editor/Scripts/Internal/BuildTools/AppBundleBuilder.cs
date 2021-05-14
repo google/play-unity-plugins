@@ -352,12 +352,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// as specified.
         /// </summary>
         /// <param name="androidBuildOptions">Options indicating how to build the AAB, including asset packs.</param>
-        /// <param name="buildSynchronously">
-        /// Indicates whether to perform the build only on the main thread or to execute some steps asynchronously.
-        /// </param>
         /// <returns>An async task that provides an AndroidBuildReport.</returns>
-        public async Task<AndroidBuildReport> CreateBundleWithTask(
-            AndroidBuildOptions androidBuildOptions, bool buildSynchronously)
+        public async Task<AndroidBuildReport> CreateBundleWithTask(AndroidBuildOptions androidBuildOptions)
         {
             var taskCompletionSource = new TaskCompletionSource<AndroidBuildReport>();
             var androidBuildResult = BuildAndroidPlayer(androidBuildOptions.BuildPlayerOptions);
@@ -377,7 +373,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             var aabFilePath = androidBuildOptions.BuildPlayerOptions.locationPathName;
             var assetPackConfig = androidBuildOptions.AssetPackConfig ?? new AssetPackConfig();
-            if (buildSynchronously)
+            if (androidBuildOptions.ForceSingleThreadedBuild || Application.isBatchMode)
             {
                 CreateBundleInternal(taskCompletionSource, aabFilePath, assetPackConfig, androidBuildReport);
             }

@@ -52,5 +52,11 @@ namespace Google.Android.AppBundle.Editor
         /// Returns the AssetPackConfig to use for the build, or null.
         /// </summary>
         public AssetPackConfig AssetPackConfig { get; set; }
+
+        /// <summary>
+        /// If true, forces the entire build to run on the main thread, potentially freezing the Editor UI during some
+        /// build steps. This setting doesn't affect batch mode builds, which always run on the main thread.
+        /// </summary>
+        public bool ForceSingleThreadedBuild;
     }
 }
