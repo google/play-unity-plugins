@@ -1,5 +1,11 @@
 # Changelog for com.google.android.appbundle
 
+## [1.4.1 - 2021-05-17
+### New Features
+ - Updated bundletool-all.jar from 1.5.0 to 1.6.1
+### Bug Fixes
+ - Fixed issue #106: bundletool build-bundle crashed when output file was specified without a parent directory
+
 ## [1.4.0] - 2021-03-08
 ### New Features
  - Updated bundletool-all.jar from 1.2.0 to 1.5.0
