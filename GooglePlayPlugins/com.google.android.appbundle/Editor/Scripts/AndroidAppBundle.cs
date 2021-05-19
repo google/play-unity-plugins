@@ -34,9 +34,14 @@ namespace Google.Android.AppBundle.Editor
     public static class AndroidAppBundle
     {
         /// <summary>
-        /// The base module contains the Unity game engine.
+        /// Reserved name for the base module that contains the Unity game engine.
         /// </summary>
         public const string BaseModuleName = "base";
+
+        /// <summary>
+        /// Reserved name for the module that separates the base module's assets into an install-time asset pack.
+        /// </summary>
+        public const string BaseAssetsModuleName = "base_assets";
 
         /// <summary>
         /// Regex used to determine whether a module name is valid.
@@ -46,14 +51,15 @@ namespace Google.Android.AppBundle.Editor
 
         /// <summary>
         /// Returns true if the specified name is a valid Android App Bundle module name, false otherwise.
-        /// The name "base" is reserved for the base module, so also return false in that case.
+        /// Certain names like "base" are reserved, so also return false in those cases.
         /// </summary>
         public static bool IsValidModuleName(string name)
         {
             // TODO: enforce a name length limit if we make it much smaller than 65535.
             return name != null
                    && NameRegex.IsMatch(name)
-                   && !name.Equals(BaseModuleName, StringComparison.OrdinalIgnoreCase);
+                   && CheckReservedName(name, BaseModuleName)
+                   && CheckReservedName(name, BaseAssetsModuleName);
         }
 
         /// <summary>
@@ -99,6 +105,11 @@ namespace Google.Android.AppBundle.Editor
 #if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
             EditorUserBuildSettings.buildAppBundle = false;
 #endif
+        }
+
+        private static bool CheckReservedName(string name, string reserved)
+        {
+            return !name.Equals(reserved, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

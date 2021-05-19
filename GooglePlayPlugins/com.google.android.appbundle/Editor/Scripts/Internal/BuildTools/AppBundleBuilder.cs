@@ -23,6 +23,7 @@ using Google.Android.AppBundle.Editor.Internal.Config;
 using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
 using UnityEngine;
+
 #if UNITY_2018_4_OR_NEWER && !NET_LEGACY
 using System.Threading.Tasks;
 #endif
@@ -181,6 +182,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 targetGroup = buildPlayerOptions.targetGroup
             };
 
+            // TODO: indicate that this feature needs to be disabled and recommend the asset pack alternative.
+            PlayerSettings.Android.useAPKExpansionFiles = false;
+
             if (EditorUserBuildSettings.androidBuildSystem == AndroidBuildSystem.Gradle)
             {
                 EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
@@ -249,6 +253,21 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             moduleDirectoryList.Add(baseDirectory);
+
+            if (assetPackConfig.SplitBaseModuleAssets)
+            {
+                // Move assets from base module directory to the separate module's directory.
+                var splitBaseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseAssetsModuleName);
+                var splitBaseErrorMessage = CreateSplitBaseModule(baseDirectory, splitBaseDirectory);
+                if (splitBaseErrorMessage != null)
+                {
+                    // Already displayed the error.
+                    return splitBaseErrorMessage;
+                }
+
+                configParams.containsInstallTimeAssetPack = true;
+                moduleDirectoryList.Add(splitBaseDirectory);
+            }
 
             // Create a ZIP file for each module directory.
             var moduleFiles = new List<string>();
@@ -484,25 +503,17 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private string CreateAssetPackModule(
             string assetPackName, AssetPack assetPack, DirectoryInfo assetPackDirectoryInfo)
         {
-            var androidManifestXmlPath = Path.Combine(assetPackDirectoryInfo.FullName, AndroidManifestFileName);
-            var assetPackManifestXDocument =
-                CreateAssetPackManifestXDocument(assetPackName, assetPack.DeliveryMode);
-            assetPackManifestXDocument.Save(androidManifestXmlPath);
-
-            // Use aapt2 link to make a bundletool compatible module
-            var sourceDirectoryInfo = assetPackDirectoryInfo.CreateSubdirectory("source");
             var aaptErrorMessage =
-                _androidAssetPackagingTool.Link(androidManifestXmlPath, sourceDirectoryInfo.FullName);
+                CreateAssetPackWithManifest(assetPackDirectoryInfo, assetPackName, assetPack.DeliveryMode);
             if (aaptErrorMessage != null)
             {
-                return DisplayBuildError("AAPT2 link " + assetPackName, aaptErrorMessage);
+                // Already displayed the error.
+                return aaptErrorMessage;
             }
 
-            var destinationDirectoryInfo = GetDestinationSubdirectory(assetPackDirectoryInfo);
-            ArrangeFilesForAssetPack(sourceDirectoryInfo, destinationDirectoryInfo);
-
             // Copy all assets to an "assets" subdirectory in the destination folder.
-            var destinationAssetsDirectory = destinationDirectoryInfo.CreateSubdirectory(AssetsDirectoryName);
+            var destinationAssetsDirectory =
+                GetDestinationSubdirectory(assetPackDirectoryInfo).CreateSubdirectory(AssetsDirectoryName);
             if (assetPack.AssetBundleFilePath != null)
             {
                 // Copy AssetBundle files into the module's "assets" folder, inside an "assetpack" folder.
@@ -687,6 +698,31 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return null;
         }
 
+        private string CreateSplitBaseModule(DirectoryInfo baseDirectory, DirectoryInfo splitBaseDirectory)
+        {
+            var aaptErrorMessage =
+                CreateAssetPackWithManifest(
+                    splitBaseDirectory, AndroidAppBundle.BaseAssetsModuleName, AssetPackDeliveryMode.InstallTime);
+            if (aaptErrorMessage != null)
+            {
+                // Already displayed the error.
+                return aaptErrorMessage;
+            }
+
+            var baseDestination = GetDestinationSubdirectory(baseDirectory);
+            var baseAssetsDirectories = baseDestination.GetDirectories(AssetsDirectoryName);
+            if (baseAssetsDirectories.Length != 1)
+            {
+                return DisplayBuildError("Find base assets directory",
+                    string.Format("Expected 1 directory but found {0}", baseAssetsDirectories.Length));
+            }
+
+            var splitBaseDestination = GetDestinationSubdirectory(splitBaseDirectory);
+            var splitBaseAssetsPath = Path.Combine(splitBaseDestination.FullName, AssetsDirectoryName);
+            baseAssetsDirectories[0].MoveTo(splitBaseAssetsPath);
+            return null;
+        }
+
         private bool UseNativeAppBundleSupport
         {
             get { return _isGradleBuild && AndroidAppBundle.HasNativeBuildSupport(); }
@@ -711,10 +747,23 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 #endif
         }
 
-        private static void ArrangeFilesForAssetPack(DirectoryInfo source, DirectoryInfo destination)
+        private string CreateAssetPackWithManifest(
+            DirectoryInfo rootDirectory, string assetPackName, AssetPackDeliveryMode deliveryMode)
         {
+            var androidManifestFilePath = Path.Combine(rootDirectory.FullName, AndroidManifestFileName);
+            var assetPackManifestXDocument = CreateAssetPackManifestXDocument(assetPackName, deliveryMode);
+            assetPackManifestXDocument.Save(androidManifestFilePath);
+
+            var source = rootDirectory.CreateSubdirectory("manifest");
+            var aaptErrorMessage = _androidAssetPackagingTool.Link(androidManifestFilePath, source.FullName);
+            if (aaptErrorMessage != null)
+            {
+                return DisplayBuildError("AAPT2 link " + assetPackName, aaptErrorMessage);
+            }
+
             // aapt2 link creates an empty resource table even though asset packs have no resources.
             // Bundletool fails if the asset pack has a resources.pb. Only retain the AndroidManifest.xml file.
+            var destination = GetDestinationSubdirectory(rootDirectory);
             foreach (var sourceFileInfo in source.GetFiles())
             {
                 if (sourceFileInfo.Name == AndroidManifestFileName)
@@ -723,6 +772,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     sourceFileInfo.MoveTo(Path.Combine(destinationSubdirectory.FullName, sourceFileInfo.Name));
                 }
             }
+
+            return null;
         }
 
         private static void ArrangeFilesForExistingModule(DirectoryInfo source, DirectoryInfo destination)
@@ -795,7 +846,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Given the root directory of an existing AAB, return a list of all bundle metadata files in the specific
         /// format expected by bundletool.
         /// </summary>
-        private IList<string> GetExistingBundleMetadata(DirectoryInfo rootDirectoryInfo)
+        private static IList<string> GetExistingBundleMetadata(DirectoryInfo rootDirectoryInfo)
         {
             var bundleMetadata = new List<string>();
             var bundleMetadataDirectories = rootDirectoryInfo.GetDirectories(BundleMetadataDirectoryName);

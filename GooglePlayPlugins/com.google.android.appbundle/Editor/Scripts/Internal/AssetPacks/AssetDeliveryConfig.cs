@@ -31,6 +31,11 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
         public TextureCompressionFormat DefaultTextureCompressionFormat = TextureCompressionFormat.Default;
 
         /// <summary>
+        /// Whether to split the assets in an AAB's base module into a separate install-time asset pack.
+        /// </summary>
+        public bool SplitBaseModuleAssets;
+
+        /// <summary>
         /// Dictionary from a folder path to a AssetBundleFolder object describing the folder's contents.
         /// </summary>
         public readonly IDictionary<string, AssetBundleFolder> Folders =

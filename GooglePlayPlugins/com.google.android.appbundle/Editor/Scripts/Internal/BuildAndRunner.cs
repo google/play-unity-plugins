@@ -60,9 +60,9 @@ namespace Google.Android.AppBundle.Editor.Internal
         private static void BuildAndRunDefault()
         {
             var assetPackConfig = AssetPackConfigSerializer.LoadConfig();
-            if (assetPackConfig.DeliveredAssetPacks.Any())
+            if (assetPackConfig.HasDeliveredAssetPacks())
             {
-                AppBundlePublisher.BuildAndRun();
+                AppBundlePublisher.BuildAndRun(assetPackConfig);
             }
             else
             {

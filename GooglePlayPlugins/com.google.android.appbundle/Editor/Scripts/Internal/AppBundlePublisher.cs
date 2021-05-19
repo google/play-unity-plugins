@@ -140,9 +140,9 @@ namespace Google.Android.AppBundle.Editor.Internal
 
         /// <summary>
         /// Builds an Android App Bundle to a temp directory and then runs it on device.
-        /// The AAB will include asset packs configured in Asset Delivery Settings.
         /// </summary>
-        public static void BuildAndRun()
+        /// <param name="assetPackConfig">The asset pack configuration to use when building.</param>
+        public static void BuildAndRun(AssetPackConfig assetPackConfig)
         {
             var appBundleBuilder = CreateAppBundleBuilder();
             if (!appBundleBuilder.Initialize(new BuildToolLogger()))
@@ -154,7 +154,7 @@ namespace Google.Android.AppBundle.Editor.Internal
             var buildSettings = new AppBundleBuildSettings
             {
                 buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(tempOutputFilePath),
-                assetPackConfig = AssetPackConfigSerializer.LoadConfig(),
+                assetPackConfig = assetPackConfig,
                 runOnDevice = true
             };
             Build(appBundleBuilder, buildSettings);

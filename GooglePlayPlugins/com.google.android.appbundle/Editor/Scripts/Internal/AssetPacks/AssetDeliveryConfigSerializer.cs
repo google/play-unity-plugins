@@ -60,7 +60,8 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
         {
             var config = new SerializableAssetPackConfig
             {
-                DefaultTextureCompressionFormat = assetDeliveryConfig.DefaultTextureCompressionFormat
+                DefaultTextureCompressionFormat = assetDeliveryConfig.DefaultTextureCompressionFormat,
+                splitBaseModuleAssets = assetDeliveryConfig.SplitBaseModuleAssets
             };
 
             foreach (var assetPack in assetDeliveryConfig.AssetBundlePacks.Values)
@@ -86,7 +87,8 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
         {
             var assetDeliveryConfig = new AssetDeliveryConfig
             {
-                DefaultTextureCompressionFormat = config.DefaultTextureCompressionFormat
+                DefaultTextureCompressionFormat = config.DefaultTextureCompressionFormat,
+                SplitBaseModuleAssets = config.splitBaseModuleAssets
             };
 
             var paths = new HashSet<string>();

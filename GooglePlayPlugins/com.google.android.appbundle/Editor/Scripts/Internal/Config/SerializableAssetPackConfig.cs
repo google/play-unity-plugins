@@ -28,6 +28,8 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
         public List<SerializableMultiTargetingAssetBundle> assetBundles =
             new List<SerializableMultiTargetingAssetBundle>();
 
+        public bool splitBaseModuleAssets;
+
         public string defaultTextureCompressionFormat = TextureCompressionFormat.Default.ToString();
 
         public TextureCompressionFormat DefaultTextureCompressionFormat

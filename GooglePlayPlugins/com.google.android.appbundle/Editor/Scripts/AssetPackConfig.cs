@@ -20,10 +20,20 @@ using System.Linq;
 namespace Google.Android.AppBundle.Editor
 {
     /// <summary>
-    /// Configuration for all asset packs that will be packaged in an Android App Bundle.
+    /// Configuration for all asset packs that will be packaged in an Android App Bundle (AAB).
     /// </summary>
     public class AssetPackConfig
     {
+        /// <summary>
+        /// Indicates that the assets in an AAB's base module should be split into a separate install-time asset
+        /// pack. Usually when building a game, some assets are stored in the base module's "assets" directory.
+        /// Games that run into APK size limits may have previously used the "Split Application Binary"
+        /// option to create APK Expansion (*.obb) files, however this is unsupported with AABs.
+        /// If Play Console indicates that the base module exceeds a download size limit, for example 150 MB,
+        /// enabling this option may resolve the issue. See https://developer.android.com/guide/app-bundle.
+        /// </summary>
+        public bool SplitBaseModuleAssets;
+
         /// <summary>
         /// Dictionary from asset pack name to <see cref="AssetPack"/> object containing info such as delivery mode.
         /// Note: asset pack names must start with a letter and can contain only letters, numbers, and underscores.
@@ -34,6 +44,7 @@ namespace Google.Android.AppBundle.Editor
 
         /// <summary>
         /// A dictionary containing the subset of <see cref="AssetPacks"/> that are marked for delivery.
+        /// Note: the returned Dictionary doesn't indicate whether <see cref="SplitBaseModuleAssets"/> is enabled.
         /// </summary>
         public Dictionary<string, AssetPack> DeliveredAssetPacks
         {
@@ -50,6 +61,15 @@ namespace Google.Android.AppBundle.Editor
         /// when building standalone APKs for Android pre-Lollipop devices.
         /// </summary>
         public TextureCompressionFormat DefaultTextureCompressionFormat = TextureCompressionFormat.Default;
+
+        /// <summary>
+        /// Returns true if this configuration includes at least 1 asset pack that may be packaged in an AAB.
+        /// Return true if <see cref="SplitBaseModuleAssets"/> is enabled, even if there are no other asset packs.
+        /// </summary>
+        public bool HasDeliveredAssetPacks()
+        {
+            return SplitBaseModuleAssets || DeliveredAssetPacks.Any();
+        }
 
         /// <summary>
         /// Package the specified AssetBundle file in its own <see cref="AssetPack"/> with the specified delivery mode.
