@@ -18,8 +18,8 @@ using System.Collections.Generic;
 namespace Google.Android.AppBundle.Editor
 {
     /// <summary>
-    /// Contains configuration about an asset pack including its <see cref="AssetPackDeliveryMode"/> and the location
-    /// on disk of the files that should be included in the pack.
+    /// Contains configuration about an asset pack including its <see cref="AssetPackDeliveryMode"/>
+    /// and the location on disk of the files that should be included in the pack.
     /// </summary>
     public class AssetPack
     {
@@ -38,9 +38,7 @@ namespace Google.Android.AppBundle.Editor
         /// Delivery APIs.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetPackDirectoryPath"/>,
-        /// <see cref="CompressionFormatToAssetBundleFilePath"/> or
-        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
+        /// Thrown on set if any other path property is already set (non-null).
         /// </exception>
         public string AssetBundleFilePath
         {
@@ -70,9 +68,7 @@ namespace Google.Android.AppBundle.Editor
         /// Location on disk of a folder containing raw asset files.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetBundleFilePath"/>,
-        /// <see cref="CompressionFormatToAssetBundleFilePath"/> or
-        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
+        /// Thrown on set if any other path property is already set (non-null).
         /// </exception>
         public string AssetPackDirectoryPath
         {
@@ -105,8 +101,7 @@ namespace Google.Android.AppBundle.Editor
         /// be delivered.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetBundleFilePath"/>, <see cref="AssetPackDirectoryPath"/> or
-        /// <see cref="CompressionFormatToAssetPackDirectoryPath"/> are non-null.
+        /// Thrown on set if any other path property is already set (non-null).
         /// </exception>
         public Dictionary<TextureCompressionFormat, string> CompressionFormatToAssetBundleFilePath
         {
@@ -139,8 +134,7 @@ namespace Google.Android.AppBundle.Editor
         /// will be delivered.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Thrown on set if either <see cref="AssetBundleFilePath"/>, <see cref="AssetPackDirectoryPath"/> or
-        /// <see cref="CompressionFormatToAssetBundleFilePath"/> are non-null.
+        /// Thrown on set if any other path property is already set (non-null).
         /// </exception>
         public Dictionary<TextureCompressionFormat, string> CompressionFormatToAssetPackDirectoryPath
         {

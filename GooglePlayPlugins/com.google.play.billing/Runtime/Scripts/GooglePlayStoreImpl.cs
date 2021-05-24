@@ -39,8 +39,6 @@ namespace Google.Play.Billing
         private readonly GooglePlayBillingUtil _billingUtil;
         private readonly JniUtils _jniUtils;
 
-        private readonly AutoResetEvent _billingClientStartConnectionCallStatus = new AutoResetEvent(false);
-
         private volatile Dictionary<SkuType, AsyncRequestStatus> _billingClientQuerySkuDetailsCallStatus =
             new Dictionary<SkuType, AsyncRequestStatus>
             {
@@ -74,7 +72,11 @@ namespace Google.Play.Billing
         public void Initialize(IStoreCallback callback)
         {
             _callback = callback;
+        }
 
+        // Unity IAP framework will call this method after Initialize method regardless.
+        public void RetrieveProducts(ReadOnlyCollection<ProductDefinition> products)
+        {
             _billingClientStateListener = new BillingClientStateListener();
             // Retry connection when Play Billing Service is disconnected.
             _billingClientStateListener.OnBillingServiceDisconnected += () =>
@@ -83,30 +85,26 @@ namespace Google.Play.Billing
                 EndConnection();
                 InstantiateBillingClientAndMakeConnection();
             };
-            // Mark Billing Client startConnection method call as completed.
-            _billingClientStateListener.OnBillingSetupFinished += MarkBillingClientStartConnectionCallComplete;
+            _billingClientStateListener.OnBillingSetupFinished += (billingResult) =>
+            {
+                MarkBillingClientStartConnectionCallComplete(billingResult);
+                if (_billingClientReady)
+                {
+                    _inventory.UpdateCatalog(products);
+
+                    // Kick off tasks to retrieve products information on the main thread.
+                    _billingUtil.RunOnMainThread(() =>
+                        RetrieveProductsInternal(products));
+                }
+                else
+                {
+                    _billingUtil.LogWarningFormat("Google Play Store: play billing service unavailable!");
+                    _billingUtil.RunOnMainThread(() =>
+                        _callback.OnSetupFailed(InitializationFailureReason.PurchasingUnavailable));
+                }
+            };
 
             InstantiateBillingClientAndMakeConnection();
-            // Block this method until startConnection call finishes. This is because the follow-up call will depend on
-            // this connection.
-            _billingClientStartConnectionCallStatus.WaitOne(Constants.BillingClientAsyncTimeout);
-        }
-
-        // Unity IAP framework will call this method after Initialize method regardless.
-        public void RetrieveProducts(ReadOnlyCollection<ProductDefinition> products)
-        {
-            if (!_billingClientReady)
-            {
-                _billingUtil.LogWarningFormat("Google Play Store: play billing service unavailable!");
-                _billingUtil.RunOnMainThread(() =>
-                    _callback.OnSetupFailed(InitializationFailureReason.PurchasingUnavailable));
-                return;
-            }
-
-            _inventory.UpdateCatalog(products);
-
-            // Run tasks to retrieve products information and trigger callback when all of them finished.
-            RetrieveProductsInternal(products);
         }
 
         private void RetrieveProductsInternal(ReadOnlyCollection<ProductDefinition> products)
@@ -472,8 +470,6 @@ namespace Google.Play.Billing
                     "Failed to connect to service with error code '{0}' and debug message: '{1}'.",
                     responseCode, JniUtils.GetDebugMessageFromBillingResult(billingResult));
             }
-
-            _billingClientStartConnectionCallStatus.Set();
         }
 
         private void QuerySkuDetailsForSkuType(ReadOnlyCollection<ProductDefinition> products,

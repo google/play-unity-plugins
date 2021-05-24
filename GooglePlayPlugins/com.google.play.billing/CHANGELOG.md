@@ -1,5 +1,11 @@
 # Changelog for com.google.play.billing
 
+## [3.1.2] - 2021-03-08
+### New Features
+ - Included Google Play Billing Libary [version 3.0.3](https://developer.android.com/google/play/billing/billing_library_releases_notes)
+### Bug Fixes
+ - Fixed issue #78: address conflicting class issue with Unity IAP 2.2+
+
 ## [3.1.0] - 2020-09-30
 ### New Features
  - Included Google Play Billing Libary [version 3.0.1](https://developer.android.com/google/play/billing/billing_library_releases_notes)

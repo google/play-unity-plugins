@@ -7,8 +7,53 @@
 # Play Billing Library Proguard Rules:
 
 # Keep the AIDL interface
--keep class com.android.vending.billing.**
+-keep class com.android.vending.billing.** { *; }
 
 # Keep the PBL public APIs
--keep class com.android.billingclient.api.**
+-keep class com.android.billingclient.api.AcknowledgePurchaseParams { *; }
 
+-keep class com.android.billingclient.api.AcknowledgePurchaseResponseListener { *; }
+
+-keep class com.android.billingclient.api.BillingClientImpl {
+    public *;
+
+    <init>(java.lang.String);
+
+    private void initialize(android.content.Context, com.android.billingclient.api.PurchasesUpdatedListener, boolean);
+ }
+
+-keep class com.android.billingclient.api.AcknowledgePurchaseParams$Builder { *; }
+
+-keep class com.android.billingclient.api.AcknowledgePurchaseResponseListener { *; }
+
+-keep class com.android.billingclient.api.BillingClientStateListener { *; }
+
+-keep class com.android.billingclient.api.BillingFlowParams$Builder { *; }
+
+-keep class com.android.billingclient.api.BillingResult { *; }
+
+-keep class com.android.billingclient.api.ConsumeParams$Builder { *; }
+
+-keep class com.android.billingclient.api.ConsumeResponseListener { *; }
+
+-keep class com.android.billingclient.api.PriceChangeFlowParams$Builder { *; }
+
+-keep class com.android.billingclient.api.PriceChangeConfirmationListener { *; }
+
+-keep class com.android.billingclient.api.Purchase {
+    public java.lang.String getOriginalJson();
+
+    public java.lang.String getSignature();
+}
+
+-keep class com.android.billingclient.api.Purchase$PurchasesResult { *; }
+
+-keep class com.android.billingclient.api.PurchasesUpdatedListener { *; }
+
+-keep class com.android.billingclient.api.SkuDetails {
+    public java.lang.String getOriginalJson();
+}
+
+-keep class com.android.billingclient.api.SkuDetailsParams$Builder { *; }
+
+-keep class com.android.billingclient.api.SkuDetailsResponseListener { *; }

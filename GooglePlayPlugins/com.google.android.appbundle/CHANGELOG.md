@@ -1,5 +1,19 @@
 # Changelog for com.google.android.appbundle
 
+## [1.4.1 - 2021-05-17
+### New Features
+ - Updated bundletool-all.jar from 1.5.0 to 1.6.1
+### Bug Fixes
+ - Fixed issue #106: bundletool build-bundle crashed when output file was specified without a parent directory
+
+## [1.4.0] - 2021-03-08
+### New Features
+ - Updated bundletool-all.jar from 1.2.0 to 1.5.0
+### Bug Fixes
+ - Fixed issue #69: add a random name to temporary build path
+ - Fixed issue #74: update bundletool-all.jar with fix
+ - Fixed issue #82: pass "-Duser.language=en" to jarsigner
+
 ## [1.3.0] - 2020-09-30
 ### New Features
  - Updated bundletool-all.jar from 1.0.0 to 1.2.0

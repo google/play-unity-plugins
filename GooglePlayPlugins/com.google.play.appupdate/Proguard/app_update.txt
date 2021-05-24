@@ -1,0 +1,156 @@
+# Copyright 2018 Google LLC
+#
+# The Play Core Library is licensed to you under the Android Software
+# Development Kit License Agreement -
+# https://developer.android.com/studio/terms ("Agreement"). By using the Play
+# Core Library, you agree to the terms of this Agreement.
+
+# Play Core Proguard Rules: Play In-app Update
+
+-keep class com.google.android.play.core.appupdate.AppUpdateInfo {
+    public java.lang.String packageName();
+    public int availableVersionCode();
+    public int updateAvailability();
+    public int installStatus();
+    public boolean isUpdateTypeAllowed(com.google.android.play.core.appupdate.AppUpdateOptions);
+    public boolean isUpdateTypeAllowed(int);
+    public int updatePriority();
+    public long bytesDownloaded();
+    public long totalBytesToDownload();
+    public java.lang.Integer clientVersionStalenessDays();
+}
+
+-keep class com.google.android.play.core.appupdate.AppUpdateManager {
+    public abstract void registerListener(com.google.android.play.core.install.InstallStateUpdatedListener);
+    public abstract void unregisterListener(com.google.android.play.core.install.InstallStateUpdatedListener);
+
+    public abstract com.google.android.play.core.tasks.Task completeUpdate();
+    public abstract com.google.android.play.core.tasks.Task getAppUpdateInfo();
+    public com.google.android.play.core.tasks.Task startUpdateFlow(com.google.android.play.core.appupdate.AppUpdateInfo, android.app.Activity, com.google.android.play.core.appupdate.AppUpdateOptions);
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, android.app.Activity, int);
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, com.google.android.play.core.common.IntentSenderForResultStarter, int);
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, android.app.Activity, com.google.android.play.core.appupdate.AppUpdateOptions, int);
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, com.google.android.play.core.common.IntentSenderForResultStarter, com.google.android.play.core.appupdate.AppUpdateOptions, int);
+}
+
+-keep class com.google.android.play.core.appupdate.AppUpdateManagerFactory {
+    <init>();
+
+    public static com.google.android.play.core.appupdate.AppUpdateManager create(android.content.Context);
+}
+
+-keep class com.google.android.play.core.appupdate.AppUpdateOptions {
+    public abstract boolean allowAssetPackDeletion();
+    public abstract int appUpdateType();
+    public static com.google.android.play.core.appupdate.AppUpdateOptions$Builder newBuilder(int);
+    public static com.google.android.play.core.appupdate.AppUpdateOptions defaultOptions(int);
+}
+
+-keep class com.google.android.play.core.appupdate.AppUpdateOptions$Builder {
+    public abstract com.google.android.play.core.appupdate.AppUpdateOptions$Builder setAllowAssetPackDeletion(boolean);
+    public abstract com.google.android.play.core.appupdate.AppUpdateOptions$Builder setAppUpdateType(int);
+    public abstract com.google.android.play.core.appupdate.AppUpdateOptions build();
+}
+
+-keep class com.google.android.play.core.appupdate.testing.FakeAppUpdateManager {
+    public <init>(android.content.Context);
+
+    public void registerListener(com.google.android.play.core.install.InstallStateUpdatedListener);
+    public void unregisterListener(com.google.android.play.core.install.InstallStateUpdatedListener);
+
+    public com.google.android.play.core.tasks.Task completeUpdate();
+    public com.google.android.play.core.tasks.Task getAppUpdateInfo();
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, android.app.Activity, int);
+    public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, com.google.android.play.core.common.IntentSenderForResultStarter, int);
+
+    public void setUpdateAvailable(int);
+    public void setUpdateNotAvailable();
+    public void setInstallErrorCode(int);
+
+    public void userAcceptsUpdate();
+    public void userRejectsUpdate();
+
+    public void downloadStarts();
+    public void downloadCompletes();
+    public void userCancelsDownload();
+    public void downloadFails();
+
+    public void installCompletes();
+    public void installFails();
+
+    public boolean isConfirmationDialogVisible();
+    public boolean isImmediateFlowVisible();
+    public boolean isInstallSplashScreenVisible();
+    public java.lang.Integer getTypeForUpdateInProgress();
+
+    public void setClientVersionStalenessDays(java.lang.Integer);
+    public void setTotalBytesToDownload(long);
+    public void setBytesDownloaded(long);
+    public void setUpdatePriority(int);
+}
+
+-keep class com.google.android.play.core.install.InstallException {
+    public int getErrorCode();
+}
+
+-keep class com.google.android.play.core.install.InstallState {
+    public int installErrorCode();
+    public int installStatus();
+    public java.lang.String packageName();
+    public long bytesDownloaded();
+    public long totalBytesToDownload();
+}
+
+-keep class com.google.android.play.core.install.InstallStateUpdatedListener {
+   <init>();
+
+   public void onStateUpdate(com.google.android.play.core.install.InstallState);
+}
+
+-keep class com.google.android.play.core.install.NativeInstallStateUpdateListener {
+    <init>();
+
+    public void onStateUpdate(com.google.android.play.core.install.InstallState);
+}
+
+-keep class com.google.android.play.core.install.model.ActivityResult {
+    public static int RESULT_IN_APP_UPDATE_FAILED;
+}
+
+-keep class com.google.android.play.core.install.model.AppUpdateType {
+    public static int FLEXIBLE;
+    public static int IMMEDIATE;
+}
+
+-keep class com.google.android.play.core.install.model.InstallErrorCode {
+    public static int NO_ERROR;
+    public static int NO_ERROR_PARTIALLY_ALLOWED;
+    public static int ERROR_API_NOT_AVAILABLE;
+    public static int ERROR_APP_NOT_OWNED;
+    public static int ERROR_DOWNLOAD_NOT_PRESENT;
+    public static int ERROR_INSTALL_NOT_ALLOWED;
+    public static int ERROR_INSTALL_UNAVAILABLE;
+    public static int ERROR_INTERNAL_ERROR;
+    public static int ERROR_INVALID_REQUEST;
+    public static int ERROR_PLAY_STORE_NOT_FOUND;
+    public static int ERROR_UNKNOWN;
+}
+
+-keep class com.google.android.play.core.install.model.InstallStatus {
+    public static int CANCELED;
+    public static int DOWNLOADED;
+    public static int DOWNLOADING;
+    public static int FAILED;
+    public static int INSTALLED;
+    public static int INSTALLING;
+    public static int PENDING;
+    public static int REQUIRES_UI_INTENT;
+    public static int UNKNOWN;
+}
+
+-keep class com.google.android.play.core.install.model.UpdateAvailability {
+    public static int UNKNOWN;
+    public static int UPDATE_AVAILABLE;
+    public static int UPDATE_NOT_AVAILABLE;
+    public static int DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS;
+}

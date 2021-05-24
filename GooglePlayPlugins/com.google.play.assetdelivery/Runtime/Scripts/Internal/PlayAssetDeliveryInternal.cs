@@ -34,7 +34,6 @@ namespace Google.Play.AssetDelivery.Internal
         private const string AssetPackFolderName = "assetpack";
 
         private readonly AssetPackManager _assetPackManager;
-        private readonly AssetPackStateUpdateListener _stateUpdateListener;
         private readonly AssetDeliveryUpdateHandler _updateHandler;
 
         private readonly PlayRequestRepository _requestRepository = new PlayRequestRepository();

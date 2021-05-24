@@ -106,7 +106,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             var arguments = string.Format(
-                "-keystore {0} {1} {2}",
+                "-J-Duser.language=en -keystore {0} {1} {2}",
                 CommandLine.QuotePath(_keystoreName),
                 CommandLine.QuotePath(zipFilePath),
                 CommandLine.QuotePath(_keyaliasName));

@@ -18,15 +18,15 @@ using UnityEngine;
 namespace Google.Play.AssetDelivery
 {
     /// <summary>
-    /// An object used to monitor the asynchronous retrieval of an asset pack via the Play Asset Delivery system.
+    /// A <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction.html">CustomYieldInstruction</a>
+    /// used to monitor the asynchronous retrieval of an asset pack.
     /// </summary>
     public abstract class PlayAssetPackRequest : CustomYieldInstruction
     {
         /// <summary>
-        /// Progress between 0.0f and 1.0f indicating the overall download progress of this request.
-        ///
-        /// Note: If this value is equal to 1.0f, it does not mean that the request has completed,
-        ///       only that the DOWNLOADING stage is finished.
+        /// Progress between 0 and 1 indicating the overall download progress of this request.
+        /// Note: If this value is equal to 1, it does not mean that the request has completed,
+        /// only that the Downloading stage is finished.
         /// </summary>
         public float DownloadProgress { get; protected set; }
 
@@ -56,8 +56,8 @@ namespace Google.Play.AssetDelivery
         public virtual event Action<PlayAssetPackRequest> Completed = delegate { };
 
         /// <summary>
-        /// Implements CustomYieldInstruction's keepWaiting method,
-        /// so that this request can be yielded on, in a coroutine, until it is done.
+        /// Implements the <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction-keepWaiting.html">CustomYieldInstruction.keepWaiting</a>
+        /// property so that this request can be yielded on in a coroutine.
         /// </summary>
         public override bool keepWaiting
         {

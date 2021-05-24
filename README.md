@@ -5,7 +5,22 @@
 The Google Play Plugins for Unity provide C# APIs for accessing various Play
 services at runtime from within the Unity Engine. These plugins also provide
 various Unity Editor features for building an app that can be published on
-[Google Play Console](//play.google.com/apps/publish).
+[Google Play Console](//play.google.com/console).
+
+## Version support
+
+These plugins officially support Unity version 2017.4.40 or newer, though they
+were written to be code compatible with Unity versions 5.6.7 or newer.
+
+[In August 2019 Google Play started requiring that any apps published with 32
+bit native libraries also provide 64 bit native
+libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html)
+An exception was made at the time enabling apps built with Unity 5.6.7 and
+earlier to still be published on the Google Play Console until August 2021,
+which is fast approaching.
+
+Note: In June 2021 we will remove any plugin code that enables compilation of
+Unity 2017.4.16 or earlier (including Unity 5.6.7).
 
 ## Download and import the plugins
 
@@ -13,27 +28,12 @@ Although it is possible to `git clone` this repository into the **Assets**
 folder of your Unity project, in general it is preferable to import a released
 version.
 
-The steps you need to follow vary depending on the version of Unity you are
-using:
-
-### For Unity 5.6 to 2018.3
-
 To import the plugins, follow these steps:
 
 1.  Download the latest release from this project's
     [releases page](//github.com/google/play-unity-plugins/releases).
 1.  Import the `.unitypackage` file by selecting the Unity IDE menu option
     **Assets > Import package > Custom Package** and importing all items.
-
-### For Unity 2018.4 and above
-
-For these Unity versions, the plugins are distributed as packages through
-[Unity's Package Manager](//docs.unity3d.com/Manual/Packages.html). To import
-one or more plugins, follow these steps:
-
-1.  Set up the
-    [Game Package Registry for Unity](//developer.android.com/games/develop/build-in-unity#download-registry).
-1.  Select packages in the Unity Package Manager and click **Install**.
 
 ## Feature plugins
 
@@ -82,18 +82,29 @@ may not use this package.
 Refer to the [documentation](//developer.android.com/google/play/billing/unity)
 for more information.
 
-### Play In-app Review
+### Play In-App Review
 
 *com.google.play.review*
 
-Play In-app Review lets you prompt users to submit Play Store ratings and
+Play In-App Review lets you prompt users to submit Play Store ratings and
 reviews without the inconvenience of leaving your game.
 
 Refer to the
-[documentation](//developer.android.com/guide/playcore/in-app-review/unity)
-and
+[documentation](//developer.android.com/guide/playcore/in-app-review/unity) and
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Review)
 for more information.
+
+### Play In-App Update
+
+*com.google.play.appupdate*
+
+Play In-App Update lets you keep your app up-to-date on your users’ devices and
+enables them to try new features, as well as benefit from performance
+improvements and bug fixes.
+
+Refer to the
+[documentation](//developer.android.com/guide/playcore/in-app-updates) for more
+information.
 
 ### Play Instant
 

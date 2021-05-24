@@ -15,6 +15,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Google.Android.AppBundle.Editor.Internal.Utils;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Google.Play.Billing.Editor
@@ -24,38 +27,28 @@ namespace Google.Play.Billing.Editor
     /// </summary>
     public class GooglePlayBillingBuildHelper
     {
+        // Expected path of Play Billing AAR when Unity IAP is installed via .unitypackage.
         private const string UnityIapGoogleAndroidAarPath = "Assets/Plugins/UnityPurchasing/Bin/Android";
 
         private const string UnityIapGoogleAndroidAarBackupPath = "Assets/GooglePlayBillingBackup~";
 
-        private const string UnityIapGoogleAidlAarFilename = "GoogleAIDL.aar";
-        private const string UnityIapGoogleAidlAarMetaDataFilename = "GoogleAIDL.aar.meta";
-        private const string UnityIapGooglePlayBillingAarFilename = "GooglePlayBilling.aar";
-        private const string UnityIapGooglePlayBillingAarMetaDataFilename = "GooglePlayBilling.aar.meta";
+        private const string UnityIapGoogleAidlAarFileName = "GoogleAIDL.aar";
+        private const string UnityIapGoogleAidlAarMetaDataFileName = "GoogleAIDL.aar.meta";
+
+        private static readonly Regex UnityIapGooglePlayBillingAarFileNameRegex =
+            RegexHelper.CreateCompiled(@"^billing[-\w.]+\.aar$");
 
         private static readonly string UnityIapGoogleAidlAar =
-            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGoogleAidlAarFilename);
+            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGoogleAidlAarFileName);
 
         private static readonly string UnityIapGoogleAidlAarBackup = Path.Combine(
-            UnityIapGoogleAndroidAarBackupPath, UnityIapGoogleAidlAarFilename);
+            UnityIapGoogleAndroidAarBackupPath, UnityIapGoogleAidlAarFileName);
 
         private static readonly string UnityIapGoogleAidlAarMetaData =
-            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGoogleAidlAarMetaDataFilename);
+            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGoogleAidlAarMetaDataFileName);
 
         private static readonly string UnityIapGoogleAidlAarMetaDataBackup = Path.Combine(
-            UnityIapGoogleAndroidAarBackupPath, UnityIapGoogleAidlAarMetaDataFilename);
-
-        private static readonly string UnityIapGooglePlayBillingAar =
-            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGooglePlayBillingAarFilename);
-
-        private static readonly string UnityIapGooglePlayBillingAarBackup = Path.Combine(
-            UnityIapGoogleAndroidAarBackupPath, UnityIapGooglePlayBillingAarFilename);
-
-        private static readonly string UnityIapGooglePlayBillingAarMetaData =
-            Path.Combine(UnityIapGoogleAndroidAarPath, UnityIapGooglePlayBillingAarMetaDataFilename);
-
-        private static readonly string UnityIapGooglePlayBillingAarMetaDataBackup = Path.Combine(
-            UnityIapGoogleAndroidAarBackupPath, UnityIapGooglePlayBillingAarMetaDataFilename);
+            UnityIapGoogleAndroidAarBackupPath, UnityIapGoogleAidlAarMetaDataFileName);
 
         /// <summary>
         /// Returns whether there is a conflicting aar file that will cause failure when building the APK.
@@ -74,12 +67,46 @@ namespace Google.Play.Billing.Editor
         }
 
         /// <summary>
-        /// Returns whether there is a conflicting GooglePlayBilling.aar file that will cause failure when building the
+        /// Returns whether there is a conflicting billing-version.aar file that will cause failure when building the
         /// APK.
         /// </summary>
         private static bool HasConflictingGooglePlayBillingAarFile()
         {
-            return File.Exists(UnityIapGooglePlayBillingAar);
+            return GetConflictingGooglePlayBillingAarFileName() != null;
+        }
+
+        /// <summary>
+        /// Returns the conflicting billing-version.aar file name if it exists, or null otherwise.
+        /// </summary>
+        private static string GetConflictingGooglePlayBillingAarFileName()
+        {
+            var files = Directory.GetFiles(UnityIapGoogleAndroidAarPath);
+            foreach (var file in files)
+            {
+                if (UnityIapGooglePlayBillingAarFileNameRegex.IsMatch(Path.GetFileName(file)))
+                {
+                    return Path.GetFileName(file);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the conflicting billing-version.aar file name in backup path if it exists, or null otherwise.
+        /// </summary>
+        private static string GetConflictingGooglePlayBillingAarBackupFileName()
+        {
+            var files = Directory.GetFiles(UnityIapGoogleAndroidAarBackupPath);
+            foreach (var file in files)
+            {
+                if (UnityIapGooglePlayBillingAarFileNameRegex.IsMatch(Path.GetFileName(file)))
+                {
+                    return Path.GetFileName(file);
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -116,8 +143,6 @@ namespace Google.Play.Billing.Editor
                     File.Delete(UnityIapGoogleAidlAarMetaDataBackup);
                     File.Move(UnityIapGoogleAidlAar, UnityIapGoogleAidlAarBackup);
                     File.Move(UnityIapGoogleAidlAarMetaData, UnityIapGoogleAidlAarMetaDataBackup);
-                    File.Move(UnityIapGooglePlayBillingAar, UnityIapGooglePlayBillingAarBackup);
-                    File.Move(UnityIapGooglePlayBillingAarMetaData, UnityIapGooglePlayBillingAarMetaDataBackup);
                     Debug.LogFormat("Successfully backed up GoogleAIDL.aar to {0}", UnityIapGoogleAndroidAarBackupPath);
                 }
                 catch (FileNotFoundException)
@@ -137,14 +162,22 @@ namespace Google.Play.Billing.Editor
 
             if (HasConflictingGooglePlayBillingAarFile())
             {
+                var fileName = GetConflictingGooglePlayBillingAarFileName();
+                var unityIapGooglePlayBillingAar = Path.Combine(UnityIapGoogleAndroidAarPath, fileName);
+                var unityIapGooglePlayBillingAarMetaData =
+                    Path.Combine(UnityIapGoogleAndroidAarPath, fileName + ".meta");
+                var unityIapGooglePlayBillingAarBackup = Path.Combine(UnityIapGoogleAndroidAarBackupPath, fileName);
+                var unityIapGooglePlayBillingAarMetaDataBackup =
+                    Path.Combine(UnityIapGoogleAndroidAarBackupPath, fileName + ".meta");
                 try
                 {
                     // Delete the files before moving. The operation is NO-OP if the file doesn't exist.
-                    File.Delete(UnityIapGooglePlayBillingAarBackup);
-                    File.Delete(UnityIapGooglePlayBillingAarMetaDataBackup);
-                    File.Move(UnityIapGooglePlayBillingAar, UnityIapGooglePlayBillingAarBackup);
-                    File.Move(UnityIapGooglePlayBillingAarMetaData, UnityIapGooglePlayBillingAarMetaDataBackup);
-                    Debug.LogFormat("Successfully backed up GooglePlayBilling.aar to {0}", UnityIapGoogleAndroidAarBackupPath);
+                    File.Delete(unityIapGooglePlayBillingAarBackup);
+                    File.Delete(unityIapGooglePlayBillingAarMetaDataBackup);
+                    File.Move(unityIapGooglePlayBillingAar, unityIapGooglePlayBillingAarBackup);
+                    File.Move(unityIapGooglePlayBillingAarMetaData, unityIapGooglePlayBillingAarMetaDataBackup);
+                    Debug.LogFormat("Successfully backed up billing-version.aar to {0}",
+                        UnityIapGoogleAndroidAarBackupPath);
                 }
                 catch (FileNotFoundException)
                 {
@@ -154,7 +187,7 @@ namespace Google.Play.Billing.Editor
                 catch (UnauthorizedAccessException ex)
                 {
                     Debug.LogErrorFormat(
-                        "Permission denied when move GooglePlayBilling.aar file to the backup directory. " +
+                        "Permission denied when move billing-version.aar file to the backup directory. " +
                         "Please check the directory access of {0}. Exception: {1}.",
                         UnityIapGoogleAndroidAarBackupPath, ex);
                     return false;
@@ -206,12 +239,19 @@ namespace Google.Play.Billing.Editor
                     "Cannot find the backup GoogleAIDL.aar file. Restore failed! Please manually re-import Unity IAP.");
             }
 
-            if (File.Exists(UnityIapGooglePlayBillingAarBackup))
+            var fileName = GetConflictingGooglePlayBillingAarBackupFileName();
+            if (fileName != null)
             {
+                var unityIapGooglePlayBillingAar = Path.Combine(UnityIapGoogleAndroidAarPath, fileName);
+                var unityIapGooglePlayBillingAarMetaData =
+                    Path.Combine(UnityIapGoogleAndroidAarPath, fileName + ".meta");
+                var unityIapGooglePlayBillingAarBackup = Path.Combine(UnityIapGoogleAndroidAarBackupPath, fileName);
+                var unityIapGooglePlayBillingAarMetaDataBackup =
+                    Path.Combine(UnityIapGoogleAndroidAarBackupPath, fileName + ".meta");
                 try
                 {
-                    File.Move(UnityIapGooglePlayBillingAarBackup, UnityIapGooglePlayBillingAar);
-                    File.Move(UnityIapGooglePlayBillingAarMetaDataBackup, UnityIapGooglePlayBillingAarMetaData);
+                    File.Move(unityIapGooglePlayBillingAarBackup, unityIapGooglePlayBillingAar);
+                    File.Move(unityIapGooglePlayBillingAarMetaDataBackup, unityIapGooglePlayBillingAarMetaData);
                     Debug.LogFormat("Successfully restored GooglePlayBilling.aar to {0}", UnityIapGoogleAndroidAarPath);
                     fileRestored = true;
                 }

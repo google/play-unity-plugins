@@ -25,13 +25,19 @@ namespace Google.Play.Review
         NoError = 0,
 
         /// <summary>
-        /// Error while requesting in-app review flow.
+        /// Error indicating that an unknown error occurred while requesting in-app review flow.
         /// </summary>
         ErrorRequestingFlow = 1,
 
         /// <summary>
-        /// Error while launching in-app review flow.
+        /// Error indicating that an unknown error occurred while launching in-app review flow.
         /// </summary>
         ErrorLaunchingFlow = 2,
+
+        /// <summary>
+        /// Error indicating that the Play Store app is either not installed or not the official
+        /// version.
+        /// </summary>
+        PlayStoreNotFound = 3,
     }
 }

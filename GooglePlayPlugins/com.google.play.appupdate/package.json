@@ -1,0 +1,14 @@
+{
+  "name": "com.google.play.appupdate",
+  "displayName": "Google Play In-app Updates",
+  "description": "Enables the user to install an app update without exiting to the Play Store.",
+  "version": "1.4.1",
+  "unity": "2017.4",
+  "author": {
+    "name": "Google LLC"
+  },
+  "dependencies": {
+    "com.google.play.common": "1.4.1",
+    "com.google.play.core": "1.4.1"
+  }
+}

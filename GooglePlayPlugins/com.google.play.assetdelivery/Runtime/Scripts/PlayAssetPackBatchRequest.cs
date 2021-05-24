@@ -19,8 +19,8 @@ using UnityEngine;
 namespace Google.Play.AssetDelivery
 {
     /// <summary>
-    /// An object used to monitor the asynchronous retrieval of a batch of asset packs via the Play Asset Delivery
-    /// system.
+    /// A <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction.html">CustomYieldInstruction</a>
+    /// used to monitor the asynchronous retrieval of a batch of asset packs.
     /// </summary>
     public abstract class PlayAssetPackBatchRequest : CustomYieldInstruction
     {
@@ -43,8 +43,8 @@ namespace Google.Play.AssetDelivery
         public virtual event Action<PlayAssetPackBatchRequest> Completed = delegate { };
 
         /// <summary>
-        /// Implements CustomYieldInstruction's keepWaiting method,
-        /// so that this request can be yielded on, in a coroutine, until it is done.
+        /// Implements the <a href="https://docs.unity3d.com/ScriptReference/CustomYieldInstruction-keepWaiting.html">CustomYieldInstruction.keepWaiting</a>
+        /// property so that this request can be yielded on in a coroutine.
         /// </summary>
         public override bool keepWaiting
         {
