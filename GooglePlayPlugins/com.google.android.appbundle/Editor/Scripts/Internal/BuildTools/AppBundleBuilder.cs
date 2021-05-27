@@ -198,7 +198,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Synchronously builds an AAB given the specified options and existing Android Player on disk.
         /// </summary>
         /// <returns>An error message if there was an error, or null if successful.</returns>
-        public string CreateBundle(string aabFilePath, AssetPackConfig assetPackConfig)
+        public string CreateBundle(
+            string aabFilePath,
+            AssetPackConfig assetPackConfig,
+            CompressionOptions compressionOptions = null)
         {
             if (_buildStatus != BuildStatus.Running)
             {
@@ -211,7 +214,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 defaultTcfSuffix = TextureTargetingTools.GetBundleToolTextureCompressionFormatName(
                     assetPackConfig.DefaultTextureCompressionFormat),
-                minSdkVersion = _minSdkVersion
+                minSdkVersion = _minSdkVersion,
+                compressionOptions = compressionOptions ?? new CompressionOptions()
             };
 
             // Create asset pack module directories.
@@ -392,9 +396,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             var aabFilePath = androidBuildOptions.BuildPlayerOptions.locationPathName;
             var assetPackConfig = androidBuildOptions.AssetPackConfig ?? new AssetPackConfig();
+            var compression = androidBuildOptions.CompressionOptions;
             if (androidBuildOptions.ForceSingleThreadedBuild || Application.isBatchMode)
             {
-                CreateBundleInternal(taskCompletionSource, aabFilePath, assetPackConfig, androidBuildReport);
+                CreateBundleInternal(
+                    taskCompletionSource, aabFilePath, assetPackConfig, compression, androidBuildReport);
             }
             else
             {
@@ -403,7 +409,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 StartCreateBundleAsync(() =>
                 {
                     CreateBundleInternal(
-                        taskCompletionSource, aabFilePath, copiedAssetPackConfig, androidBuildReport);
+                        taskCompletionSource, aabFilePath, copiedAssetPackConfig, compression, androidBuildReport);
                 });
             }
 
@@ -414,11 +420,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             TaskCompletionSource<AndroidBuildReport> taskCompletionSource,
             string aabFilePath,
             AssetPackConfig assetPackConfig,
+            CompressionOptions compressionOptions,
             AndroidBuildReport androidBuildReport)
         {
             try
             {
-                var errorMessage = CreateBundle(aabFilePath, assetPackConfig);
+                var errorMessage = CreateBundle(aabFilePath, assetPackConfig, compressionOptions);
                 if (errorMessage == null)
                 {
                     taskCompletionSource.SetResult(androidBuildReport);

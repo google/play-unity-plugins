@@ -52,6 +52,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             /// Minimum Android SDK version, e.g. from PlayerSettings.Android.
             /// </summary>
             public AndroidSdkVersions minSdkVersion;
+
+            /// <summary>
+            /// Options for overriding the default file compression policies.
+            /// </summary>
+            public CompressionOptions compressionOptions;
         }
 
         // Paths where the bundletool jar may potentially be found.
@@ -62,11 +67,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         /// <summary>
         /// List of glob patterns specifying files that Unity requires be left uncompressed.
-        /// Taken from PlaybackEngines/AndroidPlayer/Tools/GradleTemplates/mainTemplate.gradle installed alongside
-        /// Unity.
+        /// Similar to PlaybackEngines/AndroidPlayer/Tools/GradleTemplates/mainTemplate.gradle
         /// </summary>
         private static readonly string[] UnityUncompressedGlob =
-            {"assets/**/*.unity3d", "assets/**/*.ress", "assets/**/*.resource", "assets/**/*.obb"};
+            {"assets/**/*.unity3d", "assets/**/*.ress", "assets/**/*.resource"};
 
         /// <summary>
         /// Make the Bundle Config exported as JSON cleaner by removing the suffix stripping fields
@@ -105,7 +109,22 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             config.optimizations.uncompressNativeLibraries.enabled = false;
 #endif
             config.compression.uncompressedGlob.AddRange(UnityUncompressedGlob);
-            config.compression.uncompressedGlob.AddRange(GetStreamingAssetsFilePaths(streamingAssetsPath));
+
+            var compressionOptions = configParams.compressionOptions;
+            if (compressionOptions.UncompressedGlobs != null)
+            {
+                config.compression.uncompressedGlob.AddRange(compressionOptions.UncompressedGlobs);
+            }
+
+            if (!compressionOptions.CompressStreamingAssets)
+            {
+                config.compression.uncompressedGlob.AddRange(GetStreamingAssetsFilePaths(streamingAssetsPath));
+            }
+
+            if (compressionOptions.CompressInstallTimeAssetPacks)
+            {
+                config.compression.installTimeAssetModuleDefaultCompression = BundletoolConfig.Compressed;
+            }
 
             var dimensions = config.optimizations.splitsConfig.splitDimension;
             // Split on ABI so only one set of native libraries (armeabi-v7a, arm64-v8a, or x86) is sent to a device.

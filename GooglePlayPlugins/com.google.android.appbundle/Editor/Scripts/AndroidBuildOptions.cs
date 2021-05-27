@@ -41,6 +41,7 @@ namespace Google.Android.AppBundle.Editor
             }
 
             BuildPlayerOptions = buildPlayerOptions;
+            CompressionOptions = new CompressionOptions();
         }
 
         /// <summary>
@@ -54,9 +55,14 @@ namespace Google.Android.AppBundle.Editor
         public AssetPackConfig AssetPackConfig { get; set; }
 
         /// <summary>
+        /// Options for overriding the default file compression strategy.
+        /// </summary>
+        public CompressionOptions CompressionOptions { get; set; }
+
+        /// <summary>
         /// If true, forces the entire build to run on the main thread, potentially freezing the Editor UI during some
         /// build steps. This setting doesn't affect batch mode builds, which always run on the main thread.
         /// </summary>
-        public bool ForceSingleThreadedBuild;
+        public bool ForceSingleThreadedBuild { get; set; }
     }
 }
