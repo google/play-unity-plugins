@@ -28,8 +28,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     {
         // The minimum Android target SDK version supported by Google Play is described here:
         // https://support.google.com/googleplay/android-developer/answer/113469#targetsdk
-        private const int MinimumVersion = 28;
-        private const int LatestVersion = 29;
+        private const int MinimumVersion = 29;
+        private const int LatestVersion = 30;
 
         private static readonly Regex PlatformVersionRegex = RegexHelper.CreateCompiled(@"^android-(\d+)$");
 
