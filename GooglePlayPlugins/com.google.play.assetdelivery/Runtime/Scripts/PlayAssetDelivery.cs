@@ -100,6 +100,7 @@ namespace Google.Play.AssetDelivery
             return Instance.GetDownloadSizeInternal(assetPackName);
         }
 
+
         /// <summary>
         /// Starts a PlayAsyncOperation to delete the specified asset pack from internal storage.
         /// If the specified asset pack is currently being retrieved, this method will not cancel the
