@@ -170,9 +170,7 @@ namespace Google.Play.AssetDelivery.Internal
 
         private void StopListeningForUpdates()
         {
-            // Due to a Unity 5.6 issue that prevents unregisterListener from working with
-            // AndroidJavaProxies, we clear all listeners rather than just _stateUpdateListener.
-            _assetPackManager.ClearListeners();
+            _assetPackManager.UnregisterListener(_stateUpdateListener);
         }
     }
 }

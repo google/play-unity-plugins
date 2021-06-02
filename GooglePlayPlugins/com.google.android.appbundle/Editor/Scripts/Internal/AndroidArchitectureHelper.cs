@@ -12,16 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// In the Unity 2017 series ARM64 support was introduced in 2017.4.16.
-// It might seem preferable to modify targetArchitectures using reflection, but the field is extern.
-// NOTE: this supports up to UNITY_2017_4_50 and will have to be extended if more versions are released.
-
-#if UNITY_2018_1_OR_NEWER || UNITY_2017_4_16 || UNITY_2017_4_17 || UNITY_2017_4_18 || UNITY_2017_4_19 || UNITY_2017_4_20 || UNITY_2017_4_21 || UNITY_2017_4_22 || UNITY_2017_4_23 || UNITY_2017_4_24 || UNITY_2017_4_25 || UNITY_2017_4_26 || UNITY_2017_4_27 || UNITY_2017_4_28 || UNITY_2017_4_29 || UNITY_2017_4_30 || UNITY_2017_4_31 || UNITY_2017_4_32 || UNITY_2017_4_33 || UNITY_2017_4_34 || UNITY_2017_4_35 || UNITY_2017_4_36 || UNITY_2017_4_37 || UNITY_2017_4_38 || UNITY_2017_4_39 || UNITY_2017_4_40 || UNITY_2017_4_41 || UNITY_2017_4_42 || UNITY_2017_4_43 || UNITY_2017_4_44 || UNITY_2017_4_45 || UNITY_2017_4_46 || UNITY_2017_4_47 || UNITY_2017_4_48 || UNITY_2017_4_49 || UNITY_2017_4_50
-#define GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
-#else
-using System;
-#endif
-
 using UnityEditor;
 
 namespace Google.Android.AppBundle.Editor.Internal
@@ -58,23 +48,6 @@ namespace Google.Android.AppBundle.Editor.Internal
         }
 
         /// <summary>
-        /// Returns true if this version of Unity can build for the Play Store: either it can provide 64 bit libraries
-        /// or it falls under the Unity 5.6 or older exemption described
-        /// <a href="https://android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html">here</a>.
-        /// </summary>
-        public static bool UnityVersionSupported
-        {
-            get
-            {
-#if GOOGLE_ANDROID_HAS_64_BIT_SUPPORT || !UNITY_2017_1_OR_NEWER
-                return true;
-#else
-                return false;
-#endif
-            }
-        }
-
-        /// <summary>
         /// Returns true if this version of the Unity Editor has native support for building an Android App Bundle,
         /// and false otherwise.
         /// </summary>
@@ -82,7 +55,6 @@ namespace Google.Android.AppBundle.Editor.Internal
         {
             get
             {
-#if GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
                 if (!IsArchitectureEnabled(AndroidArchitecture.ARMv7))
                 {
                     return Status.ArmV7Disabled;
@@ -96,10 +68,6 @@ namespace Google.Android.AppBundle.Editor.Internal
                 return IsArchitectureEnabled(AndroidArchitecture.ARM64)
                     ? Status.Ok
                     : Status.Arm64Disabled;
-#else
-                // Don't bother checking that AndroidTargetDevice is FAT or ARMv7.
-                return Status.Ok;
-#endif
             }
         }
 
@@ -109,12 +77,8 @@ namespace Google.Android.AppBundle.Editor.Internal
         /// </summary>
         public static void FixTargetArchitectures()
         {
-#if GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures |= AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-#else
-            throw new Exception("Not supported on this version of Unity.");
-#endif
         }
 
         /// <summary>
@@ -123,11 +87,7 @@ namespace Google.Android.AppBundle.Editor.Internal
         public static void EnableIl2CppBuildArchitectures()
         {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-#if GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.All;
-#else
-            PlayerSettings.Android.targetDevice = AndroidTargetDevice.FAT;
-#endif
         }
 
         /// <summary>
@@ -138,19 +98,15 @@ namespace Google.Android.AppBundle.Editor.Internal
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.Mono2x);
 #if UNITY_2019_3_OR_NEWER
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
-#elif GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.X86;
 #else
-            PlayerSettings.Android.targetDevice = AndroidTargetDevice.FAT;
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.X86;
 #endif
         }
 
-#if GOOGLE_ANDROID_HAS_64_BIT_SUPPORT
         private static bool IsArchitectureEnabled(AndroidArchitecture androidArchitecture)
         {
             // Note: Enum.HasFlag() was introduced in .NET 4.x
             return (PlayerSettings.Android.targetArchitectures & androidArchitecture) == androidArchitecture;
         }
-#endif
     }
 }

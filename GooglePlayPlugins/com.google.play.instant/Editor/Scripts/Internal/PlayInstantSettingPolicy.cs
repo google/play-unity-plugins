@@ -141,7 +141,6 @@ namespace Google.Play.Instant.Editor.Internal
                         return true;
                     }),
 
-#if UNITY_2017_2_OR_NEWER
                 new PlayInstantSettingPolicy(
                     "Android Multithreaded Rendering should be disabled",
                     MultithreadedRenderingDescription,
@@ -151,17 +150,6 @@ namespace Google.Play.Instant.Editor.Internal
                         PlayerSettings.SetMobileMTRendering(BuildTargetGroup.Android, false);
                         return true;
                     })
-#else
-                new PlayInstantSettingPolicy(
-                    "Mobile Multithreaded Rendering should be disabled",
-                    MultithreadedRenderingDescription,
-                    () => !PlayerSettings.mobileMTRendering,
-                    () =>
-                    {
-                        PlayerSettings.mobileMTRendering = false;
-                        return true;
-                    })
-#endif
             };
         }
 

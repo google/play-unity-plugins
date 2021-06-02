@@ -22,7 +22,7 @@ namespace Google.Play.AppUpdate.Internal
     /// Proxy for Play Core's InstallStateUpdatedListener class.
     /// Used to receive callbacks from Play Core's AppUpdateManager.
     /// </summary>
-    internal class AppUpdateStateListener : PlayCoreJavaProxy
+    internal class AppUpdateStateListener : AndroidJavaProxy
     {
         public event Action<AppUpdateState> OnStateUpdateEvent = delegate { };
 

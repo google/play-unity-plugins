@@ -39,15 +39,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         // TODO: add check for PlayerSettings.productName
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
-            // See https://android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html
-            if (!AndroidArchitectureHelper.UnityVersionSupported)
-            {
-                buildToolLogger.DisplayErrorDialog(
-                    "This version of Unity doesn't support 64 bit libraries, which are required by Google Play."
-                    + " Please upgrade Unity to version 2017.4.16 or later.");
-                return false;
-            }
-
             // Try to determine whether this is intended to be a release build.
             if (!_jarSigner.UseCustomKeystore || EditorUserBuildSettings.development)
             {

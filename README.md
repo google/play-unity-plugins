@@ -9,18 +9,16 @@ various Unity Editor features for building an app that can be published on
 
 ## Version support
 
-These plugins officially support Unity version 2017.4.40 or newer, though they
-were written to be code compatible with Unity versions 5.6.7 or newer.
+These plugins support Unity 2018.4 or later, as well as Unity 2017.4.40.
 
-[In August 2019 Google Play started requiring that any apps published with 32
-bit native libraries also provide 64 bit native
+Note: some features depending on async tasks are only available on Unity 2018.4
+or later.
+
+Support for older versions of Unity (including 5.6) was removed after
+[version 1.4.0](//github.com/google/play-unity-plugins/releases/tag/v1.4.0)
+because [Google Play requires that apps published with 32 bit native libraries
+also provide 64 bit native
 libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html)
-An exception was made at the time enabling apps built with Unity 5.6.7 and
-earlier to still be published on the Google Play Console until August 2021,
-which is fast approaching.
-
-Note: In June 2021 we will remove any plugin code that enables compilation of
-Unity 2017.4.16 or earlier (including Unity 5.6.7).
 
 ## Download and import the plugins
 

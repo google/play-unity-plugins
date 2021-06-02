@@ -24,12 +24,7 @@ namespace Google.Play.Billing.Internal
     public class GooglePlayBillingUtil : MonoBehaviour
     {
         private const string GooglePlayBillingLoggingTag = "Google Play Store: ";
-
-#if UNITY_2017_1_OR_NEWER
         private readonly ILogger _logger = Debug.unityLogger;
-#else
-        private readonly ILogger _logger = Debug.logger;
-#endif
         private static readonly List<Action> _callbacks = new List<Action>();
         private static volatile bool _callbacksPending;
 

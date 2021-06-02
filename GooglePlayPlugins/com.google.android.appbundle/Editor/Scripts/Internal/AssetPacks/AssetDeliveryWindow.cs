@@ -58,7 +58,6 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
                 _collapsedAssetPacks = new HashSet<string>();
             }
 
-            // Note: Unity 5.6 apps fail to start when built this way.
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Base APK Asset Delivery", EditorStyles.boldLabel);
             RenderDescription(

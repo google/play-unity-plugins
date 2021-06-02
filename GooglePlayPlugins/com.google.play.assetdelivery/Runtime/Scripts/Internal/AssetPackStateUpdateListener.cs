@@ -22,7 +22,7 @@ namespace Google.Play.AssetDelivery.Internal
     /// Proxy for Play Core's AssetPackStateUpdateListener class.
     /// Used to receive callbacks from Play Core's AssetPackManager.
     /// </summary>
-    internal class AssetPackStateUpdateListener : PlayCoreJavaProxy
+    internal class AssetPackStateUpdateListener : AndroidJavaProxy
     {
         public event Action<AssetPackState> OnStateUpdateEvent = delegate { };
 

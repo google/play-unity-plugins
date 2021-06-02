@@ -21,7 +21,7 @@ namespace Google.Play.Core.Internal
     /// Proxy for Play Core's OnFailureListener class.
     /// Allows C# classes to be alerted when a Play Core Task throws an exception.
     /// </summary>
-    public class PlayCoreOnFailureListener : PlayCoreJavaProxy
+    public class PlayCoreOnFailureListener : AndroidJavaProxy
     {
         public event Action<string, int> OnTaskFailed = delegate { };
 
