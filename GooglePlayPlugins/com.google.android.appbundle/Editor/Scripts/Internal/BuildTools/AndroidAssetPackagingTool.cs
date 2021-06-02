@@ -15,7 +15,6 @@
 using System;
 using System.IO;
 using Google.Android.AppBundle.Editor.Internal.PlayServices;
-using Google.Android.AppBundle.Editor.Internal.Utils;
 
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
@@ -29,13 +28,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// </summary>
         private const string BuildToolsMinimumVersion = "28.0.0";
 
-        /// <summary>
-        /// Latest version of Android SDK Build-Tools known to be compatible with this plugin.
-        /// </summary>
-        private const string BuildToolsLatestVersion = "28.0.3";
-
         private const string BuildToolsDisplayName = "Android SDK Build-Tools";
-        private const string BuildToolsPackageName = "build-tools;" + BuildToolsLatestVersion;
 
         private readonly AndroidBuildTools _androidBuildTools;
         private readonly AndroidSdkPlatform _androidSdkPlatform;
@@ -68,14 +61,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return true;
             }
 
-            var message = string.Format(
-                "App Bundle creation requires {0} version {1} or later.\n\nClick \"OK\" to install {0} version {2}.",
-                BuildToolsDisplayName, BuildToolsMinimumVersion, BuildToolsLatestVersion);
-            if (buildToolLogger.DisplayActionableErrorDialog(message))
-            {
-                AndroidSdkPackageInstaller.InstallPackage(BuildToolsPackageName, BuildToolsDisplayName);
-            }
-
+            var message =
+                string.Format(
+                    "This build requires {0} version {1} or later.", BuildToolsDisplayName, BuildToolsMinimumVersion);
+            buildToolLogger.DisplayErrorDialog(message);
             return false;
         }
 
