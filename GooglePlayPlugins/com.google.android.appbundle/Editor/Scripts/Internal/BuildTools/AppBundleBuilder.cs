@@ -88,7 +88,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private volatile bool _canceled;
         private Thread _backgroundThread;
         private EventWaitHandle _progressBarWaitHandle;
-        private bool _isGradleBuild;
         private AndroidSdkVersions _minSdkVersion;
         private string _packageName;
         private int _versionCode;
@@ -118,7 +117,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
             // Cache information that is only accessible from the main thread.
-            _isGradleBuild = EditorUserBuildSettings.androidBuildSystem == AndroidBuildSystem.Gradle;
             _minSdkVersion = PlayerSettings.Android.minSdkVersion;
             _packageName = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
             _versionCode = PlayerSettings.Android.bundleVersionCode;
@@ -184,11 +182,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             // TODO: indicate that this feature needs to be disabled and recommend the asset pack alternative.
             PlayerSettings.Android.useAPKExpansionFiles = false;
-
-            if (EditorUserBuildSettings.androidBuildSystem == AndroidBuildSystem.Gradle)
-            {
-                EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
-            }
 
             // Do not use BuildAndSign since this signature won't be used.
             return _androidBuilder.Build(updatedBuildPlayerOptions);
@@ -662,8 +655,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 // If this version of Unity natively supports AABs, note that switching the Android Build System
                 // to Gradle will generally speed up the build due to the slow "aapt2 convert" step.
-                var messageSuffix =
-                    SuggestNativeAppBundleSupport ? " (switch to Gradle for faster builds)" : " (this may be slow)";
+                const string messageSuffix = " (this may be slow)";
                 DisplayProgress(CreatingBaseModuleMessage + messageSuffix, ProgressCreateBaseModule);
                 zipFilePath = Path.Combine(baseWorkingDirectory.FullName, "AndroidPlayer.zip");
 
@@ -730,14 +722,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return null;
         }
 
+        // TODO: Update supported Unity versions to remove this property.
         private bool UseNativeAppBundleSupport
         {
-            get { return _isGradleBuild && AndroidAppBundle.HasNativeBuildSupport(); }
-        }
-
-        private bool SuggestNativeAppBundleSupport
-        {
-            get { return !_isGradleBuild && AndroidAppBundle.HasNativeBuildSupport(); }
+            get { return AndroidAppBundle.HasNativeBuildSupport(); }
         }
 
         // Don't support certain versions of Unity due to the "Failed to load 'libmain.so'" crash.

@@ -24,7 +24,8 @@ using UnityEditor.Build.Reporting;
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
     /// <summary>
-    /// Report containing the results of an <see cref="AndroidBuilder"/> build.
+    /// Indicates the results of an <see cref="AndroidBuilder"/> build. This provides similar information as
+    /// Task&lt;AndroidBuildReport&gt; without requiring the .NET 4.0 async task API.
     /// </summary>
     public class AndroidBuildResult
     {
@@ -63,60 +64,56 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private const string BuildCancelledMessage = "Building Player was cancelled";
 
         private readonly AndroidSdkPlatform _androidSdkPlatform;
-        private readonly ApkSigner _apkSigner;
 
         private BuildToolLogger _buildToolLogger;
 
-        public AndroidBuilder(AndroidSdkPlatform androidSdkPlatform, ApkSigner apkSigner)
+        public AndroidBuilder(AndroidSdkPlatform androidSdkPlatform)
         {
             _androidSdkPlatform = androidSdkPlatform;
-            _apkSigner = apkSigner;
+        }
+
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        public AndroidBuilder(AndroidSdkPlatform androidSdkPlatform, ApkSigner apkSigner) : this(androidSdkPlatform)
+        {
         }
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
             _buildToolLogger = buildToolLogger;
-            return _androidSdkPlatform.Initialize(buildToolLogger) && _apkSigner.Initialize(buildToolLogger);
-        }
 
-        /// <summary>
-        /// Builds an APK or AAB based on the specified options and signs it (if necessary) via
-        /// <a href="https://source.android.com/security/apksigning/v2">APK Signature Scheme V2</a>.
-        /// Displays warning/error dialogs if there are issues during the build.
-        /// </summary>
-        /// <returns>True if the build succeeded, false if it failed or was cancelled.</returns>
-        public virtual bool BuildAndSign(BuildPlayerOptions buildPlayerOptions)
-        {
-            var androidBuildResult = Build(buildPlayerOptions);
-            if (!androidBuildResult.Succeeded)
+            if (EditorUserBuildSettings.androidBuildSystem != AndroidBuildSystem.Gradle)
             {
+                // We require Gradle builds for APK Signature Scheme V2, which is required for Play Instant on Unity 2017+.
+                const string message = "This build requires the Gradle Build System.\n\n" +
+                                       "Click \"OK\" to change the Android Build System to Gradle.";
+                if (buildToolLogger.DisplayActionableErrorDialog(message))
+                {
+                    EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
+                }
+
                 return false;
             }
 
-#if UNITY_2018_1_OR_NEWER
-            // On Unity 2018.1+ we require Gradle builds. Unity 2018+ Gradle builds always yield a properly signed APK.
-            return true;
-#else
-            // ApkSigner is fast so we call it synchronously rather than wait for the post build AppDomain reset.
-            Debug.Log("Checking for APK Signature Scheme V2...");
-            var apkPath = buildPlayerOptions.locationPathName;
-            if (_apkSigner.Verify(apkPath))
+            // TODO: remove this check if we add support for exporting a Gradle project.
+            if (EditorUserBuildSettings.exportAsGoogleAndroidProject)
             {
-                return true;
+                const string message = "This build doesn't support exporting to Android Studio.\n\n" +
+                                       "Click \"OK\" to disable exporting a Gradle project.";
+                if (buildToolLogger.DisplayActionableErrorDialog(message))
+                {
+                    EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
+                }
+
+                return false;
             }
 
-            Debug.Log("APK must be re-signed for APK Signature Scheme V2...");
-            var signingResult = _apkSigner.Sign(apkPath);
-            if (signingResult == null)
-            {
-                Debug.Log("Re-signed with APK Signature Scheme V2.");
-                return true;
-            }
+            return _androidSdkPlatform.Initialize(buildToolLogger);
+        }
 
-            _buildToolLogger.DisplayErrorDialog(
-                string.Format("Failed to re-sign the APK using apksigner:\n\n{0}", signingResult));
-            return false;
-#endif
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        public virtual bool BuildAndSign(BuildPlayerOptions buildPlayerOptions)
+        {
+            return Build(buildPlayerOptions).Succeeded;
         }
 
         /// <summary>

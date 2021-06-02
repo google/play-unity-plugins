@@ -70,11 +70,11 @@ namespace Google.Play.Instant.Editor.Internal
                     () => EditorUserBuildSettings.SwitchActiveBuildTarget(
                         BuildTargetGroup.Android, BuildTarget.Android)),
 
-                // We require Gradle for 2018.1+, but hide this policy for 2019.1+ since Gradle is the only option.
-#if UNITY_2018_1_OR_NEWER && !UNITY_2019_1_OR_NEWER
+                // We require Gradle for all versions, but hide this policy for 2019.1+ since Gradle is the only option.
+#if !UNITY_2019_1_OR_NEWER
                 new PlayInstantSettingPolicy(
                     "Android build system should be Gradle",
-                    "Required for IPostGenerateGradleAndroidProject and APK Signature Scheme v2.",
+                    "Required for APK Signature Scheme v2.",
                     () => EditorUserBuildSettings.androidBuildSystem == AndroidBuildSystem.Gradle,
                     () =>
                     {
