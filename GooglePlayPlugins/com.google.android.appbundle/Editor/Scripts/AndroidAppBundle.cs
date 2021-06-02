@@ -12,18 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// In the Unity 2017 series the EditorUserBuildSettings.buildAppBundle field was introduced in 2017.4.17.
-// It might seem preferable to modify buildAppBundle using reflection, but the field is extern.
-// Instead check for quite a few versions in the 2017.4.17+ series.
-// NOTE: this supports up to UNITY_2017_4_50 and will have to be extended if additional versions are released.
-
-#if UNITY_2018_3_OR_NEWER || UNITY_2017_4_17 || UNITY_2017_4_18 || UNITY_2017_4_19 || UNITY_2017_4_20 || UNITY_2017_4_21 || UNITY_2017_4_22 || UNITY_2017_4_23 || UNITY_2017_4_24 || UNITY_2017_4_25 || UNITY_2017_4_26 || UNITY_2017_4_27 || UNITY_2017_4_28 || UNITY_2017_4_29 || UNITY_2017_4_30 || UNITY_2017_4_31 || UNITY_2017_4_32 || UNITY_2017_4_33 || UNITY_2017_4_34 || UNITY_2017_4_35 || UNITY_2017_4_36 || UNITY_2017_4_37 || UNITY_2017_4_38 || UNITY_2017_4_39 || UNITY_2017_4_40 || UNITY_2017_4_41 || UNITY_2017_4_42 || UNITY_2017_4_43 || UNITY_2017_4_44 || UNITY_2017_4_45 || UNITY_2017_4_46 || UNITY_2017_4_47 || UNITY_2017_4_48 || UNITY_2017_4_49 || UNITY_2017_4_50
-#define GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
-using UnityEditor;
-#endif
 using System;
 using System.Text.RegularExpressions;
 using Google.Android.AppBundle.Editor.Internal.Utils;
+using UnityEditor;
 
 namespace Google.Android.AppBundle.Editor
 {
@@ -63,48 +55,44 @@ namespace Google.Android.AppBundle.Editor
         }
 
         /// <summary>
-        /// Returns true if this version of the Unity Editor has native support for building an Android App Bundle,
-        /// and false otherwise.
+        /// Always returns true. Previously indicated if this version of the Unity Editor has native support for
+        /// building an Android App Bundle.
         /// </summary>
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        [Obsolete("This is always true")]
         public static bool HasNativeBuildSupport()
         {
-#if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
             return true;
-#else
-            return false;
-#endif
         }
 
         /// <summary>
         /// Returns EditorUserBuildSettings.buildAppBundle if it is defined and false otherwise.
         /// </summary>
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        [Obsolete("Use EditorUserBuildSettings.buildAppBundle directly instead")]
         public static bool IsNativeBuildEnabled()
         {
-#if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
             return EditorUserBuildSettings.buildAppBundle;
-#else
-            return false;
-#endif
         }
 
         /// <summary>
         /// Enable the EditorUserBuildSettings.buildAppBundle field if it is defined.
         /// </summary>
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        [Obsolete("Use EditorUserBuildSettings.buildAppBundle directly instead")]
         public static void EnableNativeBuild()
         {
-#if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
             EditorUserBuildSettings.buildAppBundle = true;
-#endif
         }
 
         /// <summary>
         /// Disable the EditorUserBuildSettings.buildAppBundle field if it is defined.
         /// </summary>
+        // TODO: Needed for 1.x API compatibility. Should be removed with 2.x.
+        [Obsolete("Use EditorUserBuildSettings.buildAppBundle directly instead")]
         public static void DisableNativeBuild()
         {
-#if GOOGLE_ANDROID_APP_BUNDLE_HAS_NATIVE_SUPPORT
             EditorUserBuildSettings.buildAppBundle = false;
-#endif
         }
 
         private static bool CheckReservedName(string name, string reserved)

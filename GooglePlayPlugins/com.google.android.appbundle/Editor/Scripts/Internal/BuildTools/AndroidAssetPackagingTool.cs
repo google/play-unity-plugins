@@ -25,7 +25,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     public class AndroidAssetPackagingTool : IBuildTool
     {
         /// <summary>
-        /// Minimum version of Android SDK Build-Tools where aapt2 supports the "convert" command.
+        /// Minimum version of Android SDK Build-Tools that supports "aapt2 link --proto-format".
         /// </summary>
         private const string BuildToolsMinimumVersion = "28.0.0";
 
@@ -77,18 +77,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Given the specified APK, produces a new APK where resources.arsc is converted to proto format.
-        /// </summary>
-        /// <returns>An error message if there was a problem running aapt2, or null if successful.</returns>
-        public virtual string Convert(string inputPath, string outputPath)
-        {
-            return Run(
-                "convert {0} --output-format proto -o {1}",
-                CommandLine.QuotePath(inputPath),
-                CommandLine.QuotePath(outputPath));
         }
 
         /// <summary>

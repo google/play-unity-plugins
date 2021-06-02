@@ -51,11 +51,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private const string AndroidManifestFileName = "AndroidManifest.xml";
         private const string AssetsDirectoryName = "assets";
         private const string BundleMetadataDirectoryName = "BUNDLE-METADATA";
-        private const string DexFileExtensionOrDirectoryName = "dex";
         private const string ManifestDirectoryName = "manifest";
         private const string ResourceTableFileName = "resources.pb";
-        private const string RootDirectoryName = "root";
-        private const string CreatingBaseModuleMessage = "Creating base module";
         private const float ProgressCreateBaseModule = 0.3f;
         private const float ProgressProcessModules = 0.5f;
         private const float ProgressRunBundletool = 0.7f;
@@ -163,10 +160,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             workingDirectory.Create();
 
-            if (UseNativeAppBundleSupport)
-            {
-                AndroidAppBundle.EnableNativeBuild();
-            }
+            EditorUserBuildSettings.buildAppBundle = true;
 
             Debug.LogFormat("Building Android Player: {0}", AndroidPlayerFilePath);
             // This Android Player is an intermediate build artifact, so use a temporary path for the output file path.
@@ -644,32 +638,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         private string CreateBaseModule(DirectoryInfo baseWorkingDirectory, out IList<string> bundleMetadata)
         {
-            string zipFilePath;
+            DisplayProgress("Creating base module", ProgressCreateBaseModule);
+
             var sourceDirectoryInfo = baseWorkingDirectory.CreateSubdirectory("source");
-            if (UseNativeAppBundleSupport)
-            {
-                DisplayProgress(CreatingBaseModuleMessage, ProgressCreateBaseModule);
-                zipFilePath = AndroidPlayerFilePath;
-            }
-            else
-            {
-                // If this version of Unity natively supports AABs, note that switching the Android Build System
-                // to Gradle will generally speed up the build due to the slow "aapt2 convert" step.
-                const string messageSuffix = " (this may be slow)";
-                DisplayProgress(CreatingBaseModuleMessage + messageSuffix, ProgressCreateBaseModule);
-                zipFilePath = Path.Combine(baseWorkingDirectory.FullName, "AndroidPlayer.zip");
-
-                var aaptErrorMessage = _androidAssetPackagingTool.Convert(AndroidPlayerFilePath, zipFilePath);
-                if (aaptErrorMessage != null)
-                {
-                    bundleMetadata = null;
-                    return DisplayBuildError("AAPT2 convert", aaptErrorMessage);
-                }
-
-                DisplayProgress("Extracting base module", 0.45f);
-            }
-
-            var unzipErrorMessage = _zipUtils.UnzipFile(zipFilePath, sourceDirectoryInfo.FullName);
+            var unzipErrorMessage = _zipUtils.UnzipFile(AndroidPlayerFilePath, sourceDirectoryInfo.FullName);
             if (unzipErrorMessage != null)
             {
                 bundleMetadata = null;
@@ -679,21 +651,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             bundleMetadata = GetExistingBundleMetadata(sourceDirectoryInfo);
 
             var destinationDirectoryInfo = GetDestinationSubdirectory(baseWorkingDirectory);
-            if (UseNativeAppBundleSupport)
+            var baseModuleDirectories = sourceDirectoryInfo.GetDirectories(AndroidAppBundle.BaseModuleName);
+            if (baseModuleDirectories.Length != 1)
             {
-                var baseModuleDirectories = sourceDirectoryInfo.GetDirectories(AndroidAppBundle.BaseModuleName);
-                if (baseModuleDirectories.Length != 1)
-                {
-                    return DisplayBuildError("Find base directory", sourceDirectoryInfo.FullName);
-                }
-
-                ArrangeFilesForExistingModule(baseModuleDirectories[0], destinationDirectoryInfo);
-            }
-            else
-            {
-                ArrangeFilesForNewModule(sourceDirectoryInfo, destinationDirectoryInfo);
+                return DisplayBuildError("Find base directory", sourceDirectoryInfo.FullName);
             }
 
+            ArrangeFilesForExistingModule(baseModuleDirectories[0], destinationDirectoryInfo);
             return null;
         }
 
@@ -720,12 +684,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             var splitBaseAssetsPath = Path.Combine(splitBaseDestination.FullName, AssetsDirectoryName);
             baseAssetsDirectories[0].MoveTo(splitBaseAssetsPath);
             return null;
-        }
-
-        // TODO: Update supported Unity versions to remove this property.
-        private bool UseNativeAppBundleSupport
-        {
-            get { return AndroidAppBundle.HasNativeBuildSupport(); }
         }
 
         // Don't support certain versions of Unity due to the "Failed to load 'libmain.so'" crash.
@@ -786,54 +744,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             foreach (var sourceDirectoryInfo in source.GetDirectories())
             {
                 sourceDirectoryInfo.MoveTo(Path.Combine(destination.FullName, sourceDirectoryInfo.Name));
-            }
-        }
-
-        private static void ArrangeFilesForNewModule(DirectoryInfo source, DirectoryInfo destination)
-        {
-            // Arrange files according to https://developer.android.com/guide/app-bundle/#aab_format
-            foreach (var sourceFileInfo in source.GetFiles())
-            {
-                DirectoryInfo destinationSubdirectory;
-                var fileName = sourceFileInfo.Name;
-                if (fileName == AndroidManifestFileName)
-                {
-                    destinationSubdirectory = destination.CreateSubdirectory(ManifestDirectoryName);
-                }
-                else if (fileName == ResourceTableFileName)
-                {
-                    destinationSubdirectory = destination;
-                }
-                else if (fileName.EndsWith(DexFileExtensionOrDirectoryName))
-                {
-                    destinationSubdirectory = destination.CreateSubdirectory(DexFileExtensionOrDirectoryName);
-                }
-                else
-                {
-                    destinationSubdirectory = destination.CreateSubdirectory(RootDirectoryName);
-                }
-
-                sourceFileInfo.MoveTo(Path.Combine(destinationSubdirectory.FullName, fileName));
-            }
-
-            foreach (var sourceDirectoryInfo in source.GetDirectories())
-            {
-                var directoryName = sourceDirectoryInfo.Name;
-                switch (directoryName)
-                {
-                    case "META-INF":
-                        // Skip files like MANIFEST.MF
-                        break;
-                    case AssetsDirectoryName:
-                    case "lib":
-                    case "res":
-                        sourceDirectoryInfo.MoveTo(Path.Combine(destination.FullName, directoryName));
-                        break;
-                    default:
-                        var subdirectory = destination.CreateSubdirectory(RootDirectoryName);
-                        sourceDirectoryInfo.MoveTo(Path.Combine(subdirectory.FullName, directoryName));
-                        break;
-                }
             }
         }
 

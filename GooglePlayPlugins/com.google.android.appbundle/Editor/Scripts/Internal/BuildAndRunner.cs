@@ -84,7 +84,7 @@ namespace Google.Android.AppBundle.Editor.Internal
                 return;
             }
 
-            var artifactName = AndroidAppBundle.IsNativeBuildEnabled() ? "temp.aab" : "temp.apk";
+            var artifactName = EditorUserBuildSettings.buildAppBundle ? "temp.aab" : "temp.apk";
             var artifactPath = Path.Combine(Path.GetTempPath(), artifactName);
             var buildPlayerOptions = AndroidBuildHelper.CreateBuildPlayerOptions(artifactPath);
             buildPlayerOptions.options |= BuildOptions.AutoRunPlayer;

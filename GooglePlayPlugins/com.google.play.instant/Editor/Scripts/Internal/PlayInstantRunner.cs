@@ -72,7 +72,7 @@ namespace Google.Play.Instant.Editor.Internal
                 return;
             }
 
-            AndroidAppBundle.DisableNativeBuild();
+            EditorUserBuildSettings.buildAppBundle = false;
 
             var apkPath = Path.Combine(Path.GetTempPath(), "temp.apk");
             Debug.LogFormat("Build and Run package location: {0}", apkPath);
