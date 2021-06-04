@@ -14,6 +14,8 @@
 
 using System;
 using System.Text.RegularExpressions;
+using Google.Android.AppBundle.Editor.Internal.BuildTools;
+using UnityEditor;
 using UnityEngine;
 
 namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
@@ -92,6 +94,22 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
                     "Ignoring unrecognized texture format \"{0}\" for folder: {1}",
                     tcfValue, folderName);
             }
+        }
+
+        /// <summary>
+        /// Returns true if the specified SDK version is less than 21 and false if it's greater than or equal to 21.
+        ///
+        /// This method can be used (along with the existence of install-time asset packs) to determine whether this
+        /// app requires <see cref="BundletoolConfig.StandaloneConfig"/> to support pre-L devices.
+        /// </summary>
+        public static bool IsSdkVersionPreLollipop(AndroidSdkVersions sdkVersion)
+        {
+#if UNITY_2021_2_OR_NEWER
+            // The minimum API level supported by Unity 2021.2+ is 22.
+            return false;
+#else
+            return sdkVersion < AndroidSdkVersions.AndroidApiLevel21;
+#endif
         }
     }
 }

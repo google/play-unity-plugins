@@ -158,19 +158,21 @@ namespace Google.Play.Instant.Editor.Internal
         /// </summary>
         public static IEnumerable<PlayInstantSettingPolicy> GetRecommendedPolicies()
         {
-            var policies = new List<PlayInstantSettingPolicy>
-            {
-                new PlayInstantSettingPolicy(
-                    "Android minSdkVersion should be 21",
-                    "Lower than 21 is fine, though 21 is the minimum supported by Google Play Instant.",
-                    // TODO: consider prompting if strictly greater than 21 to say that 21 enables wider reach
-                    () => (int) PlayerSettings.Android.minSdkVersion >= 21,
-                    () =>
-                    {
-                        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
-                        return true;
-                    })
-            };
+            var policies = new List<PlayInstantSettingPolicy>();
+
+            // TODO: Update to handle the latest Unity versions.
+#if !UNITY_2021_2_OR_NEWER
+            policies.Add(new PlayInstantSettingPolicy(
+                "Android minSdkVersion should be 21",
+                "Lower than 21 is fine, though 21 is the minimum supported by Google Play Instant.",
+                () => (int) PlayerSettings.Android.minSdkVersion >= 21,
+                () =>
+                {
+                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
+                    return true;
+                })
+            );
+#endif
 
             // For the purpose of switching to .NET 2.0 Subset, it's sufficient to check #if NET_2_0. However, it would
             // be confusing if the option disappeared after clicking the Update button, so we also check NET_2_0_SUBSET.

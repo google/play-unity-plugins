@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Google.Android.AppBundle.Editor.Internal.AssetPacks;
 using Google.Android.AppBundle.Editor.Internal.PlayServices;
 using UnityEditor;
 using UnityEngine;
@@ -138,7 +139,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             // Bundletool requires the below standaloneConfig when supporting install-time asset packs for pre-Lollipop.
             if (configParams.containsInstallTimeAssetPack &&
-                configParams.minSdkVersion < AndroidSdkVersions.AndroidApiLevel21)
+                TextureTargetingTools.IsSdkVersionPreLollipop(configParams.minSdkVersion))
             {
                 config.optimizations.standaloneConfig.splitDimension.Add(new BundletoolConfig.SplitDimension
                     {value = BundletoolConfig.Abi, negate = true});
