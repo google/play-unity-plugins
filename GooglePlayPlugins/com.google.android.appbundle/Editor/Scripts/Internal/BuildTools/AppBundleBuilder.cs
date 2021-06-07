@@ -174,9 +174,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 targetGroup = buildPlayerOptions.targetGroup
             };
 
-            // TODO: indicate that this feature needs to be disabled and recommend the asset pack alternative.
-            PlayerSettings.Android.useAPKExpansionFiles = false;
-
             // Do not use BuildAndSign since this signature won't be used.
             return _androidBuilder.Build(updatedBuildPlayerOptions);
         }

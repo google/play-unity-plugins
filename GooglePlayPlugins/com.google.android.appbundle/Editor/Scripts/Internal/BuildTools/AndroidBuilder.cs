@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using Google.Android.AppBundle.Editor.Internal.AssetPacks;
 using UnityEditor;
 using UnityEngine;
 
@@ -102,6 +103,23 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 if (buildToolLogger.DisplayActionableErrorDialog(message))
                 {
                     EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
+                }
+
+                return false;
+            }
+
+            if (PlayerSettings.Android.useAPKExpansionFiles)
+            {
+                var message =
+                    string.Format(
+                        "This build doesn't support APK Expansion (OBB) files.\n\nLarge games can instead use the " +
+                        "\"{0}\" option available through the \"Google > Android App Bundle > Asset Delivery " +
+                        "Settings\" menu or the AssetPackConfig API's SplitBaseModuleAssets field.\n\n" +
+                        "Click \"OK\" to disable the \"Split Application Binary\" setting.",
+                        AssetDeliveryWindow.SeparateAssetsLabel);
+                if (buildToolLogger.DisplayActionableErrorDialog(message))
+                {
+                    PlayerSettings.Android.useAPKExpansionFiles = false;
                 }
 
                 return false;

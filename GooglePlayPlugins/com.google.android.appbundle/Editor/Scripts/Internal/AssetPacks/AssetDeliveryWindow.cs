@@ -22,6 +22,11 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
 {
     public class AssetDeliveryWindow : EditorWindow
     {
+        /// <summary>
+        /// Label for the split base APK checkbox. Visible for referencing from error messages.
+        /// </summary>
+        public const string SeparateAssetsLabel = "Separate Base APK Assets";
+
         private const string RefreshButtonText = "Refresh";
         private const int WindowMinWidth = 610;
         private const int WindowMinHeight = 300;
@@ -67,7 +72,7 @@ namespace Google.Android.AppBundle.Editor.Internal.AssetPacks
                 "instead of APK Expansion (OBB) files, so it's compatible with AABs. This option is recommended for " +
                 "apps with a large base APK, e.g. over 150 MB.");
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Separate Base APK Assets", GUILayout.Width(145));
+            EditorGUILayout.LabelField(SeparateAssetsLabel, GUILayout.Width(145));
             var pendingSplitBaseModuleAssets = EditorGUILayout.Toggle(_assetDeliveryConfig.SplitBaseModuleAssets);
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space();

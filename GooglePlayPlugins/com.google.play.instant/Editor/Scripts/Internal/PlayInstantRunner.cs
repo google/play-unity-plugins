@@ -58,8 +58,10 @@ namespace Google.Play.Instant.Editor.Internal
             var androidBuilder = new AndroidBuilder(androidSdkPlatform, apkSigner);
             var playInstantBuildHelper = new PlayInstantBuildHelper(isInstantRequired: true);
 
-            if (!androidBuilder.Initialize(buildToolLogger)
-                || !playInstantBuildHelper.Initialize(buildToolLogger)
+            // Check Play Instant build requirements before checking general build requirements, e.g. because OBB
+            // creation is handled differently on Instant, where install-time asset packs aren't a viable alternative.
+            if (!playInstantBuildHelper.Initialize(buildToolLogger)
+                || !androidBuilder.Initialize(buildToolLogger)
                 || !javaUtils.Initialize(buildToolLogger))
             {
                 return;
