@@ -20,18 +20,23 @@ because [Google Play requires that apps published with 32 bit native libraries
 also provide 64 bit native
 libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html)
 
-## Download and import the plugins
+## Downloading the plugins
 
-Although it is possible to `git clone` this repository into the **Assets**
-folder of your Unity project, in general it is preferable to import a released
-version.
+There are 3 different options for obtaining the plugins:
 
-To import the plugins, follow these steps:
+*   Download individual plugins as `.unitypackage` files or Unity Package
+    Manager (`.tgz`) files from
+    [Google APIs for Unity](//developers.google.com/unity)
 
-1.  Download the latest release from this project's
-    [releases page](//github.com/google/play-unity-plugins/releases).
-1.  Import the `.unitypackage` file by selecting the Unity IDE menu option
-    **Assets > Import package > Custom Package** and importing all items.
+*   Download the latest release from this project's
+    [releases page](//github.com/google/play-unity-plugins/releases)
+
+*   `git clone` this repository into the **Assets** folder of your Unity project
+
+## Installing the plugins
+
+For all cases except `git clone` follow the instructions to
+[Install Google packages for Unity](//developers.google.com/unity/instructions).
 
 ## Feature plugins
 
@@ -78,6 +83,8 @@ and the Google Play Billing Library. If you do not agree with the licenses, you
 may not use this package.
 
 Refer to the [documentation](//developer.android.com/google/play/billing/unity)
+and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Billing)
 for more information.
 
 ### Play In-App Review
@@ -101,8 +108,9 @@ enables them to try new features, as well as benefit from performance
 improvements and bug fixes.
 
 Refer to the
-[documentation](//developer.android.com/guide/playcore/in-app-updates) for more
-information.
+[documentation](//developer.android.com/guide/playcore/in-app-updates/unity) and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/AppUpdate)
+for more information.
 
 ### Play Instant
 

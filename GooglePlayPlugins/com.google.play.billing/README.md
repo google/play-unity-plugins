@@ -14,4 +14,6 @@ and the Google Play Billing Library. If you do not agree with the licenses, you
 may not use this package.
 
 Refer to the [documentation](//developer.android.com/google/play/billing/unity)
+and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Billing)
 for more information.
