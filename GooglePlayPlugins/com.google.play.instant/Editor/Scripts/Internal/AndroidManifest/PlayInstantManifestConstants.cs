@@ -17,10 +17,10 @@ using Google.Android.AppBundle.Editor.Internal.AndroidManifest;
 
 namespace Google.Play.Instant.Editor.Internal.AndroidManifest
 {
+    // TODO: Merge this with ManifestConstants when we increment major version code.
     /// <summary>
     /// String constants used by AndroidManifest.xml files in instant apps.
     /// </summary>
-    /// TODO: Merge this with ManifestConstants when we increment major version code.
     public static class PlayInstantManifestConstants
     {
         public const string Flavor = "com.google.android.gms.instant.flavor";
