@@ -1,5 +1,12 @@
 # Changelog for com.google.play.instant
 
+## [1.5.0] - 2021-06-14
+### New Features
+ - Changes to support minSdkVersion of 22 in Unity 2021.2
+### Other
+ - Removed ability to compile plugin with Unity 5.6, 2017.1, 2017.2, 2017.3, 2018.1, and 2018.2
+ - Require Gradle for all Unity builds
+
 ## [1.4.0] - 2021-03-08
 ### Bug Fixes
  - Fixed issue #70: don't require GLES2 for instant apps with min SDK 26+

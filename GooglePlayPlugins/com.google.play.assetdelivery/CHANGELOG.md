@@ -1,5 +1,11 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.5.0] - 2021-06-14
+### New Features
+ - Added API and UI options to replace OBB files with an install-time asset pack
+### Other
+ - Removed ability to compile plugin with Unity 5.6, 2017.1, 2017.2, 2017.3, 2018.1, and 2018.2
+
 ## [1.4.0] - 2021-03-08
 ### Bug Fixes
  - Minor documentation updates
@@ -18,7 +24,6 @@
  - Added experimental methods for retrieving asset packs that contain arbitrary files
  - Updated the Asset Delivery Demo app to utilize those experimental methods
  - Added menu options under "Google -> Android App Bundle -> Asset Delivery Demo" to facilitate building the sample
-
 ### Bug Fixes
  - Fixed issue where asset packs marked DoNotPackage were causing build to fail
 

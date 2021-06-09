@@ -1,10 +1,19 @@
 # Changelog for com.google.android.appbundle
 
-## [1.4.1 - 2021-05-17
+## [1.5.0] - 2021-06-14
 ### New Features
+ - Added a new Bundletool method for building AABs (requires 2018.4+ and .NET 4+)
+ - Added API and UI options to replace OBB files with an install-time asset pack
+ - Added API options for customizing file compression within generated APKs
+ - Changes to support minSdkVersion of 22 in Unity 2021.2
  - Updated bundletool-all.jar from 1.5.0 to 1.6.1
 ### Bug Fixes
+ - Fixed issue #80: prevent building on Unity 2020.2 and early versions of 2020.3 and 2021.1
  - Fixed issue #106: bundletool build-bundle crashed when output file was specified without a parent directory
+### Other
+ - Removed ability to compile plugin with Unity 5.6, 2017.1, 2017.2, 2017.3, 2018.1, and 2018.2
+ - Require Gradle for all Unity builds
+ - Update minimum Target SDK version to 29
 
 ## [1.4.0] - 2021-03-08
 ### New Features

@@ -1,5 +1,9 @@
 # Changelog for com.google.play.common
 
+## [1.5.0] - 2021-06-14
+### Other
+ - Removed ability to compile plugin with Unity 5.6, 2017.1, 2017.2, 2017.3, 2018.1, and 2018.2
+
 ## [1.4.0] - 2021-03-08
 ### Bug Fixes
  - Fixed a build error in 2020.2 related to isHttpError/isNetworkError
