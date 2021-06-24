@@ -44,6 +44,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             /// </summary>
             public string defaultTcfSuffix;
 
+
             /// <summary>
             /// Whether or not this bundle contains an install-time asset pack.
             /// </summary>
@@ -58,6 +59,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             /// Options for overriding the default file compression policies.
             /// </summary>
             public CompressionOptions compressionOptions;
+
         }
 
         // Paths where the bundletool jar may potentially be found.
@@ -136,6 +138,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     }
                 });
             }
+
+
 
             // Bundletool requires the below standaloneConfig when supporting install-time asset packs for pre-Lollipop.
             if (configParams.containsInstallTimeAssetPack &&
