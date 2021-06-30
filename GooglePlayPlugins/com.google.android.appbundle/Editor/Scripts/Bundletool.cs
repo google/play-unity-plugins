@@ -47,6 +47,7 @@ namespace Google.Android.AppBundle.Editor
         {
             return await AppBundlePublisher.BuildTask(androidBuildOptions);
         }
+
 #endif
 
         /// <summary>

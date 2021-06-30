@@ -182,10 +182,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Synchronously builds an AAB given the specified options and existing Android Player on disk.
         /// </summary>
         /// <returns>An error message if there was an error, or null if successful.</returns>
-        public string CreateBundle(
-            string aabFilePath,
-            AssetPackConfig assetPackConfig,
-            CompressionOptions compressionOptions = null)
+        public string CreateBundle(CreateBundleOptions options)
         {
             if (_buildStatus != BuildStatus.Running)
             {
@@ -194,126 +191,28 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             var moduleDirectoryList = new List<DirectoryInfo>();
             var workingDirectory = new DirectoryInfo(_workingDirectoryPath);
-            var configParams = new BundletoolHelper.BuildBundleConfigParams
+
+            var error = CreateAssetModules(moduleDirectoryList, options.AssetPackConfig, workingDirectory);
+            if (error != null)
             {
-                defaultTcfSuffix = TextureTargetingTools.GetBundleToolTextureCompressionFormatName(
-                    assetPackConfig.DefaultTextureCompressionFormat),
-                minSdkVersion = _minSdkVersion,
-                compressionOptions = compressionOptions ?? new CompressionOptions()
-            };
-
-            // Create asset pack module directories.
-            var index = 0;
-            var assetPacks = assetPackConfig.DeliveredAssetPacks;
-            foreach (var entry in assetPacks)
-            {
-                DisplayProgress(
-                    string.Format("Processing asset pack {0} of {1}", index + 1, assetPacks.Count),
-                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float) index / assetPacks.Count));
-                index++;
-
-                var assetPackName = entry.Key;
-                var assetPack = entry.Value;
-                configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetBundleFilePath != null;
-                configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetPackDirectoryPath != null;
-                configParams.containsInstallTimeAssetPack |=
-                    assetPack.DeliveryMode == AssetPackDeliveryMode.InstallTime;
-
-                var assetPackDirectoryInfo = workingDirectory.CreateSubdirectory(assetPackName);
-                var assetPackErrorMessage = CreateAssetPackModule(assetPackName, assetPack, assetPackDirectoryInfo);
-                if (assetPackErrorMessage != null)
-                {
-                    // Already displayed the error.
-                    return assetPackErrorMessage;
-                }
-
-                moduleDirectoryList.Add(assetPackDirectoryInfo);
+                return error;
             }
 
-            // Create base module directory.
-            var baseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseModuleName);
             IList<string> bundleMetadata;
-            var baseErrorMessage = CreateBaseModule(baseDirectory, out bundleMetadata);
-            if (baseErrorMessage != null)
+            error = CreateBaseModules(moduleDirectoryList, options, workingDirectory, out bundleMetadata);
+            if (error != null)
             {
-                // Already displayed the error.
-                return baseErrorMessage;
+                return error;
             }
 
-            moduleDirectoryList.Add(baseDirectory);
-
-            if (assetPackConfig.SplitBaseModuleAssets)
+            error = CreateBundle(moduleDirectoryList, options, bundleMetadata);
+            if (error != null)
             {
-                // Move assets from base module directory to the separate module's directory.
-                var splitBaseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseAssetsModuleName);
-                var splitBaseErrorMessage = CreateSplitBaseModule(baseDirectory, splitBaseDirectory);
-                if (splitBaseErrorMessage != null)
-                {
-                    // Already displayed the error.
-                    return splitBaseErrorMessage;
-                }
-
-                configParams.containsInstallTimeAssetPack = true;
-                moduleDirectoryList.Add(splitBaseDirectory);
+                return error;
             }
 
-            // Create a ZIP file for each module directory.
-            var moduleFiles = new List<string>();
-            var numModules = moduleDirectoryList.Count;
-            for (var i = 0; i < numModules; i++)
-            {
-                if (numModules == 1)
-                {
-                    DisplayProgress("Processing base module", ProgressProcessModules);
-                }
-                else
-                {
-                    DisplayProgress(
-                        string.Format("Processing module {0} of {1}", i + 1, numModules),
-                        Mathf.Lerp(ProgressProcessModules, ProgressRunBundletool, (float) i / numModules));
-                }
-
-                var moduleDirectoryInfo = moduleDirectoryList[i];
-                var destinationDirectoryInfo = GetDestinationSubdirectory(moduleDirectoryInfo);
-
-                // Create ZIP file path, for example /path/to/files/base becomes /path/to/files/base/base.zip
-                var zipFilePath = Path.Combine(moduleDirectoryInfo.FullName, moduleDirectoryInfo.Name + ".zip");
-                var zipErrorMessage = _zipUtils.CreateZipFile(zipFilePath, destinationDirectoryInfo.FullName, ".");
-                if (zipErrorMessage != null)
-                {
-                    return DisplayBuildError("Zip creation", zipErrorMessage);
-                }
-
-                moduleFiles.Add(zipFilePath);
-            }
-
-            DisplayProgress("Running bundletool", ProgressRunBundletool);
-            var buildBundleErrorMessage =
-                _bundletool.BuildBundle(aabFilePath, moduleFiles, bundleMetadata, configParams);
-            if (buildBundleErrorMessage != null)
-            {
-                return DisplayBuildError("Bundletool", buildBundleErrorMessage);
-            }
-
-            // Only sign the .aab if a custom keystore is configured.
-            if (_jarSigner.UseCustomKeystore)
-            {
-                DisplayProgress("Signing bundle", 0.9f);
-                var signingErrorMessage = _jarSigner.Sign(aabFilePath);
-                if (signingErrorMessage != null)
-                {
-                    return DisplayBuildError("Signing", signingErrorMessage);
-                }
-            }
-            else
-            {
-                Debug.LogFormat("Skipped signing since a Custom Keystore isn't configured in Android Player Settings");
-            }
-
-            MoveSymbolsZipFile(aabFilePath);
-
-            Debug.LogFormat("Finished building app bundle: {0}", aabFilePath);
-            _finishedAabFilePath = aabFilePath;
+            Debug.LogFormat("Finished building app bundle: {0}", options.AabFilePath);
+            _finishedAabFilePath = options.AabFilePath;
             _buildStatus = BuildStatus.Succeeding;
             return null;
         }
@@ -326,16 +225,16 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// <param name="onSuccess">
         /// Callback that fires with the final aab file location, when the bundle creation succeeds.
         /// </param>
-        public void CreateBundleAsync(string aabFilePath, AssetPackConfig assetPackConfig, PostBuildCallback onSuccess)
+        public void CreateBundleAsync(CreateBundleOptions options, PostBuildCallback onSuccess)
         {
             // Copy the AssetPackConfig before leaving the main thread in case the original is modified later.
-            var copiedAssetPackConfig = SerializationHelper.DeepCopy(assetPackConfig);
+            options.AssetPackConfig = SerializationHelper.DeepCopy(options.AssetPackConfig);
             _createBundleAsyncOnSuccess = onSuccess;
             StartCreateBundleAsync(() =>
             {
                 try
                 {
-                    CreateBundle(aabFilePath, copiedAssetPackConfig);
+                    CreateBundle(options);
                 }
                 catch (ThreadAbortException ex)
                 {
@@ -378,41 +277,50 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return await taskCompletionSource.Task;
             }
 
-            var aabFilePath = androidBuildOptions.BuildPlayerOptions.locationPathName;
-            var assetPackConfig = androidBuildOptions.AssetPackConfig ?? new AssetPackConfig();
-            var compression = androidBuildOptions.CompressionOptions;
+            var createBundleOptions = new CreateBundleOptions
+            {
+                AabFilePath = androidBuildOptions.BuildPlayerOptions.locationPathName,
+                AssetPackConfig = androidBuildOptions.AssetPackConfig ?? new AssetPackConfig(),
+                CompressionOptions = androidBuildOptions.CompressionOptions
+            };
             if (androidBuildOptions.ForceSingleThreadedBuild || Application.isBatchMode)
             {
                 CreateBundleInternal(
-                    taskCompletionSource, aabFilePath, assetPackConfig, compression, androidBuildReport);
+                    taskCompletionSource,
+                    () => CreateBundle(createBundleOptions),
+                    androidBuildReport,
+                    androidBuildReport);
             }
             else
             {
                 // Copy the AssetPackConfig while still on the main thread in case the original is modified later.
-                var copiedAssetPackConfig = SerializationHelper.DeepCopy(assetPackConfig);
+                createBundleOptions.AssetPackConfig = SerializationHelper.DeepCopy(createBundleOptions.AssetPackConfig);
                 StartCreateBundleAsync(() =>
                 {
                     CreateBundleInternal(
-                        taskCompletionSource, aabFilePath, copiedAssetPackConfig, compression, androidBuildReport);
+                        taskCompletionSource,
+                        () => CreateBundle(createBundleOptions),
+                        androidBuildReport,
+                        androidBuildReport);
                 });
             }
 
             return await taskCompletionSource.Task;
         }
 
-        private void CreateBundleInternal(
-            TaskCompletionSource<AndroidBuildReport> taskCompletionSource,
-            string aabFilePath,
-            AssetPackConfig assetPackConfig,
-            CompressionOptions compressionOptions,
-            AndroidBuildReport androidBuildReport)
+
+        private void CreateBundleInternal<T>(
+            TaskCompletionSource<T> taskCompletionSource,
+            Func<string> createBundleFunc,
+            T successResult,
+            AndroidBuildReport androidBuildReport = null)
         {
             try
             {
-                var errorMessage = CreateBundle(aabFilePath, assetPackConfig, compressionOptions);
+                var errorMessage = createBundleFunc.Invoke();
                 if (errorMessage == null)
                 {
-                    taskCompletionSource.SetResult(androidBuildReport);
+                    taskCompletionSource.SetResult(successResult);
                 }
                 else
                 {
@@ -440,6 +348,164 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
         }
 #endif
+
+        private string CreateBaseModules(IList<DirectoryInfo> moduleDirectoryList, CreateBundleOptions options,
+            DirectoryInfo workingDirectory, out IList<string> bundleMetadata)
+        {
+            // Create base module directory.
+            bundleMetadata = new List<string>();
+            var baseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseModuleName);
+            var baseErrorMessage = CreateBaseModule(baseDirectory, out bundleMetadata);
+            if (baseErrorMessage != null)
+            {
+                // Already displayed the error.
+                return baseErrorMessage;
+            }
+
+            moduleDirectoryList.Add(baseDirectory);
+
+            if (options.AssetPackConfig.SplitBaseModuleAssets)
+            {
+                // Move assets from base module directory to the separate module's directory.
+                var splitBaseDirectory = workingDirectory.CreateSubdirectory(AndroidAppBundle.BaseAssetsModuleName);
+                var splitBaseErrorMessage = CreateSplitBaseModule(baseDirectory, splitBaseDirectory);
+                if (splitBaseErrorMessage != null)
+                {
+                    // Already displayed the error.
+                    return splitBaseErrorMessage;
+                }
+
+                moduleDirectoryList.Add(splitBaseDirectory);
+            }
+
+            return null;
+        }
+
+        private string CreateAssetModules(IList<DirectoryInfo> moduleDirectoryList, AssetPackConfig assetPackConfig,
+            DirectoryInfo workingDirectory)
+        {
+            // Create asset pack module directories.
+            var index = 0;
+            var assetPacks = assetPackConfig.DeliveredAssetPacks;
+            foreach (var entry in assetPacks)
+            {
+                DisplayProgress(
+                    string.Format("Processing asset pack {0} of {1}", index + 1, assetPacks.Count),
+                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float) index / assetPacks.Count));
+                index++;
+
+                var assetPackName = entry.Key;
+                var assetPack = entry.Value;
+                var assetPackDirectoryInfo = workingDirectory.CreateSubdirectory(assetPackName);
+                var assetPackErrorMessage = CreateAssetPackModule(assetPackName, assetPack, assetPackDirectoryInfo);
+                if (assetPackErrorMessage != null)
+                {
+                    // Already displayed the error.
+                    return assetPackErrorMessage;
+                }
+
+                moduleDirectoryList.Add(assetPackDirectoryInfo);
+            }
+
+            return null;
+        }
+
+        private string CreateBundle(List<DirectoryInfo> moduleDirectoryList, CreateBundleOptions options,
+            IList<string> bundleMetadata = null)
+        {
+            // Create a ZIP file for each module directory.
+            var moduleFiles = new List<string>();
+            var numModules = moduleDirectoryList.Count;
+            for (var i = 0; i < numModules; i++)
+            {
+                if (numModules == 1)
+                {
+                    DisplayProgress("Processing base module", ProgressProcessModules);
+                }
+                else
+                {
+                    DisplayProgress(
+                        string.Format("Processing module {0} of {1}", i + 1, numModules),
+                        Mathf.Lerp(ProgressProcessModules, ProgressRunBundletool, (float) i / numModules));
+                }
+
+                var moduleDirectoryInfo = moduleDirectoryList[i];
+                var destinationDirectoryInfo = GetDestinationSubdirectory(moduleDirectoryInfo);
+
+                // Create ZIP file path, for example /path/to/files/base becomes /path/to/files/base/base.zip
+                var zipFilePath = Path.Combine(moduleDirectoryInfo.FullName, moduleDirectoryInfo.Name + ".zip");
+                var zipErrorMessage = _zipUtils.CreateZipFile(zipFilePath, destinationDirectoryInfo.FullName, ".");
+                if (zipErrorMessage != null)
+                {
+                    return DisplayBuildError("Zip creation", zipErrorMessage);
+                }
+
+                moduleFiles.Add(zipFilePath);
+            }
+
+            if (bundleMetadata == null)
+            {
+                bundleMetadata = new List<string>();
+            }
+
+            DisplayProgress("Running bundletool", ProgressRunBundletool);
+            var configParams = CreateBuildBundleConfigParams(options);
+            var buildBundleErrorMessage =
+                _bundletool.BuildBundle(options.AabFilePath, moduleFiles, bundleMetadata, configParams);
+            if (buildBundleErrorMessage != null)
+            {
+                return DisplayBuildError("Bundletool", buildBundleErrorMessage);
+            }
+
+            // Only sign the .aab if a custom keystore is configured.
+            if (_jarSigner.UseCustomKeystore)
+            {
+                DisplayProgress("Signing bundle", 0.9f);
+                var signingErrorMessage = _jarSigner.Sign(options.AabFilePath);
+                if (signingErrorMessage != null)
+                {
+                    Debug.LogError("Failed to sign");
+                    return DisplayBuildError("Signing", signingErrorMessage);
+                }
+            }
+            else
+            {
+                Debug.LogFormat("Skipped signing since a Custom Keystore isn't configured in Android Player Settings");
+            }
+
+            MoveSymbolsZipFile(options.AabFilePath);
+
+            return null;
+        }
+
+        private BundletoolHelper.BuildBundleConfigParams CreateBuildBundleConfigParams(CreateBundleOptions options)
+        {
+            var configParams = new BundletoolHelper.BuildBundleConfigParams
+            {
+                defaultTcfSuffix = TextureTargetingTools.GetBundleToolTextureCompressionFormatName(
+                    options.AssetPackConfig.DefaultTextureCompressionFormat),
+                minSdkVersion = _minSdkVersion,
+                compressionOptions = options.CompressionOptions ?? new CompressionOptions(),
+                containsInstallTimeAssetPack = options.AssetPackConfig.SplitBaseModuleAssets
+            };
+
+            var assetPacks = options.AssetPackConfig.DeliveredAssetPacks;
+            foreach (var entry in assetPacks)
+            {
+                var assetPackName = entry.Key;
+                var assetPack = entry.Value;
+
+                configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetBundleFilePath != null;
+                configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetPackDirectoryPath != null;
+                configParams.containsInstallTimeAssetPack |=
+                    assetPack.DeliveryMode == AssetPackDeliveryMode.InstallTime;
+            }
+
+            configParams.containsInstallTimeAssetPack |= options.AssetPackConfig.SplitBaseModuleAssets;
+
+
+            return configParams;
+        }
 
         private void StartCreateBundleAsync(ThreadStart threadStart)
         {
