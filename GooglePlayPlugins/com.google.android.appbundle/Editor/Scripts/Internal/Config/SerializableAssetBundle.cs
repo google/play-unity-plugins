@@ -27,5 +27,6 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             get { return SerializationHelper.GetTextureCompressionFormat(textureCompressionFormat); }
             set { textureCompressionFormat = value.ToString(); }
         }
+
     }
 }

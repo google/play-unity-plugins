@@ -142,13 +142,14 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 }
 
                 var dictionaryTextureCompression =
-                    assetBundles 
+                    assetBundles
                         .ToDictionary(item => item.TextureCompressionFormat, item => item.path);
                 if (dictionaryTextureCompression.Count != 0)
                 {
                     assetPackConfig.AddAssetBundles(dictionaryTextureCompression,
                         multiTargetingAssetBundle.DeliveryMode);
                 }
+
             }
 
             foreach (var pack in config.assetPacks)
@@ -166,6 +167,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                     assetPackConfig.AddAssetsFolders(
                         pack.name, compressionFormatToAssetPackDirectoryPath, pack.DeliveryMode);
                 }
+
             }
 
             return assetPackConfig;
