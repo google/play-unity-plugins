@@ -32,7 +32,7 @@ namespace Google.Play.AssetDelivery
         }
 
         /// <summary>
-        /// Returns whether or not the the latest version of the specified asset pack is available on disk.
+        /// Returns whether or not the specified asset pack is available on disk.
         /// </summary>
         /// <param name="assetPackName">The name of the desired asset pack.</param>
         /// <returns>True if the asset pack is available on disk and false if not.</returns>
@@ -45,7 +45,7 @@ namespace Google.Play.AssetDelivery
         /// Starts a <see cref="PlayAssetBundleRequest"/> to retrieve an asset pack containing only
         /// the specified AssetBundle.
         /// Both the AssetBundle and asset pack must share the same name. Downloads the asset pack if
-        /// the latest version isn't already available on disk.
+        /// it isn't already available on disk.
         ///
         /// After download, the contained AssetBundle is loaded into memory before the request completes.
         /// </summary>
@@ -59,9 +59,10 @@ namespace Google.Play.AssetDelivery
             return Instance.RetrieveAssetBundleAsyncInternal(assetBundleName);
         }
 
+
         /// <summary>
         /// Starts a <see cref="PlayAssetPackRequest"/> to retrieve the specified asset pack.
-        /// Downloads the asset pack if the latest version isn't already available on disk.
+        /// Downloads the asset pack if it isn't already available on disk.
         ///
         /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b>
         /// loaded into memory. To load them see <see cref="PlayAssetPackRequest.GetAssetLocation"/>
@@ -74,9 +75,10 @@ namespace Google.Play.AssetDelivery
             return Instance.RetrieveAssetPackAsyncInternal(assetPackName);
         }
 
+
         /// <summary>
         /// Starts a <see cref="PlayAssetPackBatchRequest"/> to retrieve the specified asset packs.
-        /// Downloads the asset packs if the latest versions aren't already available on disk.
+        /// Downloads the asset packs if they aren't already available on disk.
         ///
         /// After download, the assets and/or AssetBundles contained in the asset pack are <b>not</b>
         /// loaded into memory. To load them use <see cref="PlayAssetPackRequest.GetAssetLocation"/>
@@ -90,6 +92,7 @@ namespace Google.Play.AssetDelivery
         {
             return Instance.RetrieveAssetPackBatchAsyncInternal(assetPackNames);
         }
+
 
         /// <summary>
         /// Starts a PlayAsyncOperation to determine the download size in bytes of the specified asset pack.

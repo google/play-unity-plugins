@@ -53,6 +53,15 @@ namespace Google.Play.AssetDelivery.Internal
 
         internal PlayAssetBundleRequest RetrieveAssetBundleAsyncInternal(string assetBundleName)
         {
+            var request = InitializeAssetBundleRequest(assetBundleName);
+            InitiateRequest(request.PackRequest);
+
+            return request;
+        }
+
+
+        private PlayAssetBundleRequestImpl InitializeAssetBundleRequest(string assetBundleName)
+        {
             if (_requestRepository.ContainsRequest(assetBundleName))
             {
                 throw new ArgumentException(string.Format("There is already an active request for AssetBundle: {0}",
@@ -63,38 +72,32 @@ namespace Google.Play.AssetDelivery.Internal
             _requestRepository.AddAssetBundleRequest(request);
             request.Completed += req => _requestRepository.RemoveRequest(assetBundleName);
 
-            InitiateRequest(request.PackRequest);
-
             return request;
         }
 
         internal PlayAssetPackRequest RetrieveAssetPackAsyncInternal(string assetPackName)
         {
-            if (_requestRepository.ContainsAssetBundleRequest(assetPackName))
+            var request = GetExistingAssetPackRequest(assetPackName);
+            if (request != null)
             {
-                throw new ArgumentException(string.Format(
-                    "Cannot create a new PlayAssetPackRequest because there is already an active " +
-                    "PlayAssetBundleRequest for asset bundle: {0}",
-                    assetPackName));
-            }
-
-            PlayAssetPackRequestImpl request;
-            if (_requestRepository.TryGetRequest(assetPackName, out request))
-            {
-                Debug.LogFormat("Returning existing active request for {0}", assetPackName);
                 return request;
             }
 
-            request = CreateAssetPackRequest(assetPackName);
-            _requestRepository.AddRequest(request);
-            request.Completed += req => _requestRepository.RemoveRequest(assetPackName);
-
+            request = InitializeAssetPackRequest(assetPackName);
             InitiateRequest(request);
 
             return request;
         }
 
+
         internal PlayAssetPackBatchRequest RetrieveAssetPackBatchAsyncInternal(IList<string> assetPackNames)
+        {
+            return CreateAndInitiateBatchRequest(assetPackNames, IsDownloaded);
+        }
+
+
+        private PlayAssetPackBatchRequest CreateAndInitiateBatchRequest(IList<string> assetPackNames,
+            Func<string, bool> isPackAvailable)
         {
             if (assetPackNames.Count != assetPackNames.Distinct().Count())
             {
@@ -129,7 +132,7 @@ namespace Google.Play.AssetDelivery.Internal
                 request.Completed += req => _requestRepository.RemoveRequest(request.AssetPackName);
                 requests.Add(request);
 
-                if (IsDownloaded(assetPackName))
+                if (isPackAvailable.Invoke(assetPackName))
                 {
                     request.OnPackAvailable();
                 }
@@ -148,7 +151,7 @@ namespace Google.Play.AssetDelivery.Internal
             });
             fetchTask.RegisterOnFailureCallback((reason, errorCode) =>
             {
-                Debug.LogErrorFormat("Failed to retrieve asset pack batch: {0}", reason);
+                Debug.LogError("Failed to retrieve asset pack batch: " + reason);
                 batchRequest.OnInitializationErrorOccurred(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
                 fetchTask.Dispose();
             });
@@ -230,6 +233,35 @@ namespace Google.Play.AssetDelivery.Internal
             return _assetPackManager.GetAssetLocation(assetBundleName, assetPath);
         }
 
+        private PlayAssetPackRequestImpl GetExistingAssetPackRequest(string assetPackName)
+        {
+            if (_requestRepository.ContainsAssetBundleRequest(assetPackName))
+            {
+                throw new ArgumentException(string.Format(
+                    "Cannot create a new PlayAssetPackRequest because there is already an active " +
+                    "PlayAssetBundleRequest for asset bundle: {0}",
+                    assetPackName));
+            }
+
+            PlayAssetPackRequestImpl request;
+            if (_requestRepository.TryGetRequest(assetPackName, out request))
+            {
+                Debug.Log("Returning existing active request for " + assetPackName);
+            }
+
+            return request;
+        }
+
+        private PlayAssetPackRequestImpl InitializeAssetPackRequest(string assetPackName)
+        {
+            var request = CreateAssetPackRequest(assetPackName);
+            _requestRepository.AddRequest(request);
+            request.Completed += req => _requestRepository.RemoveRequest(assetPackName);
+
+            return request;
+        }
+
+
         private PlayAssetPackRequestImpl CreateAssetPackRequest(string assetPackName)
         {
             return new PlayAssetPackRequestImpl(assetPackName, _assetPackManager, _requestRepository);
@@ -243,7 +275,13 @@ namespace Google.Play.AssetDelivery.Internal
 
         private void InitiateRequest(PlayAssetPackRequestImpl request)
         {
-            if (IsDownloaded(request.AssetPackName))
+            StartRequest(request, IsDownloaded(request.AssetPackName));
+        }
+
+
+        private void StartRequest(PlayAssetPackRequestImpl request, bool isAvailable)
+        {
+            if (isAvailable)
             {
                 request.OnPackAvailable();
             }
