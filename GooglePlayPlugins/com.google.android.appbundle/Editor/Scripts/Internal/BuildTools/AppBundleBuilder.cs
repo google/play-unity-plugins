@@ -52,6 +52,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private const string AssetsDirectoryName = "assets";
         private const string BundleMetadataDirectoryName = "BUNDLE-METADATA";
         private const string ManifestDirectoryName = "manifest";
+        private const string RequiredDirectoryName = "assets/bin/Data/Managed";
         private const string ResourceTableFileName = "resources.pb";
         private const float ProgressCreateBaseModule = 0.3f;
         private const float ProgressProcessModules = 0.5f;
@@ -746,6 +747,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             var splitBaseDestination = GetDestinationSubdirectory(splitBaseDirectory);
             var splitBaseAssetsPath = Path.Combine(splitBaseDestination.FullName, AssetsDirectoryName);
             baseAssetsDirectories[0].MoveTo(splitBaseAssetsPath);
+
+            // IL2CPP build crash unless the assets/bin/Data/Managed folder exists in the base apk.
+            // Create an empty file in that folder to ensure that folder is present.
+            var requiredDirPath = Path.Combine(baseDestination.FullName, RequiredDirectoryName);
+            var requiredDirInfo = Directory.CreateDirectory(requiredDirPath);
+            File.Create(Path.Combine(requiredDirInfo.FullName, ".keep_folder")).Close();
+
             return null;
         }
 
