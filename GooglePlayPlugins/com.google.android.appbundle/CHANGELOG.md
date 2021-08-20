@@ -1,5 +1,9 @@
 # Changelog for com.google.android.appbundle
 
+## [1.5.1] - 2021-09-20
+### New Features
+ - Updated bundletool-all.jar from 1.6.1 to 1.8.0
+
 ## [1.5.0] - 2021-06-14
 ### New Features
  - Added a new Bundletool method for building AABs (requires 2018.4+ and .NET 4+)
