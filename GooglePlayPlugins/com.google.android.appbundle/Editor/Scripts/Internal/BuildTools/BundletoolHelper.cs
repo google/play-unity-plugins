@@ -110,7 +110,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             if (!compressionOptions.CompressStreamingAssets)
             {
-                config.compression.uncompressedGlob.AddRange(GetStreamingAssetsFilePaths(streamingAssetsPath));
+                config.compression.uncompressedGlob.AddRange(GetStreamingAssetsFileGlobs(streamingAssetsPath));
             }
 
             if (compressionOptions.CompressInstallTimeAssetPacks)
@@ -164,12 +164,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         }
 
         /// <summary>
-        /// Recursively searches the streaming assets path, and returns the path to each file relative to its final
-        /// location within the APK.
+        /// Searches the streaming assets path and returns a list of globs that includes the contained files relative to
+        /// their final location within the APK.
         /// Note: Does not include .meta files.
         /// Visible for testing.
         /// </summary>
-        public static IEnumerable<string> GetStreamingAssetsFilePaths(string streamingAssetsPath)
+        public static IEnumerable<string> GetStreamingAssetsFileGlobs(string streamingAssetsPath)
         {
             if (!Directory.Exists(streamingAssetsPath))
             {
@@ -177,9 +177,21 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             var streamingAssets = new DirectoryInfo(streamingAssetsPath);
-            return streamingAssets.GetFiles("*", SearchOption.AllDirectories)
+
+            // Create a glob for every subdirectory in the streaming assets path.
+            // This is more efficient than returning every file from each of the subdirectories.
+            var directoryGlobs = streamingAssets.GetDirectories("*", SearchOption.TopDirectoryOnly)
+                .Select(directory => Path.Combine(directory.FullName, "**"));
+
+            // Create a list of files that are located in the root of the streaming assets directory.
+            var fileNames = streamingAssets.GetFiles("*", SearchOption.TopDirectoryOnly)
                 .Where(file => !file.Name.EndsWith(".meta"))
-                .Select(file => "assets/" + file.FullName.Remove(0, streamingAssetsPath.Length + 1))
+                .Select(file => file.FullName);
+
+            // Combine the directory glob list and file list and update the paths to be relative to the final file
+            // locations within the APK.
+            return directoryGlobs.Concat(fileNames)
+                .Select(fullName => "assets/" + fullName.Remove(0, streamingAssetsPath.Length + 1))
                 .Select(name => name.Replace("\\", "/")); // Support Windows' path separator.
         }
 
