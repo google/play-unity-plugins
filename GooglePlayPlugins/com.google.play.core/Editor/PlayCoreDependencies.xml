@@ -1,0 +1,7 @@
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.google.android.play:core:1.10.2">
+        </androidPackage>
+    </androidPackages>
+</dependencies>
+
