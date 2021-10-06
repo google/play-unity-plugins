@@ -143,8 +143,33 @@ Play packages, such as Play Instant.
 *com.google.play.core*
 
 The Google Play Core package provides the
-[Play Core Library](//developer.android.com/guide/playcore) required by some
-Google Play packages, such as Play Asset Delivery.
+[Play Core Library](//developer.android.com/guide/playcore) required by some Google Play packages, such as Play Asset
+Delivery.
+
+## Known Issues
+
+### Play Asset Delivery support built into Unity {:#built-in-pad}
+
+Recent versions of Unity, such as 2019.4.29, 2020.3.15, and 2021.1.15 (or later), include
+[built-in support](https://docs.unity3d.com/Manual/play-asset-delivery.html)
+for [Play Asset Delivery (PAD)](https://developer.android.com/guide/playcore/asset-delivery). These Unity versions allow
+developers to specify asset packs by placing assets in .androidpack folders within their project. These versions also
+change the "Split Application Binary" option to use asset packs instead of OBBs.
+
+The build method used by the Google Play Plugins for Unity is incompatible with these features and will ignore assets placed
+in the .androidpack folders.
+
+### Play Core library conflicts {:#play-core-conflicts}
+
+When building an Android App Bundle with Unity's build system (e.g. "File > Build and Run"), Unity includes the Play
+Core library in a way that may conflict the Google Play Plugins for Unity.
+
+To resolve this conflict, enable "Custom Main Gradle Template" in "Android Player > Publishing Settings" and enable
+"Patch mainTemplate.gradle" in "Assets > External Dependency Manager > Android Resolver > Settings". This will
+allow [EDM4U](https://github.com/googlesamples/unity-jar-resolver) to update the mainTemplate.gradle to include the Play
+Core library as a gradle dependency. This will override the version of the Play Core library included by Unity with the
+version specified in
+[PlayCoreDependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/PlayCoreDependencies.xml).
 
 ## Related plugins
 
@@ -154,3 +179,9 @@ The
 [Google Play Games plugin for Unity](//github.com/playgameservices/play-games-plugin-for-unity)
 enables access to the
 [Google Play Games APIs](//developers.google.com/games/services) from Unity.
+
+### External Dependency Manager for Unity (EDM4U)
+
+The [External Dependency Manager for Unity](https://github.com/googlesamples/unity-jar-resolver) provides tools for
+handling dependencies such as Android libraries (AARs) and iOS CocoaPods. The Google Play Plugins for Unity depend on
+EDM4U to resolve AAR dependencies such as the [Play Core library](//developer.android.com/guide/playcore).
