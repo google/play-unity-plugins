@@ -17,9 +17,9 @@ using System.IO;
 using Google.Android.AppBundle.Editor.Internal.AssetPacks;
 using UnityEditor;
 using UnityEngine;
-
 #if UNITY_2018_1_OR_NEWER
 using UnityEditor.Build.Reporting;
+
 #endif
 
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
@@ -108,15 +108,33 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return false;
             }
 
-            if (PlayerSettings.Android.useAPKExpansionFiles)
+            if (BuiltInPadHelper.EditorSupportsPad() && BuiltInPadHelper.ProjectHasAndroidPacks())
             {
                 var message =
-                    string.Format(
-                        "This build doesn't support APK Expansion (OBB) files.\n\nLarge games can instead use the " +
-                        "\"{0}\" option available through the \"Google > Android App Bundle > Asset Delivery " +
-                        "Settings\" menu or the AssetPackConfig API's SplitBaseModuleAssets field.\n\n" +
-                        "Click \"OK\" to disable the \"Split Application Binary\" setting.",
-                        AssetDeliveryWindow.SeparateAssetsLabel);
+                    "This build method doesn't support .androidpack folders. Assets within those folders will not be included" +
+                    " in the build.";
+                buildToolLogger.DisplayOptOutDialog(message, "androidPackError");
+            }
+
+            if (PlayerSettings.Android.useAPKExpansionFiles)
+            {
+                string messagePrefix;
+                if (BuiltInPadHelper.EditorSupportsPad())
+                {
+                    messagePrefix = "This build method doesn't support Unity's \"Split Application Binary\" option.";
+                }
+                else
+                {
+                    messagePrefix = "This build method doesn't support APK Expansion (OBB) files.";
+                }
+
+                var message = string.Format(
+                    "{0}\n\nLarge games can instead use the " +
+                    "\"{1}\" option available through the \"Google > Android App Bundle > Asset Delivery " +
+                    "Settings\" menu or the AssetPackConfig API's SplitBaseModuleAssets field.\n\n" +
+                    "Click \"OK\" to disable the \"Split Application Binary\" setting.",
+                    messagePrefix,
+                    AssetDeliveryWindow.SeparateAssetsLabel);
                 if (buildToolLogger.DisplayActionableErrorDialog(message))
                 {
                     PlayerSettings.Android.useAPKExpansionFiles = false;

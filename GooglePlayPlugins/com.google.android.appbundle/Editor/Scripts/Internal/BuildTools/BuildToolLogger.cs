@@ -24,6 +24,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     public class BuildToolLogger
     {
         public const string BuildErrorTitle = "Build Error";
+        public const string BuildWarningTitle = "Build Warning";
 
         /// <summary>
         /// Returns true if the running instance of Unity is headless (e.g. a command line build),
@@ -51,6 +52,39 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             return EditorUtility.DisplayDialog(
                 BuildErrorTitle, message, WindowUtils.OkButtonText, WindowUtils.CancelButtonText);
+        }
+
+        /// <summary>
+        /// Displays dialog with an additional option to "Opt out for this session". If the user selects that setting,
+        /// they won't be shown the dialog again until they restart Unity. Instead, the specified message will be logged
+        /// as a warning.
+        ///
+        /// On Unity versions 2019.2 and below, this method displays a normal dialog without the opt out option.
+        /// </summary>
+        /// <param name="message">The message included in the dialog.</param>
+        /// <param name="optOutPreferenceKey">The unique key used to determine if a user has opted out of this dialog.</param>
+        public virtual void DisplayOptOutDialog(string message, string optOutPreferenceKey)
+        {
+            Debug.LogWarningFormat("Build warning: {0}", message);
+            if (IsHeadlessMode())
+            {
+                return;
+            }
+
+#if UNITY_2019_3_OR_NEWER
+            var didOptOut =
+                EditorUtility.GetDialogOptOutDecision(DialogOptOutDecisionType.ForThisSession, optOutPreferenceKey);
+            if (didOptOut)
+            {
+                return;
+            }
+
+
+            EditorUtility.DisplayDialog(BuildWarningTitle, message, WindowUtils.OkButtonText,
+                DialogOptOutDecisionType.ForThisSession, optOutPreferenceKey);
+#else
+            EditorUtility.DisplayDialog(BuildWarningTitle, message, WindowUtils.OkButtonText);
+#endif
         }
 
         /// <summary>
