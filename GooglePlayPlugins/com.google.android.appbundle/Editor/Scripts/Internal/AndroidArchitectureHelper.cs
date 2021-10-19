@@ -92,6 +92,7 @@ namespace Google.Android.AppBundle.Editor.Internal
 
         /// <summary>
         /// Enable the Mono scripting backend and all Android architectures supported by Mono builds.
+        /// Note: Unity 2019.4.31+ only supports x86 for IL2CPP builds.
         /// </summary>
         public static void EnableMonoBuildArchitectures()
         {
