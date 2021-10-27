@@ -1,5 +1,9 @@
 # Changelog for com.google.play.instant
 
+## [1.6.0] - 2021-10-25
+### New Features
+ - Incremented version number to match other packages
+
 ## [1.5.0] - 2021-06-14
 ### New Features
  - Changes to support minSdkVersion of 22 in Unity 2021.2

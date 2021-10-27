@@ -1,5 +1,9 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.6.0] - 2021-10-25
+### Other
+ - Added partial support for newer versions of Unity with an alternative implementation of Play Asset Delivery
+
 ## [1.5.0] - 2021-06-14
 ### New Features
  - Added API and UI options to replace OBB files with an install-time asset pack

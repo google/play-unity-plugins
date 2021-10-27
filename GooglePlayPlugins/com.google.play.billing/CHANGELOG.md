@@ -1,5 +1,9 @@
 # Changelog for com.google.play.billing
 
+## [3.2.1] - 2021-10-25
+### New Features
+ - Incremented version number to match other packages
+
 ## [3.2.0] - 2021-06-14
 ### Bug Fixes
  - Clarified documentation in GooglePlayStoreProrationMode

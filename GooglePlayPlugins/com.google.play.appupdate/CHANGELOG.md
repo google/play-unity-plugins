@@ -1,5 +1,9 @@
 # Changelog for com.google.play.appupdate
 
+## [1.6.0] - 2021-10-25
+### New Features
+ - Incremented version number to match other packages
+
 ## [1.5.0] - 2021-06-14
 ### Bug Fixes
  - Return the correct value for ClientVersionStalenessDays

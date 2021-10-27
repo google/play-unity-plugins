@@ -1,5 +1,11 @@
 # Changelog for com.google.play.core
 
+## [1.6.0] - 2021-10-25
+### New Features
+ - Updated Java Play Core dependency from 1.10.0 to 1.10.2
+### Other
+ - Removed playcore.aar file and switched to EDM4U for dependency management
+
 ## [1.5.0] - 2021-06-14
 ### Other
  - Removed ability to compile plugin with Unity 5.6, 2017.1, 2017.2, 2017.3, 2018.1, and 2018.2

@@ -2,13 +2,13 @@
   "name": "com.google.play.assetdelivery",
   "displayName": "Google Play Asset Delivery",
   "description": "Play Asset Delivery enables AssetBundles and other assets to be packaged into an Android App Bundle and delivered through Google Play.",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "unity": "2017.4",
   "author": {
     "name": "Google LLC"
   },
   "dependencies": {
-    "com.google.play.common": "1.5.0",
-    "com.google.play.core": "1.5.0"
+    "com.google.play.common": "1.6.0",
+    "com.google.play.core": "1.6.0"
   }
 }
