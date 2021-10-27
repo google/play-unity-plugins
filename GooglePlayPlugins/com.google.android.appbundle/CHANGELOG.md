@@ -7,6 +7,8 @@
  - Fixed issue #127: crash with IL2CPP and "Separate base APK asset" enabled
  - Fixed issue #143: handle AssetBundle files that have file extensions
  - Fixed issue #145: AAB upload to Play Console fails due to BundleConfig.pb file size
+### Other
+ - Update minimum Target SDK version to 30
 
 ## [1.5.0] - 2021-06-14
 ### New Features
