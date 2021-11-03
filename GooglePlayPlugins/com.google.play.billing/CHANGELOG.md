@@ -1,8 +1,10 @@
 # Changelog for com.google.play.billing
 
-## [3.2.1] - 2021-10-25
+## [3.2.1] - 2021-11-02
 ### New Features
  - Incremented version number to match other packages
+### Other
+ - Updated README and announced deprecation of this plugin
 
 ## [3.2.0] - 2021-06-14
 ### Bug Fixes

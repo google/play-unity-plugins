@@ -69,24 +69,6 @@ and
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/AssetDelivery)
 for more information.
 
-### Play Billing
-
-*com.google.play.billing*
-
-Package contains Google Play Billing Library, which is required to sell digital
-content and subscriptions in games distributed via Google Play. This new version
-of the Google Play Billing Library provides all of the features available in the
-current Java and Kotlin versions.
-
-To use this package, you must agree to the licenses for this Google Play Plugin
-and the Google Play Billing Library. If you do not agree with the licenses, you
-may not use this package.
-
-Refer to the [documentation](//developer.android.com/google/play/billing/unity)
-and
-[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Billing)
-for more information.
-
 ### Play In-App Review
 
 *com.google.play.review*
@@ -145,6 +127,29 @@ Play packages, such as Play Instant.
 The Google Play Core package provides the
 [Play Core Library](//developer.android.com/guide/playcore) required by some Google Play packages, such as Play Asset
 Delivery.
+
+### [Deprecated] Play Billing
+
+*com.google.play.billing*
+
+**The Google Play Billing Plugin for Unity will not be receiving updates going
+forward. This means that it will stay on Play Billing Library 3 and app updates
+past Nov 1, 2022 will no longer be able to use the plugin.**
+
+
+Package contains Google Play Billing Library, which is required to sell digital
+content and subscriptions in games distributed via Google Play. This new version
+of the Google Play Billing Library provides all of the features available in the
+current Java and Kotlin versions.
+
+To use this package, you must agree to the licenses for this Google Play Plugin
+and the Google Play Billing Library. If you do not agree with the licenses, you
+may not use this package.
+
+Refer to the [documentation](//developer.android.com/google/play/billing/unity)
+and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Billing)
+for more information.
 
 ## Known Issues
 
