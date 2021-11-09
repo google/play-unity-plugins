@@ -2,7 +2,7 @@
 
 ## [1.6.0] - 2021-10-25
 ### New Features
- - Updated bundletool-all.jar from 1.6.1 to 1.8.0
+ - Updated bundletool-all.jar from 1.6.1 to 1.8.2
 ### Bug Fixes
  - Fixed issue #127: crash with IL2CPP and "Separate base APK asset" enabled
  - Fixed issue #143: handle AssetBundle files that have file extensions
