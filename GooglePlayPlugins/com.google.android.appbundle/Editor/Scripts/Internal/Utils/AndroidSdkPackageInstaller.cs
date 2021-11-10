@@ -27,7 +27,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Utils
         /// <summary>
         /// Installs the specified Android SDK package.
         /// </summary>
-        public static void InstallPackage(string packageName, string displayName)
+        public static void InstallPackage(string packageName, string displayName, string androidSdkRoot)
         {
             // In many cases the SDK install is quick and clearly indicates download/install progress. However, on
             // some systems it can take a couple minutes and not indicate progress - set expectations with a dialog.
@@ -43,7 +43,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Utils
                 return;
             }
 
-            AndroidSdkManager.Create(manager =>
+            AndroidSdkManager.Create(androidSdkRoot, manager =>
             {
                 manager.QueryPackages(collection =>
                 {

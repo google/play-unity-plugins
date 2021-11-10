@@ -990,11 +990,12 @@ namespace Google.Android.AppBundle.Editor.Internal.PlayServices
         ///
         /// If the package manager is out of date, the user is prompted to update it.
         /// </summary>
+        /// <param name="androidSdkRoot">The path to the Android SDK root folder.</param>
         /// <param name="complete">Used to report a AndroidSdkManager instance if a SDK manager is
         /// available, returns null otherwise.</param>
-        public static void Create(Action<IAndroidSdkManager> complete) {
+        public static void Create(string androidSdkRoot, Action<IAndroidSdkManager> complete) {
             // Search for the new package manager
-            var sdkManagerTool = FindAndroidSdkTool(SdkManager.TOOL_NAME, AndroidSdkRoot);
+            var sdkManagerTool = FindAndroidSdkTool(SdkManager.TOOL_NAME, androidSdkRoot);
             if (sdkManagerTool != null) {
                 var sdkManager = new SdkManager(sdkManagerTool);
                 var sdkManagerPackage = sdkManager.Package;
@@ -1024,25 +1025,15 @@ namespace Google.Android.AppBundle.Editor.Internal.PlayServices
             }
 
             // Search for the legacy package manager.
-            var androidTool = FindAndroidSdkTool("android", AndroidSdkRoot);
+            var androidTool = FindAndroidSdkTool("android", androidSdkRoot);
             if (androidTool != null) {
-                var sdkManager = new AndroidToolSdkManager(androidTool, AndroidSdkRoot);
+                var sdkManager = new AndroidToolSdkManager(androidTool, androidSdkRoot);
                 if (!sdkManager.IsWrapper) {
                     complete(sdkManager);
                     return;
                 }
             }
             CreateFailed(complete);
-        }
-
-        private static string AndroidSdkRoot {
-            get {
-                var sdkPath = UnityEditor.EditorPrefs.GetString("AndroidSdkRoot");
-                if (string.IsNullOrEmpty(sdkPath)) {
-                    sdkPath = Environment.GetEnvironmentVariable("ANDROID_HOME");
-                }
-                return sdkPath;
-            }
         }
     }
 }

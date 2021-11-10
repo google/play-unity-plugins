@@ -69,7 +69,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     // Note: this install can be slow, but it's not clear that it's any slower through Unity.
                     AndroidSdkPackageInstaller.InstallPackage(
                         string.Format("platforms;android-{0}", LatestVersion),
-                        string.Format("Android SDK Platform {0}", LatestVersion));
+                        string.Format("Android SDK Platform {0}", LatestVersion),
+                        _androidSdk.RootPath);
                 }
 
                 return false;
