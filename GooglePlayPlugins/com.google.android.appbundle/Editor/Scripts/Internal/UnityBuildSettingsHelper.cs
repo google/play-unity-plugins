@@ -53,7 +53,7 @@ namespace Google.Android.AppBundle.Editor.Internal
         /// A list of expected Exceptions that may occur while using Type.GetMethod and MethodInfo.Invoke to call
         /// methods via reflection.
         /// </summary>
-        private static readonly ISet<Type> ExpectedReflectionExceptions = new HashSet<Type>
+        private static readonly HashSet<Type> ExpectedReflectionExceptions = new HashSet<Type>
         {
             typeof(ArgumentException),
             typeof(AmbiguousMatchException),
