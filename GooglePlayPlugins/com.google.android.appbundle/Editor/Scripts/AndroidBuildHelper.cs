@@ -15,10 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Google.Android.AppBundle.Editor.Internal;
 using Google.Android.AppBundle.Editor.Internal.Config;
 using UnityEditor;
-using UnityEngine;
 
 namespace Google.Android.AppBundle.Editor
 {
@@ -28,7 +26,7 @@ namespace Google.Android.AppBundle.Editor
     public static class AndroidBuildHelper
     {
         // Allowed characters for splitting PlayerSettings.GetScriptingDefineSymbolsForGroup().
-        private static readonly char[] ScriptingDefineSymbolsSplitChars = { ';', ',', ' ' };
+        private static readonly char[] ScriptingDefineSymbolsSplitChars = {';', ',', ' '};
 
         /// <summary>
         /// Returns an array of enabled scenes from the "Scenes In Build" section of Unity's Build Settings window.
@@ -51,27 +49,11 @@ namespace Google.Android.AppBundle.Editor
         /// <returns>A new <see cref="BuildPlayerOptions"/> object.</returns>
         public static BuildPlayerOptions CreateBuildPlayerOptions(string locationPathName)
         {
-            var buildOptions = EditorUserBuildSettings.development ? BuildOptions.Development : BuildOptions.None;
-
-            try
-            {
-                var compressionBuildOption = UnityBuildSettingsHelper.GetCompressionBuildOption();
-                if (compressionBuildOption.HasValue)
-                {
-                    buildOptions |= compressionBuildOption.Value;
-                }
-            }
-            catch (UnityBuildSettingsHelper.ReflectionException)
-            {
-                Debug.LogWarning(
-                    "Failed to detect the compression method specified in the editor Build Settings window. Using Default.");
-            }
-
             return new BuildPlayerOptions
             {
                 assetBundleManifestPath = AndroidBuildConfiguration.AssetBundleManifestPath,
                 locationPathName = locationPathName,
-                options = buildOptions,
+                options = EditorUserBuildSettings.development ? BuildOptions.Development : BuildOptions.None,
                 scenes = GetEditorBuildEnabledScenes(),
                 target = BuildTarget.Android,
                 targetGroup = BuildTargetGroup.Android
@@ -86,7 +68,7 @@ namespace Google.Android.AppBundle.Editor
             var scriptingDefineSymbols = GetScriptingDefineSymbols();
             if (!IsScriptingSymbolDefined(scriptingDefineSymbols, symbol))
             {
-                SetScriptingDefineSymbols(scriptingDefineSymbols.Concat(new[] { symbol }));
+                SetScriptingDefineSymbols(scriptingDefineSymbols.Concat(new[] {symbol}));
             }
         }
 
