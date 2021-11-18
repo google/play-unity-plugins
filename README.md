@@ -38,6 +38,10 @@ There are 3 different options for obtaining the plugins:
 For all cases except `git clone` follow the instructions to
 [Install Google packages for Unity](//developers.google.com/unity/instructions).
 
+Developers using `git clone` must also install the [External Dependency Manager for Unity (EDM4U)](https://github.com/googlesamples/unity-jar-resolver) using either the .tgz or .unitypackage available on the [Google APIs for Unity archive page](https://developers.google.com/unity/archive#external_dependency_manager_for_unity).
+
+If EDM4U is not installed, the project won't be able to fetch necessary Java dependencies such as the [Play Core library](//developer.android.com/guide/playcore), resulting in runtime errors.
+
 ## Feature plugins
 
 These plugins add features, such as Google Play Instant support, to a Unity
@@ -153,7 +157,7 @@ for more information.
 
 ## Known Issues
 
-### Play Asset Delivery support built into Unity {:#built-in-pad}
+### Play Asset Delivery support built into Unity {#built-in-pad}
 
 Recent versions of Unity, such as 2019.4.29, 2020.3.15, and 2021.1.15 (or later), include
 [built-in support](https://docs.unity3d.com/Manual/play-asset-delivery.html)
@@ -164,7 +168,7 @@ change the "Split Application Binary" option to use asset packs instead of OBBs.
 The build method used by the Google Play Plugins for Unity is incompatible with these features and will ignore assets placed
 in the .androidpack folders.
 
-### Play Core library conflicts {:#play-core-conflicts}
+### Play Core library conflicts {#play-core-conflicts}
 
 When building an Android App Bundle with Unity's build system (e.g. "File > Build and Run"), Unity includes the Play
 Core library in a way that may conflict the Google Play Plugins for Unity.
