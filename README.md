@@ -157,7 +157,8 @@ for more information.
 
 ## Known Issues
 
-### Play Asset Delivery support built into Unity {#built-in-pad}
+<!----><a name="built-in-pad"></a>
+### Play Asset Delivery support built into Unity
 
 Recent versions of Unity, such as 2019.4.29, 2020.3.15, and 2021.1.15 (or later), include
 [built-in support](https://docs.unity3d.com/Manual/play-asset-delivery.html)
@@ -168,7 +169,8 @@ change the "Split Application Binary" option to use asset packs instead of OBBs.
 The build method used by the Google Play Plugins for Unity is incompatible with these features and will ignore assets placed
 in the .androidpack folders.
 
-### Play Core library conflicts {#play-core-conflicts}
+<!----><a name="play-core-conflicts"></a>
+### Play Core library conflicts
 
 When building an Android App Bundle with Unity's build system (e.g. "File > Build and Run"), Unity includes the Play
 Core library in a way that may conflict the Google Play Plugins for Unity.
