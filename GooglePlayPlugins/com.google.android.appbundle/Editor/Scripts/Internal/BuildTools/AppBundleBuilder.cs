@@ -22,10 +22,18 @@ using Google.Android.AppBundle.Editor.Internal.AssetPacks;
 using Google.Android.AppBundle.Editor.Internal.Config;
 using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 #if UNITY_2018_4_OR_NEWER && !NET_LEGACY
 using System.Threading.Tasks;
+#endif
+
+// IPreprocessBuild was deprecated in 2018.1 in favor of IPreprocessBuildWithReport.
+#if UNITY_2018_1_OR_NEWER
+using IPreprocessBuildCompat = UnityEditor.Build.IPreprocessBuildWithReport;
+#else
+using IPreprocessBuildCompat = UnityEditor.Build.IPreprocessBuild;
 #endif
 
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
@@ -33,7 +41,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
     /// <summary>
     /// Helper to build an Android App Bundle file on Unity.
     /// </summary>
-    public class AppBundleBuilder : IBuildTool
+    public class AppBundleBuilder : IBuildTool,IPreprocessBuildCompat
     {
         public delegate void PostBuildCallback(string finishedAabFilePath);
 
@@ -88,6 +96,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private EventWaitHandle _progressBarWaitHandle;
         private AndroidSdkVersions _minSdkVersion;
         private string _packageName;
+        private int _versionCode;
+        private string _versionName;
         private PostBuildCallback _createBundleAsyncOnSuccess = delegate { };
         private IEnumerable<IAssetPackManifestTransformer> _assetPackManifestTransformers;
 
@@ -108,6 +118,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             _jarSigner = jarSigner;
             _workingDirectoryPath = workingDirectoryPath;
             _zipUtils = zipUtils;
+        }
+
+        public int callbackOrder { get { return int.MaxValue; } }
+
+		public void OnPreprocessBuild(BuildReport report)
+        {
+            _versionCode = PlayerSettings.Android.bundleVersionCode;
+            _versionName = PlayerSettings.bundleVersion;
         }
 
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
@@ -635,16 +653,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return;
             }
 
-            string symbolVersionFile =  string.Format("{0}-v{1}.symbols.zip",PlayerSettings.bundleVersion,PlayerSettings.Android.bundleVersionCode);
-
-            var symbolsFilePath = Path.Combine(_workingDirectoryPath,AndroidPlayerFilePrefix + "-" + symbolVersionFile);
+            var symbolsFilePath = Path.Combine(_workingDirectoryPath, GetSymbolsFileName(AndroidPlayerFilePrefix));
             if (!File.Exists(symbolsFilePath))
             {
                 // The file won't exist for Mono builds or if EditorUserBuildSettings.androidCreateSymbolsZip is false.
                 return;
             }
 
-            var outputSymbolsFileName = Path.GetFileNameWithoutExtension(aabFilePath) + "-" + symbolVersionFile;
+            var outputSymbolsFileName = GetSymbolsFileName(Path.GetFileNameWithoutExtension(aabFilePath));
             var outputSymbolsFilePath = Path.Combine(outputDirectoryPath, outputSymbolsFileName);
             if (File.Exists(outputSymbolsFilePath))
             {
@@ -653,6 +669,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             File.Move(symbolsFilePath, outputSymbolsFilePath);
+        }
+
+        private string GetSymbolsFileName(string prefix)
+        {
+            return string.Format("{0}-{1}-v{2}.symbols.zip", prefix, _versionName, _versionCode);
         }
 
         private static void CopyFilesRecursively(DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
