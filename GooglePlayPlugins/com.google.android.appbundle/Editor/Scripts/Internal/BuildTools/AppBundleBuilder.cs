@@ -28,19 +28,12 @@ using UnityEngine;
 using System.Threading.Tasks;
 #endif
 
-// IPreprocessBuild was deprecated in 2018.1 in favor of IPreprocessBuildWithReport.
-#if UNITY_2018_1_OR_NEWER
-using IPreprocessBuildCompat = UnityEditor.Build.IPreprocessBuildWithReport;
-#else
-using IPreprocessBuildCompat = UnityEditor.Build.IPreprocessBuild;
-#endif
-
 namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 {
     /// <summary>
     /// Helper to build an Android App Bundle file on Unity.
     /// </summary>
-    public class AppBundleBuilder : IBuildTool,IPreprocessBuildCompat
+    public class AppBundleBuilder : IBuildTool
     {
         public delegate void PostBuildCallback(string finishedAabFilePath);
 
@@ -119,18 +112,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             _zipUtils = zipUtils;
         }
 
-        public int callbackOrder { get { return 99; } }
-
-#if UNITY_2018_1_OR_NEWER
-        public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
-#else
-        public void OnPreprocessBuild(BuildTarget target, string outputPath)
-#endif
-        {
-            _versionCode = PlayerSettings.Android.bundleVersionCode;
-            _versionName = PlayerSettings.bundleVersion;
-        }
-
         public virtual bool Initialize(BuildToolLogger buildToolLogger)
         {
             // Cache information that is only accessible from the main thread.
@@ -193,7 +174,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             };
 
             // Do not use BuildAndSign since this signature won't be used.
-            return _androidBuilder.Build(updatedBuildPlayerOptions);
+            var buildResult = _androidBuilder.Build(updatedBuildPlayerOptions);
+
+            _versionCode = PlayerSettings.Android.bundleVersionCode;
+            _versionName = PlayerSettings.bundleVersion;
+
+            return buildResult;
         }
 
         /// <summary>
