@@ -119,7 +119,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             _zipUtils = zipUtils;
         }
 
-        public int callbackOrder { get { return int.MaxValue; } }
+        public int callbackOrder { get { return 99; } }
 
 #if UNITY_2018_1_OR_NEWER
         public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
