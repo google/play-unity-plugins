@@ -22,7 +22,6 @@ using Google.Android.AppBundle.Editor.Internal.AssetPacks;
 using Google.Android.AppBundle.Editor.Internal.Config;
 using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
-using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 #if UNITY_2018_4_OR_NEWER && !NET_LEGACY
@@ -122,7 +121,11 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         public int callbackOrder { get { return int.MaxValue; } }
 
-		public void OnPreprocessBuild(BuildReport report)
+#if UNITY_2018_1_OR_NEWER
+        public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
+#else
+        public void OnPreprocessBuild(BuildTarget target, string outputPath)
+#endif
         {
             _versionCode = PlayerSettings.Android.bundleVersionCode;
             _versionName = PlayerSettings.bundleVersion;
