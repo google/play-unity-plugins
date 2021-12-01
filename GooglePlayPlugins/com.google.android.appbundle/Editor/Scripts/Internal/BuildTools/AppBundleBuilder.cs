@@ -644,7 +644,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return;
             }
 
-            var outputSymbolsFileName = Path.GetFileNameWithoutExtension(aabFilePath) +  + "-" + symbolVersionFile;
+            var outputSymbolsFileName = Path.GetFileNameWithoutExtension(aabFilePath) + "-" + symbolVersionFile;
             var outputSymbolsFilePath = Path.Combine(outputDirectoryPath, outputSymbolsFileName);
             if (File.Exists(outputSymbolsFilePath))
             {
