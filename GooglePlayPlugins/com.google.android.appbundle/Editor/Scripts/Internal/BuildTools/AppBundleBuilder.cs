@@ -88,8 +88,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         private EventWaitHandle _progressBarWaitHandle;
         private AndroidSdkVersions _minSdkVersion;
         private string _packageName;
-        private int _versionCode;
-        private string _versionName;
         private PostBuildCallback _createBundleAsyncOnSuccess = delegate { };
         private IEnumerable<IAssetPackManifestTransformer> _assetPackManifestTransformers;
 
@@ -117,8 +115,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             // Cache information that is only accessible from the main thread.
             _minSdkVersion = PlayerSettings.Android.minSdkVersion;
             _packageName = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
-            _versionCode = PlayerSettings.Android.bundleVersionCode;
-            _versionName = PlayerSettings.bundleVersion;
 
             _assetPackManifestTransformers = AssetPackManifestTransformerRegistry.Registry.ConstructInstances();
             var initializedManifestTransformers = true;
@@ -639,14 +635,16 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return;
             }
 
-            var symbolsFilePath = Path.Combine(_workingDirectoryPath, GetSymbolsFileName(AndroidPlayerFilePrefix));
+            string symbolVersionFile =  string.Format("{0}-v{1}.symbols.zip",PlayerSettings.bundleVersion,PlayerSettings.Android.bundleVersionCode);
+
+            var symbolsFilePath = Path.Combine(_workingDirectoryPath,AndroidPlayerFilePrefix + "-" + symbolVersionFile);
             if (!File.Exists(symbolsFilePath))
             {
                 // The file won't exist for Mono builds or if EditorUserBuildSettings.androidCreateSymbolsZip is false.
                 return;
             }
 
-            var outputSymbolsFileName = GetSymbolsFileName(Path.GetFileNameWithoutExtension(aabFilePath));
+            var outputSymbolsFileName = Path.GetFileNameWithoutExtension(aabFilePath) +  + "-" + symbolVersionFile;
             var outputSymbolsFilePath = Path.Combine(outputDirectoryPath, outputSymbolsFileName);
             if (File.Exists(outputSymbolsFilePath))
             {
@@ -655,11 +653,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             File.Move(symbolsFilePath, outputSymbolsFilePath);
-        }
-
-        private string GetSymbolsFileName(string prefix)
-        {
-            return string.Format("{0}-{1}-v{2}.symbols.zip", prefix, _versionName, _versionCode);
         }
 
         private static void CopyFilesRecursively(DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
