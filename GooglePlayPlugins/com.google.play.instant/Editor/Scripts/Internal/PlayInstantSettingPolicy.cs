@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Google.Android.AppBundle.Editor.Internal.Utils;
 using UnityEditor;
 using UnityEngine.Rendering;
@@ -27,10 +27,10 @@ namespace Google.Play.Instant.Editor.Internal
     /// </summary>
     public class PlayInstantSettingPolicy
     {
-        private const string MultithreadedRenderingDescription =
-            "Pre-Oreo devices do not support instant apps using EGL shared contexts.";
-
         private const string ApkSizeReductionDescription = "This setting reduces APK size.";
+
+        private const string GraphicsApiDescription =
+            "Removing additional Graphics APIs reduces APK size.";
 
         public delegate bool IsCorrectStateDelegate();
 
@@ -84,70 +84,12 @@ namespace Google.Play.Instant.Editor.Internal
 #endif
 
                 new PlayInstantSettingPolicy(
-                    "Graphics API should be GLES2 for minSdkVersion < 26",
-                    "Pre-Oreo devices only support instant apps using OpenGLES2. " +
-                    "Removing unused Graphics APIs reduces APK size.",
-                    () =>
-                    {
-                        if ((int) PlayerSettings.Android.minSdkVersion >= 26)
-                        {
-                            return true;
-                        }
-
-                        var graphicsDeviceTypes = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
-                        return !PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android) &&
-                               graphicsDeviceTypes.Length == 1 &&
-                               graphicsDeviceTypes[0] == GraphicsDeviceType.OpenGLES2;
-                    },
-                    () =>
-                    {
-                        // On headless build machines we don't want to show a dialog, so assume which change to make.
-                        if (WindowUtils.IsHeadlessMode())
-                        {
-                            SetGraphicsApiGles2();
-                            return true;
-                        }
-
-                        // Otherwise, there are 2 possible fixes, so ask which is preferred.
-                        var result = EditorUtility.DisplayDialogComplex("Update Graphics APIs",
-                            "Pre-Oreo devices only support instant apps using OpenGLES2. " +
-                            "Update Graphics APIs to OpenGLES2 only or change the Android minimum SDK to 26.",
-                            "Set GLES2", "Cancel", "Set MinSdk 26");
-                        switch (result)
-                        {
-                            case 0:
-                                SetGraphicsApiGles2();
-                                break;
-                            case 1:
-                                // Cancel: do nothing, though this may result in a console log message.
-                                break;
-                            case 2:
-                                PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
-                                break;
-                            default:
-                                throw new Exception("Unexpected DisplayDialogComplex result: " + result);
-                        }
-
-                        return true;
-                    }),
-
-                new PlayInstantSettingPolicy(
                     "Split Application Binary should be disabled",
                     "Instant apps don't support APK Expansion (OBB) Files.",
                     () => !PlayerSettings.Android.useAPKExpansionFiles,
                     () =>
                     {
                         PlayerSettings.Android.useAPKExpansionFiles = false;
-                        return true;
-                    }),
-
-                new PlayInstantSettingPolicy(
-                    "Android Multithreaded Rendering should be disabled",
-                    MultithreadedRenderingDescription,
-                    () => !PlayerSettings.GetMobileMTRendering(BuildTargetGroup.Android),
-                    () =>
-                    {
-                        PlayerSettings.SetMobileMTRendering(BuildTargetGroup.Android, false);
                         return true;
                     })
             };
@@ -160,19 +102,57 @@ namespace Google.Play.Instant.Editor.Internal
         {
             var policies = new List<PlayInstantSettingPolicy>();
 
-            // TODO: Update to handle the latest Unity versions.
-#if !UNITY_2021_2_OR_NEWER
             policies.Add(new PlayInstantSettingPolicy(
-                "Android minSdkVersion should be 21",
-                "Lower than 21 is fine, though 21 is the minimum supported by Google Play Instant.",
-                () => (int) PlayerSettings.Android.minSdkVersion >= 21,
+                "Android minSdkVersion should be 26",
+                "Lower than 26 is fine, though 26 is the minimum supported by Google Play Instant.",
+                () => (int)PlayerSettings.Android.minSdkVersion >= 26,
                 () =>
                 {
-                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
+                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
                     return true;
                 })
             );
-#endif
+
+            policies.Add(new PlayInstantSettingPolicy(
+                "Use a single Graphics API, either GLES2, GLES3, or Vulkan",
+                GraphicsApiDescription,
+                () => !PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android) &&
+                      PlayerSettings.GetGraphicsAPIs(BuildTarget.Android).Length == 1,
+                () =>
+                {
+                    // On headless build machines we don't want to show a dialog, so just ignore.
+                    if (WindowUtils.IsHeadlessMode())
+                    {
+                        return true;
+                    }
+
+                    // Otherwise, ask which single Graphics API to use (generally recommending GLES3).
+                    var preferredGraphicsApi = GraphicsDeviceType.OpenGLES3;
+                    var preferredGraphicsApiName = "GLES3";
+                    if (!PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android))
+                    {
+                        var types = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
+                        if (!types.Contains(GraphicsDeviceType.OpenGLES3))
+                        {
+                            // If GLES3 isn't in the existing list, recommend GLES2. (Alternatively, Vulkan could be
+                            // recommended here since it's available on Android SDK 24+.)
+                            preferredGraphicsApi = GraphicsDeviceType.OpenGLES2;
+                            preferredGraphicsApiName = "GLES2";
+                        }
+                    }
+
+                    var result = EditorUtility.DisplayDialog("Remove Additional Graphics APIs",
+                        GraphicsApiDescription +
+                        " Set Graphics APIs to " + preferredGraphicsApiName + " Only or Cancel to ignore.",
+                        preferredGraphicsApiName + " Only", "Cancel");
+                    if (result)
+                    {
+                        PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
+                        PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, new[] { preferredGraphicsApi });
+                    }
+
+                    return true;
+                }));
 
             // For the purpose of switching to .NET 2.0 Subset, it's sufficient to check #if NET_2_0. However, it would
             // be confusing if the option disappeared after clicking the Update button, so we also check NET_2_0_SUBSET.
@@ -228,7 +208,6 @@ namespace Google.Play.Instant.Editor.Internal
             policies.Add(new PlayInstantSettingPolicy(
                 "Release builds should use managed code stripping",
                 ApkSizeReductionDescription,
-                // Note: in some alpha/beta builds of 2018.3 ManagedStrippingLevel.High isn't defined (use "Normal").
                 () => PlayerSettings.GetManagedStrippingLevel(BuildTargetGroup.Android) == ManagedStrippingLevel.High,
                 () =>
                 {
@@ -238,12 +217,6 @@ namespace Google.Play.Instant.Editor.Internal
 #endif
 
             return policies;
-        }
-
-        private static void SetGraphicsApiGles2()
-        {
-            PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
-            PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, new[] {GraphicsDeviceType.OpenGLES2});
         }
     }
 }
