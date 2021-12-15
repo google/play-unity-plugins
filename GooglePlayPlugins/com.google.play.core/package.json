@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "com.google.android.appbundle": "1.6.0",
-    "com.google.external-dependency-manager": "1.2.167"
+    "com.google.external-dependency-manager": "1.2.168"
   }
 }
