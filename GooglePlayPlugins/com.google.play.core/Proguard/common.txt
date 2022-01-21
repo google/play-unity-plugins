@@ -53,6 +53,7 @@
 -keep class com.google.android.play.core.tasks.Tasks {
     public static java.lang.Object await(com.google.android.play.core.tasks.Task);
     public static java.lang.Object await(com.google.android.play.core.tasks.Task, long, java.util.concurrent.TimeUnit);
+    public static com.google.android.play.core.tasks.Task whenAll(java.util.Collection);
 }
 
 -keep class com.google.android.play.core.tasks.NativeOnCompleteListener {
@@ -75,3 +76,4 @@
     public static void addVersion(java.lang.String, java.lang.String, int);
 }
 
+-dontwarn com.google.android.gms.common.**
