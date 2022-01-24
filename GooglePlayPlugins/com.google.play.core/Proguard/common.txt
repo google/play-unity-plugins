@@ -75,5 +75,3 @@
 -keep class com.google.android.play.core.common.PlayCoreVersion {
     public static void addVersion(java.lang.String, java.lang.String, int);
 }
-
--dontwarn com.google.android.gms.common.**

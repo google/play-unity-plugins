@@ -1,5 +1,11 @@
 # Changelog for com.google.play.instant
 
+## [1.6.1] - 2022-01-24
+### New Features
+ - Updated Google Play Instant minSdkVersion to 26
+ - Updated some Play Instant setting policies now that Oreo (SDK 26) is the minimum supported Android version for launching Android instant apps.
+ - Added a policy recommending the use of a single Graphics API to reduce APK size.
+
 ## [1.6.0] - 2021-11-15
 ### New Features
  - Incremented version number to match other packages

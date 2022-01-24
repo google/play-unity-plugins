@@ -1,5 +1,9 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.6.1] - 2022-01-24
+### New Features
+ - Moved samples to a seperate folder
+
 ## [1.6.0] - 2021-11-15
 ### Other
  - Added partial support for newer versions of Unity with an alternative implementation of Play Asset Delivery
