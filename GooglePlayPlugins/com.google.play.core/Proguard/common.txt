@@ -75,3 +75,55 @@
 -keep class com.google.android.play.core.common.PlayCoreVersion {
     public static void addVersion(java.lang.String, java.lang.String, int);
 }
+
+-keep class com.google.android.gms.tasks.OnCompleteListener {
+    public abstract void onComplete(com.google.android.gms.tasks.Task);
+}
+
+-keep class com.google.android.gms.tasks.OnFailureListener {
+    public abstract void onFailure(java.lang.Exception);
+}
+
+-keep class com.google.android.gms.tasks.OnSuccessListener {
+    public abstract void onSuccess(java.lang.Object);
+}
+
+-keep class com.google.android.gms.tasks.RuntimeExecutionException {
+}
+
+-keep class com.google.android.gms.tasks.Task {
+    <init>();
+
+    public com.google.android.gms.tasks.Task addOnCompleteListener(com.google.android.gms.tasks.OnCompleteListener);
+    public com.google.android.gms.tasks.Task addOnCompleteListener(java.util.concurrent.Executor, com.google.android.gms.tasks.OnCompleteListener);
+    public abstract com.google.android.gms.tasks.Task addOnFailureListener(com.google.android.gms.tasks.OnFailureListener);
+    public abstract com.google.android.gms.tasks.Task addOnFailureListener(java.util.concurrent.Executor, com.google.android.gms.tasks.OnFailureListener);
+    public abstract com.google.android.gms.tasks.Task addOnSuccessListener(com.google.android.gms.tasks.OnSuccessListener);
+    public abstract com.google.android.gms.tasks.Task addOnSuccessListener(java.util.concurrent.Executor, com.google.android.gms.tasks.OnSuccessListener);
+    public abstract java.lang.Exception getException();
+    public abstract java.lang.Object getResult();
+    public abstract java.lang.Object getResult(java.lang.Class);
+    public abstract boolean isComplete();
+    public abstract boolean isSuccessful();
+}
+
+-keep class com.google.android.gms.tasks.TaskExecutors {
+    public static java.util.concurrent.Executor MAIN_THREAD;
+}
+
+-keep class com.google.android.gms.tasks.Tasks {
+    public static java.lang.Object await(com.google.android.gms.tasks.Task);
+    public static java.lang.Object await(com.google.android.gms.tasks.Task, long, java.util.concurrent.TimeUnit);
+    public static com.google.android.gms.tasks.Task whenAll(java.util.Collection);
+}
+
+-keep class com.google.android.gms.tasks.NativeOnCompleteListener {
+    <init>(long);
+
+    public void onComplete(com.google.android.gms.tasks.Task);
+    public void playCoreNativeOnComplete(long, java.lang.Object, bool, bool, java.lang.String);
+}
+
+-keep class com.google.android.gms.common.api.ApiException {
+    public int getStatusCode();
+}
