@@ -1,5 +1,9 @@
 # Changelog for com.google.play.core
 
+## [1.7.0] - 2022-02-15
+### New Features
+- Incremented version number to match other packages
+
 ## [1.6.1] - 2022-1-20
 ### New Features
  - Updated Java Play Core dependency from 1.10.2 to 1.10.3

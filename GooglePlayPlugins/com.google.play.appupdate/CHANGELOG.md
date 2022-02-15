@@ -1,5 +1,9 @@
 # Changelog for com.google.play.appupdate
 
+## [1.7.0] - 2022-02-15
+### New Features
+- Incremented version number to match other packages
+
 ## [1.6.1] - 2022-01-24
 ### New Features
  - Incremented version number to match other packages

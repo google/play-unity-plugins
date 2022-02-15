@@ -1,0 +1,53 @@
+# Copyright 2022 Google LLC
+#
+# The Play Integrity API Android library is licensed to you under the Play
+# Integrity API Terms of Service
+# (https://developer.android.com/google/play/integrity/overview#tos).
+# By using the Play Integrity API Android library, you agree to the Play
+# Integrity API Terms of Service.
+
+# Play Integrity API Proguard Rules
+
+-keep class com.google.android.play.core.integrity.IntegrityManager {
+  public abstract com.google.android.play.core.tasks.Task requestIntegrityToken(com.google.android.play.core.integrity.IntegrityTokenRequest);
+}
+
+-keep class com.google.android.play.core.integrity.IntegrityManagerFactory {
+  public static com.google.android.play.core.integrity.IntegrityManager create(android.content.Context);
+}
+
+-keep class com.google.android.play.core.integrity.IntegrityTokenRequest {
+  public abstract java.lang.String nonce();
+  public abstract java.lang.Long cloudProjectNumber();
+  public static com.google.android.play.core.integrity.IntegrityTokenRequest$Builder builder();
+}
+
+-keep class com.google.android.play.core.integrity.IntegrityTokenRequest$Builder {
+  public abstract com.google.android.play.core.integrity.IntegrityTokenRequest$Builder setNonce(java.lang.String);
+  public abstract com.google.android.play.core.integrity.IntegrityTokenRequest$Builder setCloudProjectNumber(long);
+  public abstract com.google.android.play.core.integrity.IntegrityTokenRequest build();
+}
+
+-keep class com.google.android.play.core.integrity.IntegrityTokenResponse {
+  public abstract java.lang.String token();
+}
+
+-keep class com.google.android.play.core.integrity.model.IntegrityErrorCode {
+    public static int NO_ERROR;
+    public static int API_NOT_AVAILABLE;
+    public static int PLAY_STORE_NOT_FOUND;
+    public static int NETWORK_ERROR;
+    public static int PLAY_STORE_ACCOUNT_NOT_FOUND;
+    public static int APP_NOT_INSTALLED;
+    public static int PLAY_SERVICES_NOT_FOUND;
+    public static int APP_UID_MISMATCH;
+    public static int TOO_MANY_REQUESTS;
+    public static int CANNOT_BIND_TO_SERVICE;
+    public static int NONCE_TOO_SHORT;
+    public static int NONCE_TOO_LONG;
+    public static int GOOGLE_SERVER_UNAVAILABLE;
+    public static int NONCE_IS_NOT_BASE64;
+    public static int PLAY_STORE_VERSION_OUTDATED;
+    public static int PLAY_SERVICES_VERSION_OUTDATED;
+    public static int INTERNAL_ERROR;
+}

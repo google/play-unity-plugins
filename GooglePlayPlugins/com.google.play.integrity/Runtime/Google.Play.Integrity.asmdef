@@ -1,0 +1,11 @@
+{
+  "name": "Google.Play.Integrity",
+  "references": [
+    "Google.Play.Common",
+    "Google.Play.Core"
+  ],
+  "includePlatforms": [
+    "Android",
+    "Editor"
+  ]
+}
