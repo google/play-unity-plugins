@@ -112,6 +112,19 @@ and
 [Editor API reference](//developer.android.com/reference/unity/namespace/Google/Play/Instant/Editor)
 for more information.
 
+### Play Integrity API
+
+*com.google.play.integrity*
+
+The Play Integrity API helps protect your apps and games from potentially risky
+and fraudulent interactions, allowing you to respond with appropriate actions to
+reduce attacks and abuse such as fraud, cheating, and unauthorized access.
+
+Refer to the
+[documentation](//developer.android.com/google/play/integrity/overview) and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Integrity)
+for more information.
+
 ## Support plugins
 
 These plugins provide shared functionality to some of the above plugins, but
@@ -181,6 +194,14 @@ allow [EDM4U](https://github.com/googlesamples/unity-jar-resolver) to update the
 Core library as a gradle dependency. This will override the version of the Play Core library included by Unity with the
 version specified in
 [PlayCoreDependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/PlayCoreDependencies.xml).
+
+### Enable Jetifier for Play Integrity plugin
+
+Because the Play Integrity API Android Library contains AndroidX dependencies, for Unity 2020.3 or above, you may need
+to manually enable Jetifier in EDM4U with the following steps:
+
+- Enable `Custom Gradle Properties Template` in `Project Settings` -> `Player` -> `Publishing Settings`, if not already.
+- Then enable `Use Jetifier` and `Patch gradleTemplate.properties` in EDM4U's Android Resolver setting.
 
 ## Related plugins
 

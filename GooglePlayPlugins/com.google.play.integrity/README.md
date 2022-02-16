@@ -4,8 +4,8 @@
 
 ## Overview
 
-The Play Integrity API provides developers with security and anti-tampering
-features such as device attestation, licensing verification, etc.
+The Play Integrity API provides developers with security and anti-tampering features such as device attestation,
+licensing verification, etc.
 
 ## Documentation
 
