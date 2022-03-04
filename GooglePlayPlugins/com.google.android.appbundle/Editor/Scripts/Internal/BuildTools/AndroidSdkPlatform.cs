@@ -47,6 +47,14 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return false;
             }
 
+            // If targetSdkVersion is higher than the MinimumVersion, we skip verifying the newest version,
+            // and instead trust that Unity will install it at build time if it isn't already available.
+            var targetSdkVersion = PlayerSettings.Android.targetSdkVersion;
+            if ((int)targetSdkVersion >= MinimumVersion)
+            {
+                return true;
+            }
+
             string ignoredPath;
             var newestVersion = GetNewestVersionAndPath(out ignoredPath);
             if (newestVersion == null)
@@ -76,8 +84,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 return false;
             }
 
-            var targetSdkVersion = PlayerSettings.Android.targetSdkVersion;
-            if (targetSdkVersion == AndroidSdkVersions.AndroidApiLevelAuto || (int) targetSdkVersion >= MinimumVersion)
+            if (targetSdkVersion == AndroidSdkVersions.AndroidApiLevelAuto)
             {
                 return true;
             }
@@ -86,7 +93,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 "The currently selected Android Target API Level is {0}, however version {1} is the minimum "
                 + "required to build for Google Play.\n\nClick \"OK\" to change the Target API Level to "
                 + "\"Automatic (highest installed)\", which is currently {2}.",
-                (int) targetSdkVersion, MinimumVersion, newestVersion);
+                (int)targetSdkVersion, MinimumVersion, newestVersion);
             if (buildToolLogger.DisplayActionableErrorDialog(selectedVersionMessage))
             {
                 PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
