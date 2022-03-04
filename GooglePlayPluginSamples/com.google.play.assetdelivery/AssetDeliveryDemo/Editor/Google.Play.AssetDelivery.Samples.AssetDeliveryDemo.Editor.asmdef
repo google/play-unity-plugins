@@ -1,0 +1,16 @@
+{
+    "name": "Google.Play.AssetDelivery.Samples.AssetDeliveryDemo.Editor",
+    "references": [
+        "Google.Android.AppBundle.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

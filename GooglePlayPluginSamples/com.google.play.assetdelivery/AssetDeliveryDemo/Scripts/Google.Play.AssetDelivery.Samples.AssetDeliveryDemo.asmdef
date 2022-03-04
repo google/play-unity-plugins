@@ -1,0 +1,18 @@
+{
+    "name": "Google.Play.AssetDelivery.Samples.AssetDeliveryDemo",
+    "references": [
+        "Google.Play.AssetDelivery",
+        "Google.Play.Common"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

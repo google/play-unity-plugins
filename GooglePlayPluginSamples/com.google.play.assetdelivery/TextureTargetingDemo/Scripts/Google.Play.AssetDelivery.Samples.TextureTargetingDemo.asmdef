@@ -1,0 +1,17 @@
+{
+    "name": "Google.Play.AssetDelivery.Samples.TextureTargetingDemo",
+    "references": [
+        "Google.Play.AssetDelivery"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
