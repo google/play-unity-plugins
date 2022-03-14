@@ -1,5 +1,9 @@
 # Changelog for com.google.play.review
 
+## [1.7.1] - 2022-03-16
+### New Features
+- Incremented version number to match other packages
+
 ## [1.7.0] - 2022-02-15
 ### New Features
 - Incremented version number to match other packages

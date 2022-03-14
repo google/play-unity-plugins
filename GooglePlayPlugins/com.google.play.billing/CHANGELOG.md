@@ -1,5 +1,9 @@
 # Changelog for com.google.play.billing
 
+## [3.2.4] - 2022-03-16
+### New Features
+- Incremented version number to match other packages
+
 ## [3.2.3] - 2022-02-15
 ### New Features
 - Incremented version number to match other packages

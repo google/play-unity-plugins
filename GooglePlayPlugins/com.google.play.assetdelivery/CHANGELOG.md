@@ -1,5 +1,9 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.7.1] - 2022-03-16
+### Bug Fixes
+- Fixed issue #170: sample files erroneously included in iOS and other non-android platforms
+
 ## [1.7.0] - 2022-02-15
 ### New Features
 - Incremented version number to match other packages

@@ -195,14 +195,6 @@ Core library as a gradle dependency. This will override the version of the Play 
 version specified in
 [PlayCoreDependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/PlayCoreDependencies.xml).
 
-### Enable Jetifier for Play Integrity plugin
-
-Because the Play Integrity API Android Library contains AndroidX dependencies, for Unity 2020.3 or above, you may need
-to manually enable Jetifier in EDM4U with the following steps:
-
-- Enable `Custom Gradle Properties Template` in `Project Settings` -> `Player` -> `Publishing Settings`, if not already.
-- Then enable `Use Jetifier` and `Patch gradleTemplate.properties` in EDM4U's Android Resolver setting.
-
 ## Related plugins
 
 ### Google Play Games plugin for Unity
