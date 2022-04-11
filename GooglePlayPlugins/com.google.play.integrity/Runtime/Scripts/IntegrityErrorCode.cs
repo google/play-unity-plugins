@@ -153,6 +153,15 @@ namespace Google.Play.Integrity
         PlayServicesVersionOutdated = 15,
 
         /// <summary>
+        /// The provided cloud project number is invalid.
+        /// <para>
+        /// Use the cloud project number which can be found in Project info in your Google Cloud
+        /// Console for the cloud project where Play Integrity API is enabled.
+        /// </para>
+        /// </summary>
+        CloudProjectNumberIsInvalid = 16,
+
+        /// <summary>
         /// Unknown internal error.
         /// <para>
         /// Retry with an exponential backoff. Consider filing a bug if fails consistently.

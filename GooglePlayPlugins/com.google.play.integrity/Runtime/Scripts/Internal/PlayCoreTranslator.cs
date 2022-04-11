@@ -40,6 +40,7 @@ namespace Google.Play.Integrity.Internal
             public const int NonceIsNotBase64 = -13;
             public const int PlayStoreVersionOutdated = -14;
             public const int PlayServicesVersionOutdated = -15;
+            public const int CloudProjectNumberIsInvalid = -16;
             public const int InternalError = -100;
         }
 
@@ -63,6 +64,7 @@ namespace Google.Play.Integrity.Internal
                 {JavaIntegrityErrorCode.PlayStoreVersionOutdated, IntegrityErrorCode.PlayStoreVersionOutdated},
                 {JavaIntegrityErrorCode.PlayServicesVersionOutdated, IntegrityErrorCode.PlayServicesVersionOutdated},
                 {JavaIntegrityErrorCode.InternalError, IntegrityErrorCode.InternalError},
+                {JavaIntegrityErrorCode.CloudProjectNumberIsInvalid, IntegrityErrorCode.CloudProjectNumberIsInvalid},
             };
 
         /// <summary>

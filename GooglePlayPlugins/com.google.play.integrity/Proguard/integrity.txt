@@ -49,5 +49,6 @@
     public static int NONCE_IS_NOT_BASE64;
     public static int PLAY_STORE_VERSION_OUTDATED;
     public static int PLAY_SERVICES_VERSION_OUTDATED;
+    public static int CLOUD_PROJECT_NUMBER_IS_INVALID;
     public static int INTERNAL_ERROR;
 }
