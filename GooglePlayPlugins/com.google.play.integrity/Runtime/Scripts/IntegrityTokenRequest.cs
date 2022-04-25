@@ -21,25 +21,30 @@ namespace Google.Play.Integrity
     {
         /// <summary>
         /// A nonce to bind the integrity token to.
-        /// <p>A nonce is a unique token which is ideally generated on the application backend and bound to the context
-        /// (for example, hash of the user id and timestamp). The provided nonce will be a part of the signed response
-        /// token, which will allow you to compare it to the original one and hence prevent replay attacks.
         ///
-        /// <p>Nonces should always be generated in a secure server environment. Do not generate a nonce from within the
-        /// client app.
+        /// <p>It must be base64 encoded in web-safe no-wrap form.
         ///
-        /// <p>It must be Base64 encoded in web-safe no-wrap form.
+        /// <p>See https://developer.android.com/google/play/integrity/verdict#nonce for details about
+        /// the nonce requirements and recommendations.
         /// </summary>
         public string Nonce { get; private set; }
 
         /// <summary>
         /// A cloud project number to link to the integrity token.
-        /// <p>This is an optional field and is meant to be used only for apps not available on Google Play or by SDKs
-        /// that include the Play Integrity API.
+        /// <p>This field is required for <a
+        /// href="https://developer.android.com/google/play/integrity/setup#apps-exclusively-distributed-outside-google-play">
+        /// apps exclusively distributed outside of Google Play</a> and <a
+        /// href="https://developer.android.com/google/play/integrity/setup#sdks">SDKs</a>. For apps
+        /// distributed on Google Play, the cloud project number is configured in the Play Console and
+        /// need not be set on the request.
         ///
-        /// <p>Cloud project number is an automatically generated unique identifier for your Google Cloud project. It
-        /// can be found in Project info in your Google Cloud Console for the cloud project where Play Integrity API is
-        /// enabled.
+        /// <p>Cloud project number can be found in Project info in your Google Cloud Console for the
+        /// cloud project where Play Integrity API is enabled.
+        ///
+        /// <p>Calls to <a
+        /// href="https://developer.android.com/google/play/integrity/verdict#decrypt-verify-google-servers">
+        /// decrypt the token on Google's server</a> must be authenticated using the cloud account that
+        /// was linked to the token in this request.
         /// </summary>
         public long? CloudProjectNumber { get; private set; }
 
