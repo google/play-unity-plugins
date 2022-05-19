@@ -30,13 +30,13 @@ namespace Google.Play.Review
         private const int JavaReviewErrorCodePlayNotFound = -1;
 
 #if !UNITY_EDITOR
-        private readonly ReviewPlayCoreTaskManager _reviewPlayCoreTaskManager;
+        private readonly ReviewPlayServicesTaskManager _reviewPlayServicesTaskManager;
 #endif
 
         public ReviewManager()
         {
 #if !UNITY_EDITOR
-            _reviewPlayCoreTaskManager = new ReviewPlayCoreTaskManager();
+            _reviewPlayServicesTaskManager = new ReviewPlayServicesTaskManager();
 #endif
         }
 
@@ -78,7 +78,7 @@ namespace Google.Play.Review
         private PlayAsyncOperation<PlayReviewInfo, ReviewErrorCode> RequestReviewFlowInternal()
         {
             var operation = new ReviewAsyncOperation<PlayReviewInfo>();
-            var requestFlowTask = _reviewPlayCoreTaskManager.RequestReviewFlow();
+            var requestFlowTask = _reviewPlayServicesTaskManager.RequestReviewFlow();
             requestFlowTask.RegisterOnSuccessCallback(reviewInfo =>
             {
                 operation.SetResult(new PlayReviewInfo(reviewInfo));
@@ -100,7 +100,7 @@ namespace Google.Play.Review
         {
             var operation = new ReviewAsyncOperation<VoidResult>();
             var requestFlowTask =
-                _reviewPlayCoreTaskManager.LaunchReviewFlow(reviewInfo.GetReviewInfo());
+                _reviewPlayServicesTaskManager.LaunchReviewFlow(reviewInfo.GetReviewInfo());
             requestFlowTask.RegisterOnSuccessCallback(result =>
             {
                 operation.SetResult(new VoidResult());

@@ -1,0 +1,6 @@
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.google.android.play:core-common:2.0.0"/>
+    </androidPackages>
+</dependencies>
+

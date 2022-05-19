@@ -15,66 +15,12 @@
 -keep class com.google.android.play.core.common.LocalTestingException {
 }
 
--keep class com.google.android.play.core.tasks.OnCompleteListener {
-    public abstract void onComplete(com.google.android.play.core.tasks.Task);
-}
-
--keep class com.google.android.play.core.tasks.OnFailureListener {
-    public abstract void onFailure(java.lang.Exception);
-}
-
--keep class com.google.android.play.core.tasks.OnSuccessListener {
-    public abstract void onSuccess(java.lang.Object);
-}
-
--keep class com.google.android.play.core.tasks.RuntimeExecutionException {
-}
-
--keep class com.google.android.play.core.tasks.Task {
-    <init>();
-
-    public abstract com.google.android.play.core.tasks.Task addOnCompleteListener(com.google.android.play.core.tasks.OnCompleteListener);
-    public abstract com.google.android.play.core.tasks.Task addOnCompleteListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnCompleteListener);
-    public abstract com.google.android.play.core.tasks.Task addOnFailureListener(com.google.android.play.core.tasks.OnFailureListener);
-    public abstract com.google.android.play.core.tasks.Task addOnFailureListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnFailureListener);
-    public abstract com.google.android.play.core.tasks.Task addOnSuccessListener(com.google.android.play.core.tasks.OnSuccessListener);
-    public abstract com.google.android.play.core.tasks.Task addOnSuccessListener(java.util.concurrent.Executor, com.google.android.play.core.tasks.OnSuccessListener);
-    public abstract java.lang.Exception getException();
-    public abstract java.lang.Object getResult();
-    public abstract java.lang.Object getResult(java.lang.Class);
-    public abstract boolean isComplete();
-    public abstract boolean isSuccessful();
-}
-
--keep class com.google.android.play.core.tasks.TaskExecutors {
-    public static java.util.concurrent.Executor MAIN_THREAD;
-}
-
--keep class com.google.android.play.core.tasks.Tasks {
-    public static java.lang.Object await(com.google.android.play.core.tasks.Task);
-    public static java.lang.Object await(com.google.android.play.core.tasks.Task, long, java.util.concurrent.TimeUnit);
-    public static com.google.android.play.core.tasks.Task whenAll(java.util.Collection);
-}
-
--keep class com.google.android.play.core.tasks.NativeOnCompleteListener {
-    <init>(long, int);
-
-    public void onComplete(com.google.android.play.core.tasks.Task);
-    public void nativeOnComplete(long, int, java.lang.Object, int);
-}
-
--keep class com.google.android.play.core.common.LocalTestingException {}
-
 -keep class com.google.android.play.core.listener.StateUpdatedListener {
     public abstract void onStateUpdate(java.lang.Object);
 }
 
 -keep @interface android.support.annotation.NonNull
 -keep @interface android.support.annotation.Nullable
-
--keep class com.google.android.play.core.common.PlayCoreVersion {
-    public static void addVersion(java.lang.String, java.lang.String, int);
-}
 
 -keep class com.google.android.gms.tasks.OnCompleteListener {
     public abstract void onComplete(com.google.android.gms.tasks.Task);

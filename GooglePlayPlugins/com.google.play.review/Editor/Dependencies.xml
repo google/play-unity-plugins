@@ -1,6 +1,6 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.google.android.play:core:1.10.3"/>
+        <androidPackage spec="com.google.android.play:review:2.0.0"/>
     </androidPackages>
 </dependencies>
 

@@ -193,7 +193,7 @@ To resolve this conflict, enable "Custom Main Gradle Template" in "Android Playe
 allow [EDM4U](https://github.com/googlesamples/unity-jar-resolver) to update the mainTemplate.gradle to include the Play
 Core library as a gradle dependency. This will override the version of the Play Core library included by Unity with the
 version specified in
-[PlayCoreDependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/PlayCoreDependencies.xml).
+[Dependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/Dependencies.xml).
 
 ## Related plugins
 

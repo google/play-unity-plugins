@@ -75,12 +75,12 @@ namespace Google.Play.AssetDelivery.Internal
         /// A wrapped Play Core task, which will return a AndroidJavaObject representing an
         /// AssetPackStates. The caller is responsible for disposing this task.
         /// </returns>
-        public PlayCoreTask<AndroidJavaObject> Fetch(params string[] assetPackNames)
+        public PlayServicesTask<AndroidJavaObject> Fetch(params string[] assetPackNames)
         {
             using (var request = BuildAssetPackList(assetPackNames))
             {
                 var javaTask = _javaAssetPackManager.Call<AndroidJavaObject>("fetch", request);
-                return new PlayCoreTask<AndroidJavaObject>(javaTask);
+                return new PlayServicesTask<AndroidJavaObject>(javaTask);
             }
         }
 
@@ -91,12 +91,12 @@ namespace Google.Play.AssetDelivery.Internal
         /// A wrapped Play Core task, which will return a AndroidJavaObject representing an
         /// AssetPackStates. The caller is responsible for disposing this task.
         /// </returns>
-        public PlayCoreTask<AndroidJavaObject> GetPackStates(params string[] assetPackNames)
+        public PlayServicesTask<AndroidJavaObject> GetPackStates(params string[] assetPackNames)
         {
             using (var packList = BuildAssetPackList(assetPackNames))
             {
                 var javaTask = _javaAssetPackManager.Call<AndroidJavaObject>("getPackStates", packList);
-                return new PlayCoreTask<AndroidJavaObject>(javaTask);
+                return new PlayServicesTask<AndroidJavaObject>(javaTask);
             }
         }
 
@@ -150,13 +150,13 @@ namespace Google.Play.AssetDelivery.Internal
         /// If the asset pack is currently being downloaded or installed, this method will not cancel the process.
         /// </summary>
         /// <returns>
-        /// A PlayCoreTask representing a Task{Void} that will only be successful if files were successfully
+        /// A PlayServicesTask representing a Task{Void} that will only be successful if files were successfully
         /// deleted.
         /// </returns>
-        public PlayCoreTask<AndroidJavaObject> RemovePack(string assetPackName)
+        public PlayServicesTask<AndroidJavaObject> RemovePack(string assetPackName)
         {
             var javaTask = _javaAssetPackManager.Call<AndroidJavaObject>("removePack", assetPackName);
-            return new PlayCoreTask<AndroidJavaObject>(javaTask);
+            return new PlayServicesTask<AndroidJavaObject>(javaTask);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Google.Play.AssetDelivery.Internal
         /// packs are downloaded over cellular data.
         /// </summary>
         /// <returns>
-        /// Returns a <see cref="PlayCoreTask{ActivityResult}"/> that completes once the dialog has been accepted,
+        /// Returns a <see cref=" PlayServicesTask{ActivityResult}"/> that completes once the dialog has been accepted,
         /// denied or closed. A successful task result contains one of the following values:
         /// <ul>
         ///   <li><see cref="ActivityResult.ResultOk"/> if the user accepted.</li>
@@ -173,11 +173,11 @@ namespace Google.Play.AssetDelivery.Internal
         ///       any other way (e.g. backpress).</li>
         /// </ul>
         /// </returns>
-        public PlayCoreTask<int> ShowCellularDataConfirmation()
+        public PlayServicesTask<int> ShowCellularDataConfirmation()
         {
             var task = _javaAssetPackManager.Call<AndroidJavaObject>("showCellularDataConfirmation",
                 UnityPlayerHelper.GetCurrentActivity());
-            return new PlayCoreTask<int>(task);
+            return new PlayServicesTask<int>(task);
         }
 
         // Returns a list of asset pack names.
