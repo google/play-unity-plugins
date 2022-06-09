@@ -1,0 +1,4 @@
+# Ignore reason: These files are required in Play Unity Plugin's implementation.
+ignorePaths:
+- GooglePlayPlugins/com.google.android.appbundle/Editor/Tools/bundletool-all.jar
+- GooglePlayPlugins/com.google.play.instant/Editor/Tools/ia.jar
