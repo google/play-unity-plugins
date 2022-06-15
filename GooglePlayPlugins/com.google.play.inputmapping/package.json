@@ -1,0 +1,11 @@
+{
+  "name": "com.google.play.inputmapping",
+  "displayName": "Google Play Input Mapping",
+  "description": "Provides tools for exposing keyboard and mouse controls to the Android framework",
+  "version": "1.0.0-beta",
+  "unity": "2017.4",
+  "author": {
+    "name": "Google LLC"
+  },
+  "dependencies": {}
+}

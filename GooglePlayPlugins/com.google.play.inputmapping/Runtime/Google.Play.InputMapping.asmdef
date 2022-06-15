@@ -1,0 +1,9 @@
+{
+    "name": "Google.Play.InputMapping",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ]
+}

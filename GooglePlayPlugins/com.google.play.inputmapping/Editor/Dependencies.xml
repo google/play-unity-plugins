@@ -1,0 +1,5 @@
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.google.android.libraries.play.games:inputmapping:1.0.0-beta"/>
+    </androidPackages>
+</dependencies>
