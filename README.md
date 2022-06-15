@@ -185,15 +185,21 @@ in the .androidpack folders.
 <!----><a name="play-core-conflicts"></a>
 ### Play Core library conflicts
 
-When building an Android App Bundle with Unity's build system (e.g. "File > Build and Run"), Unity includes the Play
-Core library in a way that may conflict the Google Play Plugins for Unity.
+When building an Android App Bundle with Unity's build system (e.g. "File > Build and Run"), Unity may include the
+[monolithic Play Core library](https://maven.google.com/web/index.html?q=core#com.google.android.play:core) in a way that
+causes conflicts with the [new Play libraries](https://developer.android.com/reference/com/google/android/play/core/release-notes#partitioned-apis)
+included by Google Play Plugins for Unity.
 
-To resolve this conflict, enable "Custom Main Gradle Template" in "Android Player > Publishing Settings" and enable
-"Patch mainTemplate.gradle" in "Assets > External Dependency Manager > Android Resolver > Settings". This will
-allow [EDM4U](https://github.com/googlesamples/unity-jar-resolver) to update the mainTemplate.gradle to include the Play
-Core library as a gradle dependency. This will override the version of the Play Core library included by Unity with the
-version specified in
-[Dependencies.xml](https://github.com/google/play-unity-plugins/blob/master/GooglePlayPlugins/com.google.play.core/Editor/Dependencies.xml).
+To resolve these conflicts, follow the steps below:
+
+1. Enable "Custom Main Gradle Template" in "Android Player > Publishing Settings"
+2. Enable "Patch mainTemplate.gradle" in "Assets > External Dependency Manager > Android Resolver > Settings"
+3. Include [this](https://dl.google.com/games/registry/unity/com.google.play.core/playcore_empty_m2repo.zip) empty monolithic
+Play Core library as a local maven repository
+
+These steps will allow [EDM4U](https://github.com/googlesamples/unity-jar-resolver) to update the mainTemplate.gradle to
+include the empty monolithic Play Core library as a gradle dependency. This will override the version of the Play Core library
+included by Unity and resolve the duplicate class errors and manifest merger failures.
 
 ## Related plugins
 
