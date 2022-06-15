@@ -1,6 +1,6 @@
 # Changelog for com.google.play.common
 
-## [1.7.1] - 2022-03-16
+## [1.8.0] - 2022-06-15
 ### New Features
 - Incremented version number to match other packages
 

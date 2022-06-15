@@ -1,6 +1,9 @@
 # Changelog for com.google.play.assetdelivery
 
-## [1.7.1] - 2022-03-16
+## [1.8.0] - 2022-06-15
+### New Features
+- Migrated to [Play Asset Delivery 2.0.0](https://developer.android.com/reference/com/google/android/play/core/release-notes-asset_delivery#2-0-0).
+
 ### Bug Fixes
 - Fixed issue #170: sample files erroneously included in iOS and other non-android platforms
 

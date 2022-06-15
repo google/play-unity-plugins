@@ -1,6 +1,6 @@
 # Changelog for com.google.play.integrity
 
-## [1.0.1] - 2022-03-16
+## [1.0.1] - 2022-06-15
 ### New Features
 - Updated Java Play Integrity API dependency from 1.0.0 to 1.0.1
 
