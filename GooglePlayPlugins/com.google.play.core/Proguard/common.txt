@@ -63,13 +63,6 @@
     public static com.google.android.gms.tasks.Task whenAll(java.util.Collection);
 }
 
--keep class com.google.android.gms.tasks.NativeOnCompleteListener {
-    <init>(long);
-
-    public void onComplete(com.google.android.gms.tasks.Task);
-    public void playCoreNativeOnComplete(long, java.lang.Object, bool, bool, java.lang.String);
-}
-
 -keep class com.google.android.gms.common.api.ApiException {
     public int getStatusCode();
 }

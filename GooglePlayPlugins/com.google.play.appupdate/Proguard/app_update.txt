@@ -25,9 +25,9 @@
     public abstract void registerListener(com.google.android.play.core.install.InstallStateUpdatedListener);
     public abstract void unregisterListener(com.google.android.play.core.install.InstallStateUpdatedListener);
 
-    public abstract com.google.android.play.core.tasks.Task completeUpdate();
-    public abstract com.google.android.play.core.tasks.Task getAppUpdateInfo();
-    public com.google.android.play.core.tasks.Task startUpdateFlow(com.google.android.play.core.appupdate.AppUpdateInfo, android.app.Activity, com.google.android.play.core.appupdate.AppUpdateOptions);
+    public abstract com.google.android.gms.tasks.Task completeUpdate();
+    public abstract com.google.android.gms.tasks.Task getAppUpdateInfo();
+    public com.google.android.gms.tasks.Task startUpdateFlow(com.google.android.play.core.appupdate.AppUpdateInfo, android.app.Activity, com.google.android.play.core.appupdate.AppUpdateOptions);
     public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, android.app.Activity, int);
     public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, com.google.android.play.core.common.IntentSenderForResultStarter, int);
     public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, android.app.Activity, com.google.android.play.core.appupdate.AppUpdateOptions, int);
@@ -59,8 +59,8 @@
     public void registerListener(com.google.android.play.core.install.InstallStateUpdatedListener);
     public void unregisterListener(com.google.android.play.core.install.InstallStateUpdatedListener);
 
-    public com.google.android.play.core.tasks.Task completeUpdate();
-    public com.google.android.play.core.tasks.Task getAppUpdateInfo();
+    public com.google.android.gms.tasks.Task completeUpdate();
+    public com.google.android.gms.tasks.Task getAppUpdateInfo();
     public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, android.app.Activity, int);
     public boolean startUpdateFlowForResult(com.google.android.play.core.appupdate.AppUpdateInfo, int, com.google.android.play.core.common.IntentSenderForResultStarter, int);
 

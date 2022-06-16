@@ -62,11 +62,11 @@
     public com.google.android.play.core.assetpacks.AssetLocation getAssetLocation(java.lang.String, java.lang.String);
     public com.google.android.play.core.assetpacks.AssetPackLocation getPackLocation(java.lang.String);
     public java.util.Map getPackLocations();
-    public com.google.android.play.core.tasks.Task getPackStates(java.util.List);
-    public com.google.android.play.core.tasks.Task fetch(java.util.List);
+    public com.google.android.gms.tasks.Task getPackStates(java.util.List);
+    public com.google.android.gms.tasks.Task fetch(java.util.List);
     public void registerListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
-    public com.google.android.play.core.tasks.Task removePack(java.lang.String);
-    public com.google.android.play.core.tasks.Task showCellularDataConfirmation(android.app.Activity);
+    public com.google.android.gms.tasks.Task removePack(java.lang.String);
+    public com.google.android.gms.tasks.Task showCellularDataConfirmation(android.app.Activity);
     public void unregisterListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
 }
 
