@@ -1,6 +1,6 @@
 # Changelog for com.google.play.assetdelivery
 
-## [1.8.0] - 2022-07-01
+## [1.8.0] - 2022-07-06
 ### New Features
 - Migrated to [Play Asset Delivery 2.0.0](https://developer.android.com/reference/com/google/android/play/core/release-notes-asset_delivery#2-0-0).
 

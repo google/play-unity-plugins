@@ -1,6 +1,6 @@
 # Changelog for com.google.android.appbundle
 
-## [1.8.0] - 2022-07-01
+## [1.8.0] - 2022-07-06
 ### Bug Fixes
 - Fixed issue #172: Unity Cloud Build failure if Android SDK 30+ is not installed
 
