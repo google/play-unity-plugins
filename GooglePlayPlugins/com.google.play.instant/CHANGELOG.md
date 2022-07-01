@@ -1,6 +1,6 @@
 # Changelog for com.google.play.instant
 
-## [1.8.0] - 2022-06-15
+## [1.8.0] - 2022-07-01
 ### New Features
 - Incremented version number to match other packages
 
