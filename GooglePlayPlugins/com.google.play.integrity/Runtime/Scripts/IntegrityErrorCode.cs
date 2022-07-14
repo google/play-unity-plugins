@@ -55,7 +55,9 @@ namespace Google.Play.Integrity
         NetworkError = 3,
 
         /// <summary>
-        /// No Play Store account is found on device.
+        /// No Play Store account is found on device. Note that the Play Integrity API now supports
+        /// unauthenticated requests. This error code is used only for older Play Store versions
+        /// that lack support.
         /// <para>
         /// Ask the user to authenticate in Play Store.
         /// </para>
