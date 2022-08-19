@@ -201,6 +201,23 @@ These steps will allow [EDM4U](https://github.com/googlesamples/unity-jar-resolv
 include the empty monolithic Play Core library as a gradle dependency. This will override the version of the Play Core library
 included by Unity and resolve the duplicate class errors and manifest merger failures.
 
+## Data Collection
+
+The Google Play Plugins for Unity may collect version related data to allow Google to improve the product, including:
+
+* App’s package name
+* App’s package version
+* Google Play Plugins for Unity's version
+
+This data will be collected when you upload your app package to the Play Console.
+To opt-out of this data collection process, remove the packagename.metadata.jar
+file found under each plugin's `Runtime/Plugins` folder.
+
+Note, this data collection related to your use of the Google Play Plugins for
+Unity and Google’s use of the collected data is separate and independent of
+Google’s collection of your library dependencies for Java-based SDKs or wrappers
+around Unity plugins when you upload your app package to the Play Console.
+
 ## Related plugins
 
 ### Google Play Games plugin for Unity
