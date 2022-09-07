@@ -209,14 +209,14 @@ The Google Play Plugins for Unity may collect version related data to allow Goog
 * App’s package version
 * Google Play Plugins for Unity's version
 
-This data will be collected when you upload your app package to the Play Console.
-To opt-out of this data collection process, remove the packagename.metadata.jar
+This data will be collected when you upload [your app package](https://developer.android.com/studio/publish/upload-bundle)
+to the Play Console. To opt-out of this data collection process, remove the packagename.metadata.jar
 file found under each plugin's `Runtime/Plugins` folder.
 
 Note, this data collection related to your use of the Google Play Plugins for
-Unity and Google’s use of the collected data is separate and independent of
-Google’s collection of your library dependencies for Java-based SDKs or wrappers
-around Unity plugins when you upload your app package to the Play Console.
+Unity and Google’s use of the collected data is separate and independent of Google’s
+collection of library dependencies declared in Gradle when you upload your app package
+to the Play Console.
 
 ## Related plugins
 

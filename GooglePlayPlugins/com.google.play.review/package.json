@@ -2,13 +2,13 @@
   "name": "com.google.play.review",
   "displayName": "Google Play In-app Review",
   "description": "The Google Play In-App Review package lets you prompt users to submit Play Store ratings and reviews without the inconvenience of leaving your game.",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "unity": "2017.4",
   "author": {
     "name": "Google LLC"
   },
   "dependencies": {
-    "com.google.play.common": "1.8.0",
-    "com.google.play.core": "1.8.0"
+    "com.google.play.common": "1.8.1",
+    "com.google.play.core": "1.8.1"
   }
 }
