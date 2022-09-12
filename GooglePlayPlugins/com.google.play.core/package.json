@@ -8,7 +8,7 @@
     "name": "Google LLC"
   },
   "dependencies": {
-    "com.google.android.appbundle": "1.8.1",
+    "com.google.android.appbundle": "1.8.0",
     "com.google.external-dependency-manager": "1.2.172"
   }
 }
