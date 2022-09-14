@@ -2,3 +2,9 @@
 ignorePaths:
 - GooglePlayPlugins/com.google.android.appbundle/Editor/Tools/bundletool-all.jar
 - GooglePlayPlugins/com.google.play.instant/Editor/Tools/ia.jar
+- GooglePlayPlugins/com.google.play.appupdate/Runtime/Plugins/com.google.play.appupdate.metadata.jar
+- GooglePlayPlugins/com.google.play.assetdelivery/Runtime/Plugins/com.google.play.assetdelivery.metadata.jar
+- GooglePlayPlugins/com.google.play.common/Runtime/Plugins/com.google.play.common.metadata.jar
+- GooglePlayPlugins/com.google.play.core/Runtime/Plugins/com.google.play.core.metadata.jar
+- GooglePlayPlugins/com.google.play.integrity/Runtime/Plugins/com.google.play.integrity.metadata.jar
+- GooglePlayPlugins/com.google.play.review/Runtime/Plugins/com.google.play.review.metadata.jar
