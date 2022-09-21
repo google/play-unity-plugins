@@ -27,11 +27,10 @@ namespace Google.Play.Integrity
         /// <summary>
         /// Integrity API is not available.
         /// <para>
-        /// The Play Store version might be old, or the application is not
-        /// allowlisted to use this API.
+        /// Integrity API is not enabled, or the Play Store version might be old.
         /// Recommended actions:
         /// <list>
-        /// <item>Make sure that an app is allowlisted to use the API.</item>
+        /// <item>Make sure that Integrity API is enabled in Google Play Console.</item>
         /// <item>Ask the user to update Play Store.</item>
         /// </list>
         /// </para>
