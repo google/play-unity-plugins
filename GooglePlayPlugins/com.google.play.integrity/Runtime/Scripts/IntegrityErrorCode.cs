@@ -163,6 +163,19 @@ namespace Google.Play.Integrity
         CloudProjectNumberIsInvalid = 16,
 
         /// <summary>
+        /// There was a transient error in the client device.
+        /// <para>
+        /// Retry with an exponential backoff.
+        /// </para>
+        /// <para>
+        /// Introduced in Integrity Play Core version 1.1.0 (prior versions returned a token with
+        /// empty Device Integrity Verdict). If the error persists after a few retries, you should
+        /// assume that the device has failed integrity checks and act accordingly.
+        /// </para>
+        /// </summary>
+        ClientTransientError = 17,
+
+        /// <summary>
         /// Unknown internal error.
         /// <para>
         /// Retry with an exponential backoff. Consider filing a bug if fails consistently.
