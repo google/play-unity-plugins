@@ -315,7 +315,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 // GUIDToAssetPath throws an exception if called on a non-main thread. To catch this case early, we
                 // define this variable here, rather than below, where it is used.
-                var guidPath = AssetDatabase.GUIDToAssetPath("4c3bd2894171e437eb6d99ddad4a81ac");
+                var guidPath = AssetDatabase.GUIDToAssetPath("c52291e63505c4121a167e6f0121c1b1");
 
                 string relativePath = null;
 

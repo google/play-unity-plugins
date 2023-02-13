@@ -1,5 +1,9 @@
 # Changelog for com.google.android.appbundle
 
+## [1.9.0] - 2023-02-08
+### New Features
+- Updated bundletool-all.jar from 1.8.2 to 1.14.0
+
 ## [1.8.0] - 2022-07-06
 ### Bug Fixes
 - Fixed issue #172: Unity Cloud Build failure if Android SDK 30+ is not installed
