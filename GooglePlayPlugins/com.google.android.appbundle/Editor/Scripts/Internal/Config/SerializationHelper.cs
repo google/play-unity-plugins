@@ -24,13 +24,14 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
         public static AssetPackDeliveryMode GetAssetPackDeliveryMode(string deliveryMode)
         {
-            return (AssetPackDeliveryMode) Enum.Parse(typeof(AssetPackDeliveryMode), deliveryMode);
+            return (AssetPackDeliveryMode)Enum.Parse(typeof(AssetPackDeliveryMode), deliveryMode);
         }
 
         public static TextureCompressionFormat GetTextureCompressionFormat(string textureCompressionFormat)
         {
-            return (TextureCompressionFormat) Enum.Parse(typeof(TextureCompressionFormat), textureCompressionFormat);
+            return (TextureCompressionFormat)Enum.Parse(typeof(TextureCompressionFormat), textureCompressionFormat);
         }
+
 
 
         /// <summary>
@@ -76,6 +77,8 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 splitBaseModuleAssets = assetPackConfig.SplitBaseModuleAssets
             };
 
+
+
             foreach (var assetPackEntry in assetPackConfig.AssetPacks)
             {
                 var name = assetPackEntry.Key;
@@ -113,6 +116,8 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                     config.assetBundles.Add(assetBundle);
                 }
 
+
+
                 if (assetPack.AssetPackDirectoryPath != null)
                 {
                     config.assetPacks.Add(new SerializableAssetPack
@@ -138,6 +143,8 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
                     config.targetedAssetPacks.Add(multiTargetingAssetPack);
                 }
+
+
             }
 
             return config;
@@ -156,6 +163,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 SplitBaseModuleAssets = config.splitBaseModuleAssets
             };
 
+
             foreach (var multiTargetingAssetBundle in config.assetBundles)
             {
                 var assetBundles = multiTargetingAssetBundle.assetBundles;
@@ -167,20 +175,26 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 // TODO: consider checking the folder name for "#tcf".
                 if (assetBundles.Count == 1 &&
                     assetBundles[0].TextureCompressionFormat == TextureCompressionFormat.Default
-                )
+                   )
                 {
                     assetPackConfig.AddAssetBundle(assetBundles[0].path, multiTargetingAssetBundle.DeliveryMode);
                     continue;
                 }
 
+                // AssetBundles inside SerializableMultiTargetingAssetBundle are targeting only on one dimension.
+                // Check out serialize function for more details.
                 var dictionaryTextureCompression =
-                    assetBundles
-                        .ToDictionary(item => item.TextureCompressionFormat, item => item.path);
+                    assetBundles.Any(assetBundle =>
+                        assetBundle.TextureCompressionFormat != TextureCompressionFormat.Default)
+                        ? assetBundles
+                            .ToDictionary(item => item.TextureCompressionFormat, item => item.path)
+                        : new Dictionary<TextureCompressionFormat, string>();
                 if (dictionaryTextureCompression.Count != 0)
                 {
                     assetPackConfig.AddAssetBundles(dictionaryTextureCompression,
                         multiTargetingAssetBundle.DeliveryMode);
                 }
+
 
             }
 
@@ -191,14 +205,19 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
             foreach (var pack in config.targetedAssetPacks)
             {
+                // Asset packs inside SerializableMultiTargetingAssetPack are targeting only on one dimension.
+                // Check out serialize function for more details.
                 var compressionFormatToAssetPackDirectoryPath =
-                    pack.paths
-                        .ToDictionary(item => item.TextureCompressionFormat, item => item.path);
+                    pack.paths.Any(path => path.TextureCompressionFormat != TextureCompressionFormat.Default)
+                        ? pack.paths
+                            .ToDictionary(item => item.TextureCompressionFormat, item => item.path)
+                        : new Dictionary<TextureCompressionFormat, String>();
                 if (compressionFormatToAssetPackDirectoryPath.Count != 0)
                 {
                     assetPackConfig.AddAssetsFolders(
                         pack.name, compressionFormatToAssetPackDirectoryPath, pack.DeliveryMode);
                 }
+
 
             }
 

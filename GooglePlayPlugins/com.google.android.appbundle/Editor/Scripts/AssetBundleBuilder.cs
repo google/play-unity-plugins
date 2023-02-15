@@ -117,6 +117,8 @@ namespace Google.Android.AppBundle.Editor
                 outputPath, builds, assetBundleOptions, baseTextureFormat, textureSubtargets);
         }
 
+
+
         // The internal method assumes all parameter preconditions have already been checked.
         private static Dictionary<string, Dictionary<TextureCompressionFormat, string>> BuildAssetBundlesInternal(
             string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions,
@@ -156,6 +158,8 @@ namespace Google.Android.AppBundle.Editor
                 EditorUserBuildSettings.androidBuildSubtarget = originalAndroidBuildSubtarget;
             }
         }
+
+
 
         private static void BuildAssetBundles(
             string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions)

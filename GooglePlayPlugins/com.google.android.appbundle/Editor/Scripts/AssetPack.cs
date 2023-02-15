@@ -28,6 +28,8 @@ namespace Google.Android.AppBundle.Editor
         private Dictionary<TextureCompressionFormat, string> _compressionFormatToAssetBundleFilePath;
         private Dictionary<TextureCompressionFormat, string> _compressionFormatToAssetPackDirectoryPath;
 
+
+
         /// <summary>
         /// Indicates how this asset pack will be delivered.
         /// </summary>
@@ -66,6 +68,8 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
                 }
 
+
+
                 _assetBundleFilePath = value;
             }
         }
@@ -101,6 +105,8 @@ namespace Google.Android.AppBundle.Editor
                 {
                     throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
                 }
+
+
 
                 _assetPackDirectoryPath = value;
             }
@@ -141,6 +147,8 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("CompressionFormatToAssetPackDirectoryPath is already set.");
                 }
 
+
+
                 _compressionFormatToAssetBundleFilePath = value;
             }
         }
@@ -180,8 +188,12 @@ namespace Google.Android.AppBundle.Editor
                     throw new ArgumentException("CompressionFormatToAssetBundleFilePath is already set.");
                 }
 
+
+
                 _compressionFormatToAssetPackDirectoryPath = value;
             }
         }
+
+
     }
 }

@@ -36,6 +36,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
 
 
+
         [Serializable]
         public class Config
         {

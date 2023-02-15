@@ -62,6 +62,8 @@ namespace Google.Android.AppBundle.Editor
         /// </summary>
         public TextureCompressionFormat DefaultTextureCompressionFormat = TextureCompressionFormat.Default;
 
+
+
         /// <summary>
         /// Returns true if this configuration includes at least 1 asset pack that may be packaged in an AAB.
         /// Return true if <see cref="SplitBaseModuleAssets"/> is enabled, even if there are no other asset packs.
@@ -190,6 +192,8 @@ namespace Google.Android.AppBundle.Editor
                     new Dictionary<TextureCompressionFormat, string>(compressionFormatToAssetBundleFilePath)
             };
         }
+
+
 
         private static string GetAssetPackName(string assetBundleFilePath)
         {

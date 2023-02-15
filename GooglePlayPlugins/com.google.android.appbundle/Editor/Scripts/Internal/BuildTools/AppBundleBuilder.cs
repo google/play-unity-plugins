@@ -392,7 +392,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 DisplayProgress(
                     string.Format("Processing asset pack {0} of {1}", index + 1, assetPacks.Count),
-                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float) index / assetPacks.Count));
+                    Mathf.Lerp(0.1f, ProgressCreateBaseModule, (float)index / assetPacks.Count));
                 index++;
 
                 var assetPackName = entry.Key;
@@ -427,7 +427,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 {
                     DisplayProgress(
                         string.Format("Processing module {0} of {1}", i + 1, numModules),
-                        Mathf.Lerp(ProgressProcessModules, ProgressRunBundletool, (float) i / numModules));
+                        Mathf.Lerp(ProgressProcessModules, ProgressRunBundletool, (float)i / numModules));
                 }
 
                 var moduleDirectoryInfo = moduleDirectoryList[i];
@@ -526,7 +526,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     // Checking for task cancellation during EditorApplication.update is much more responsive
                     // than only calling DisplayCancelableProgressBar() when the message changes.
                     if (EditorUtility.DisplayCancelableProgressBar(
-                        "Building App Bundle", _progressBarMessage, _progressBarProgress))
+                            "Building App Bundle", _progressBarMessage, _progressBarProgress))
                     {
                         Debug.Log("Cancelling app bundle build...");
                         EditorUtility.ClearProgressBar();

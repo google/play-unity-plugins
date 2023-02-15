@@ -20,12 +20,17 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
     public class SerializableTargetedDirectoryPath
     {
         public string path;
+
         public string textureCompressionFormat = TextureCompressionFormat.Default.ToString();
+
+
 
         public TextureCompressionFormat TextureCompressionFormat
         {
             get { return SerializationHelper.GetTextureCompressionFormat(textureCompressionFormat); }
             set { textureCompressionFormat = value.ToString(); }
         }
+
+
     }
 }

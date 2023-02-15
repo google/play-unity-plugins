@@ -32,10 +32,14 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
         public string defaultTextureCompressionFormat = TextureCompressionFormat.Default.ToString();
 
+
+
         public TextureCompressionFormat DefaultTextureCompressionFormat
         {
             get { return SerializationHelper.GetTextureCompressionFormat(defaultTextureCompressionFormat); }
             set { defaultTextureCompressionFormat = value.ToString(); }
         }
+
+
     }
 }

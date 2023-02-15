@@ -45,6 +45,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             public string defaultTcfSuffix;
 
 
+
             /// <summary>
             /// Whether or not this bundle contains an install-time asset pack.
             /// </summary>
@@ -73,7 +74,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         /// Similar to PlaybackEngines/AndroidPlayer/Tools/GradleTemplates/mainTemplate.gradle
         /// </summary>
         private static readonly string[] UnityUncompressedGlob =
-            {"assets/**/*.unity3d", "assets/**/*.ress", "assets/**/*.resource"};
+            { "assets/**/*.unity3d", "assets/**/*.ress", "assets/**/*.resource" };
 
         /// <summary>
         /// Make the Bundle Config exported as JSON cleaner by removing the suffix stripping fields
@@ -120,11 +121,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
             var dimensions = config.optimizations.splitsConfig.splitDimension;
             // Split on ABI so only one set of native libraries (armeabi-v7a, arm64-v8a, or x86) is sent to a device.
-            dimensions.Add(new BundletoolConfig.SplitDimension {value = BundletoolConfig.Abi, negate = false});
+            dimensions.Add(new BundletoolConfig.SplitDimension { value = BundletoolConfig.Abi, negate = false });
             // Do not split on LANGUAGE since Unity games don't store localized strings in the typical Android manner.
-            dimensions.Add(new BundletoolConfig.SplitDimension {value = BundletoolConfig.Language, negate = true});
+            dimensions.Add(new BundletoolConfig.SplitDimension { value = BundletoolConfig.Language, negate = true });
             // Do not split on SCREEN_DENSITY since Unity games don't have per-density resources other than app icons.
-            dimensions.Add(new BundletoolConfig.SplitDimension {value = BundletoolConfig.ScreenDensity, negate = true});
+            dimensions.Add(
+                new BundletoolConfig.SplitDimension { value = BundletoolConfig.ScreenDensity, negate = true });
             if (configParams.enableTcfTargeting)
             {
                 dimensions.Add(new BundletoolConfig.SplitDimension
@@ -141,21 +143,22 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
 
 
+
             // Bundletool requires the below standaloneConfig when supporting install-time asset packs for pre-Lollipop.
             if (configParams.containsInstallTimeAssetPack &&
                 TextureTargetingTools.IsSdkVersionPreLollipop(configParams.minSdkVersion))
             {
                 config.optimizations.standaloneConfig.splitDimension.Add(new BundletoolConfig.SplitDimension
-                    {value = BundletoolConfig.Abi, negate = true});
+                    { value = BundletoolConfig.Abi, negate = true });
 
                 config.optimizations.standaloneConfig.splitDimension.Add(new BundletoolConfig.SplitDimension
-                    {value = BundletoolConfig.Language, negate = true});
+                    { value = BundletoolConfig.Language, negate = true });
 
                 config.optimizations.standaloneConfig.splitDimension.Add(new BundletoolConfig.SplitDimension
-                    {value = BundletoolConfig.ScreenDensity, negate = true});
+                    { value = BundletoolConfig.ScreenDensity, negate = true });
 
                 config.optimizations.standaloneConfig.splitDimension.Add(new BundletoolConfig.SplitDimension
-                    {value = BundletoolConfig.TextureCompressionFormat, negate = true});
+                    { value = BundletoolConfig.TextureCompressionFormat, negate = true });
 
                 config.optimizations.standaloneConfig.strip64BitLibraries = true;
             }
