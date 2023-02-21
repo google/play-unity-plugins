@@ -32,6 +32,16 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             return (TextureCompressionFormat)Enum.Parse(typeof(TextureCompressionFormat), textureCompressionFormat);
         }
 
+        public static DeviceTier GetDeviceTier(string deviceTier)
+        {
+            int parsedTier;
+            if (Int32.TryParse(deviceTier, out parsedTier))
+            {
+                return DeviceTier.From(parsedTier);
+            }
+
+            return null;
+        }
 
 
         /// <summary>
@@ -48,6 +58,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             {
                 SplitBaseModuleAssets = assetPackConfig.SplitBaseModuleAssets,
                 DefaultTextureCompressionFormat = assetPackConfig.DefaultTextureCompressionFormat,
+                DefaultDeviceTier = assetPackConfig.DefaultDeviceTier,
             };
 
             foreach (var pair in assetPackConfig.AssetPacks)
@@ -62,6 +73,8 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                         CopyDictionary(assetPack.CompressionFormatToAssetBundleFilePath),
                     CompressionFormatToAssetPackDirectoryPath =
                         CopyDictionary(assetPack.CompressionFormatToAssetPackDirectoryPath),
+                    DeviceTierToAssetBundleFilePath = assetPack.DeviceTierToAssetBundleFilePath,
+                    DeviceTierToAssetPackDirectoryPath = assetPack.DeviceTierToAssetPackDirectoryPath,
                 };
                 copy.AssetPacks.Add(pair.Key, assetPackCopy);
             }
@@ -77,6 +90,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 splitBaseModuleAssets = assetPackConfig.SplitBaseModuleAssets
             };
 
+            config.DefaultDeviceTier = assetPackConfig.DefaultDeviceTier;
 
 
             foreach (var assetPackEntry in assetPackConfig.AssetPacks)
@@ -116,6 +130,23 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                     config.assetBundles.Add(assetBundle);
                 }
 
+                if (assetPack.DeviceTierToAssetBundleFilePath != null)
+                {
+                    var assetBundle = new SerializableMultiTargetingAssetBundle
+                    {
+                        name = name, DeliveryMode = assetPack.DeliveryMode
+                    };
+                    foreach (var deviceTierEntry in assetPack.DeviceTierToAssetBundleFilePath)
+                    {
+                        assetBundle.assetBundles.Add(new SerializableAssetBundle
+                        {
+                            path = deviceTierEntry.Value,
+                            DeviceTier = deviceTierEntry.Key
+                        });
+                    }
+
+                    config.assetBundles.Add(assetBundle);
+                }
 
 
                 if (assetPack.AssetPackDirectoryPath != null)
@@ -144,6 +175,23 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                     config.targetedAssetPacks.Add(multiTargetingAssetPack);
                 }
 
+                if (assetPack.DeviceTierToAssetPackDirectoryPath != null)
+                {
+                    var multiTargetingAssetPack = new SerializableMultiTargetingAssetPack
+                    {
+                        name = name, DeliveryMode = assetPack.DeliveryMode
+                    };
+                    foreach (var deviceTierEntry in assetPack.DeviceTierToAssetPackDirectoryPath)
+                    {
+                        multiTargetingAssetPack.paths.Add(new SerializableTargetedDirectoryPath
+                        {
+                            path = deviceTierEntry.Value,
+                            DeviceTier = deviceTierEntry.Key
+                        });
+                    }
+
+                    config.targetedAssetPacks.Add(multiTargetingAssetPack);
+                }
 
             }
 
@@ -162,6 +210,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 DefaultTextureCompressionFormat = config.DefaultTextureCompressionFormat,
                 SplitBaseModuleAssets = config.splitBaseModuleAssets
             };
+            assetPackConfig.DefaultDeviceTier = config.DefaultDeviceTier;
 
 
             foreach (var multiTargetingAssetBundle in config.assetBundles)
@@ -175,7 +224,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                 // TODO: consider checking the folder name for "#tcf".
                 if (assetBundles.Count == 1 &&
                     assetBundles[0].TextureCompressionFormat == TextureCompressionFormat.Default
-                   )
+                    && assetBundles[0].DeviceTier == null)
                 {
                     assetPackConfig.AddAssetBundle(assetBundles[0].path, multiTargetingAssetBundle.DeliveryMode);
                     continue;
@@ -195,6 +244,15 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                         multiTargetingAssetBundle.DeliveryMode);
                 }
 
+                var dictionaryDeviceTier =
+                    assetBundles.Any(assetBundle => assetBundle.DeviceTier != null)
+                        ? assetBundles
+                            .ToDictionary(item => item.DeviceTier, item => item.path)
+                        : new Dictionary<DeviceTier, string>();
+                if (dictionaryDeviceTier.Count != 0)
+                {
+                    assetPackConfig.AddAssetBundles(dictionaryDeviceTier, multiTargetingAssetBundle.DeliveryMode);
+                }
 
             }
 
@@ -218,6 +276,16 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
                         pack.name, compressionFormatToAssetPackDirectoryPath, pack.DeliveryMode);
                 }
 
+                var deviceTierToAssetPackDirectoryPath =
+                    pack.paths.Any(path => path.DeviceTier != null)
+                        ? pack.paths
+                            .ToDictionary(item => item.DeviceTier, item => item.path)
+                        : new Dictionary<DeviceTier, string>();
+                if (deviceTierToAssetPackDirectoryPath.Count != 0)
+                {
+                    assetPackConfig.AddAssetsFolders(pack.name, deviceTierToAssetPackDirectoryPath,
+                        pack.DeliveryMode);
+                }
 
             }
 

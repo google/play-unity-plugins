@@ -33,7 +33,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
         public const string Language = "LANGUAGE";
         public const string ScreenDensity = "SCREEN_DENSITY";
         public const string TextureCompressionFormat = "TEXTURE_COMPRESSION_FORMAT";
-
+        public const string DeviceTier = "DEVICE_TIER";
 
 
 

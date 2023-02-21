@@ -44,6 +44,17 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             /// </summary>
             public string defaultTcfSuffix;
 
+            /// <summary>
+            /// If true, enables targeting of module contents by device tiers.
+            /// </summary>
+            public bool enableDeviceTierTargeting;
+
+            /// <summary>
+            /// When targeting by device tier, specifies the default device tier that will be used to generate
+            /// standalone APKs for Android pre-Lollipop devices that don't support split APKs.
+            /// If not specified, it defaults to "0".
+            /// </summary>
+            public string defaultDeviceTier = "0";
 
 
             /// <summary>
@@ -141,6 +152,19 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                 });
             }
 
+            if (configParams.enableDeviceTierTargeting)
+            {
+                dimensions.Add(new BundletoolConfig.SplitDimension
+                {
+                    value = BundletoolConfig.DeviceTier,
+                    negate = false,
+                    suffixStripping =
+                    {
+                        enabled = true,
+                        defaultSuffix = configParams.defaultDeviceTier
+                    }
+                });
+            }
 
 
 

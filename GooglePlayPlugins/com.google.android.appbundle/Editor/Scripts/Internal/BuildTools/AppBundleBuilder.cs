@@ -485,6 +485,9 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             {
                 defaultTcfSuffix = TextureTargetingTools.GetBundleToolTextureCompressionFormatName(
                     options.AssetPackConfig.DefaultTextureCompressionFormat),
+                defaultDeviceTier =
+                    DeviceTierTargetingTools.GetBundleToolDeviceTierFormatName(
+                        options.AssetPackConfig.DefaultDeviceTier),
                 minSdkVersion = _minSdkVersion,
                 compressionOptions = options.CompressionOptions ?? new CompressionOptions(),
                 containsInstallTimeAssetPack = options.AssetPackConfig.SplitBaseModuleAssets
@@ -498,6 +501,8 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
                 configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetBundleFilePath != null;
                 configParams.enableTcfTargeting |= assetPack.CompressionFormatToAssetPackDirectoryPath != null;
+                configParams.enableDeviceTierTargeting |= assetPack.DeviceTierToAssetBundleFilePath != null;
+                configParams.enableDeviceTierTargeting |= assetPack.DeviceTierToAssetPackDirectoryPath != null;
                 configParams.containsInstallTimeAssetPack |=
                     assetPack.DeliveryMode == AssetPackDeliveryMode.InstallTime;
             }
@@ -589,6 +594,17 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
                     File.Copy(compressionAndFilePath.Value, Path.Combine(outputDirectory.FullName, assetPackName));
                 }
             }
+            else if (assetPack.DeviceTierToAssetBundleFilePath != null)
+            {
+                // Copy the AssetBundle files into the module's "assets" folder, inside an "assetpack#tier_xxx" folder.
+                foreach (var deviceTierAndFilePath in assetPack.DeviceTierToAssetBundleFilePath)
+                {
+                    var targetedAssetsFolderName =
+                        AssetPackFolder + DeviceTierTargetingTools.GetTargetingSuffix(deviceTierAndFilePath.Key);
+                    var outputDirectory = destinationAssetsDirectory.CreateSubdirectory(targetedAssetsFolderName);
+                    File.Copy(deviceTierAndFilePath.Value, Path.Combine(outputDirectory.FullName, assetPackName));
+                }
+            }
             else if (assetPack.AssetPackDirectoryPath != null)
             {
                 var sourceAssetsDirectory = new DirectoryInfo(assetPack.AssetPackDirectoryPath);
@@ -617,6 +633,25 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
                     var targetedAssetsFolderName =
                         AssetPackFolder + TextureTargetingTools.GetTargetingSuffix(compressionAndDirectoryPath.Key);
+                    var outputDirectory = destinationAssetsDirectory.CreateSubdirectory(targetedAssetsFolderName);
+                    CopyFilesRecursively(sourceAssetsDirectory, outputDirectory);
+                }
+            }
+            else if (assetPack.DeviceTierToAssetPackDirectoryPath != null)
+            {
+                // Copy asset pack files into the module's "assets" folder, inside an "assetpack#tier_xxx" folder.
+                foreach (var deviceTierAndDirectoryPath in assetPack.DeviceTierToAssetPackDirectoryPath)
+                {
+                    var sourceAssetsDirectory = new DirectoryInfo(deviceTierAndDirectoryPath.Value);
+                    if (!sourceAssetsDirectory.Exists)
+                    {
+                        // TODO: check this earlier.
+                        return DisplayBuildError("Missing directory for " + assetPackName,
+                            sourceAssetsDirectory.FullName);
+                    }
+
+                    var targetedAssetsFolderName =
+                        AssetPackFolder + DeviceTierTargetingTools.GetTargetingSuffix(deviceTierAndDirectoryPath.Key);
                     var outputDirectory = destinationAssetsDirectory.CreateSubdirectory(targetedAssetsFolderName);
                     CopyFilesRecursively(sourceAssetsDirectory, outputDirectory);
                 }

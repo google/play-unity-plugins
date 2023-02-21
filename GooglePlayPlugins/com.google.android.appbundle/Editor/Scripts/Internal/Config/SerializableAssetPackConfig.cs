@@ -32,6 +32,7 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
 
         public string defaultTextureCompressionFormat = TextureCompressionFormat.Default.ToString();
 
+        public int defaultDeviceTier = 0;
 
 
         public TextureCompressionFormat DefaultTextureCompressionFormat
@@ -40,6 +41,11 @@ namespace Google.Android.AppBundle.Editor.Internal.Config
             set { defaultTextureCompressionFormat = value.ToString(); }
         }
 
+        public DeviceTier DefaultDeviceTier
+        {
+            get { return DeviceTier.From(defaultDeviceTier); }
+            set { defaultDeviceTier = value.Tier; }
+        }
 
     }
 }
