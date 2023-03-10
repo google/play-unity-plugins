@@ -59,6 +59,12 @@ namespace Google.Play.AssetDelivery.Internal
             return request;
         }
 
+        internal PlayAssetBundleRequest RetrieveAssetBundleAsyncInternal(string assetBundleName, bool updateIfAvailable)
+        {
+            var request = InitializeAssetBundleRequest(assetBundleName);
+            InitiateRequest(request.PackRequest, updateIfAvailable);
+            return request;
+        }
 
         private PlayAssetBundleRequestImpl InitializeAssetBundleRequest(string assetBundleName)
         {
@@ -89,12 +95,31 @@ namespace Google.Play.AssetDelivery.Internal
             return request;
         }
 
+        internal PlayAssetPackRequest RetrieveAssetPackAsyncInternal(string assetPackName, bool updateIfAvailable)
+        {
+            var request = GetExistingAssetPackRequest(assetPackName);
+            if (request != null)
+            {
+                return request;
+            }
+
+            request = InitializeAssetPackRequest(assetPackName);
+            InitiateRequest(request, updateIfAvailable);
+
+            return request;
+        }
 
         internal PlayAssetPackBatchRequest RetrieveAssetPackBatchAsyncInternal(IList<string> assetPackNames)
         {
             return CreateAndInitiateBatchRequest(assetPackNames, IsDownloaded);
         }
 
+        internal PlayAssetPackBatchRequest RetrieveAssetPackBatchAsyncInternal(IList<string> assetPackNames,
+            bool updateIfAvailable)
+        {
+            Func<string, bool> useAvailablePack = packName => IsCurrentVersionGoodEnough(packName, updateIfAvailable);
+            return CreateAndInitiateBatchRequest(assetPackNames, useAvailablePack);
+        }
 
         private PlayAssetPackBatchRequest CreateAndInitiateBatchRequest(IList<string> assetPackNames,
             Func<string, bool> isPackAvailable)
@@ -208,6 +233,24 @@ namespace Google.Play.AssetDelivery.Internal
             return operation;
         }
 
+        internal PlayAsyncOperation<IDictionary<string, PlayAssetPackDownloadInfo>, AssetDeliveryErrorCode>
+            GetDownloadInfoInternal(IList<string> assetPackNames)
+        {
+            var operation = new AssetDeliveryAsyncOperation<IDictionary<string, PlayAssetPackDownloadInfo>>();
+
+            var task = _assetPackManager.GetPackStates(assetPackNames.ToArray());
+            task.RegisterOnSuccessCallback(javaPackStates =>
+            {
+                operation.SetResult(PlayAssetPackDownloadInfoImpl.FromAssetPackStates(javaPackStates));
+                task.Dispose();
+            });
+            task.RegisterOnFailureCallback((message, errorCode) =>
+            {
+                operation.SetError(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
+                task.Dispose();
+            });
+            return operation;
+        }
 
         internal PlayAsyncOperation<VoidResult, AssetDeliveryErrorCode> RemoveAssetPackInternal(
             string assetBundleName)
@@ -278,6 +321,33 @@ namespace Google.Play.AssetDelivery.Internal
             StartRequest(request, IsDownloaded(request.AssetPackName));
         }
 
+        private void InitiateRequest(PlayAssetPackRequestImpl request, bool updateIfAvailable)
+        {
+            StartRequest(request, IsCurrentVersionGoodEnough(request.AssetPackName, updateIfAvailable));
+        }
+
+        private bool IsCurrentVersionGoodEnough(string assetPackName, bool wantNewerVersion)
+        {
+            var packLocation = _assetPackManager.GetPackLocation(assetPackName);
+            bool isCurrentVersionGoodEnough;
+            if (packLocation == null)
+            {
+                isCurrentVersionGoodEnough= false;
+            }
+            else if (packLocation.PackStorageMethod == AssetPackStorageMethod.ApkAssets)
+            {
+                // If the pack exists as an APK, then it is an install-time pack which cannot be updated.
+                isCurrentVersionGoodEnough = true;
+            }
+            else
+            {
+                // When wantNewerVersion is true,
+                // we can't use the version on disk without checking if a newer version exists.
+                isCurrentVersionGoodEnough = !wantNewerVersion;
+            }
+
+            return isCurrentVersionGoodEnough;
+        }
 
         private void StartRequest(PlayAssetPackRequestImpl request, bool isAvailable)
         {

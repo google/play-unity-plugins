@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Google.Android.AppBundle.Editor.Internal
+namespace Google.Play.AssetDelivery
 {
-    // Options related to creating Android App Bundles.
-    public class CreateBundleOptions
+    /// <summary>
+    /// Enum indicating the availability of a newer version of a particular asset pack.
+    /// </summary>
+    public enum AssetPackUpdateAvailability
     {
         /// <summary>
-        /// Specifies the file path for the AAB.
+        /// The asset pack update availability is unknown.
         /// </summary>
-        public string AabFilePath{ get; set; }
+        Unknown = 0,
 
         /// <summary>
-        /// Returns the AssetPackConfig to use for the build, or null.
+        /// The asset pack is already at the latest version; there's no update available.
         /// </summary>
-        public AssetPackConfig AssetPackConfig { get; set; }
+        UpdateNotAvailable = 1,
 
         /// <summary>
-        /// Options for overriding the default file compression strategy.
+        /// The asset pack can be updated to a newer version.
         /// </summary>
-        public CompressionOptions CompressionOptions { get; set; }
-
-        /// <summary>
-        /// Options for building asset only bundles.
-        /// </summary>
-        public AssetOnlyOptions AssetOnlyOptions { get; set; }
+        UpdateAvailable = 2
     }
 }

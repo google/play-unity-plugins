@@ -12,29 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace Google.Android.AppBundle.Editor.Internal
 {
-    // Options related to creating Android App Bundles.
-    public class CreateBundleOptions
+    /// <summary>
+    /// Build Options for building asset-only app bundles.
+    /// </summary>
+    public class AssetOnlyOptions
     {
         /// <summary>
-        /// Specifies the file path for the AAB.
+        /// A list of app versions that are eligible to update to this asset-only app bundle.
         /// </summary>
-        public string AabFilePath{ get; set; }
+        public IList<long> AppVersions { get; set; }
 
         /// <summary>
-        /// Returns the AssetPackConfig to use for the build, or null.
+        /// A string uniquely identifying this asset-only app bundle.
         /// </summary>
-        public AssetPackConfig AssetPackConfig { get; set; }
-
-        /// <summary>
-        /// Options for overriding the default file compression strategy.
-        /// </summary>
-        public CompressionOptions CompressionOptions { get; set; }
-
-        /// <summary>
-        /// Options for building asset only bundles.
-        /// </summary>
-        public AssetOnlyOptions AssetOnlyOptions { get; set; }
+        public string AssetVersionTag { get; set; }
     }
 }

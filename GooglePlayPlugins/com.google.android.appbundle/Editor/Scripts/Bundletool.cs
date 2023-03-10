@@ -48,6 +48,19 @@ namespace Google.Android.AppBundle.Editor
             return await AppBundlePublisher.BuildTask(androidBuildOptions);
         }
 
+        /// <summary>
+        /// Build an App Bundle containing only the specified asset packs.
+        /// </summary>
+        /// <param name="assetOnlyBuildOptions">
+        /// Configuration options for the build, including what asset packs to include in the Android App Bundle.
+        /// </param>
+        /// <returns>
+        /// True if the build completed successfully and false otherwise.
+        /// </returns>
+        public static async Task BuildAssetOnlyBundle(AssetOnlyBuildOptions assetOnlyBuildOptions)
+        {
+            await AppBundlePublisher.BuildAssetOnlyBundle(assetOnlyBuildOptions);
+        }
 #endif
 
         /// <summary>

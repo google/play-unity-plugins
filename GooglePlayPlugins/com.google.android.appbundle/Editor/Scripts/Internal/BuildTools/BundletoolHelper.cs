@@ -72,6 +72,10 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             /// </summary>
             public CompressionOptions compressionOptions;
 
+            /// <summary>
+            /// Options for configuring asset only app bundles.
+            /// </summary>
+            public AssetOnlyOptions assetOnlyOptions;
         }
 
         // Paths where the bundletool jar may potentially be found.
@@ -167,6 +171,16 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
 
+            if (configParams.assetOnlyOptions != null)
+            {
+                config.type = BundletoolConfig.AssetOnly;
+                config.asset_modules_config = new BundletoolConfig.AssetModulesConfig
+                {
+                    app_version = new List<long>(configParams.assetOnlyOptions.AppVersions),
+                    asset_version_tag = configParams.assetOnlyOptions.AssetVersionTag
+                };
+                return config;
+            }
 
             // Bundletool requires the below standaloneConfig when supporting install-time asset packs for pre-Lollipop.
             if (configParams.containsInstallTimeAssetPack &&

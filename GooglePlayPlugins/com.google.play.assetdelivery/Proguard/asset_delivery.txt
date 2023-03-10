@@ -23,6 +23,9 @@
     public int status();
     public java.lang.String toString();
     public long totalBytesToDownload();
+    public int updateAvailability();
+    public java.lang.String availableVersionTag();
+    public java.lang.String installedVersionTag();
 }
 
 -keep class com.google.android.play.core.assetpacks.AssetPackStates {
@@ -101,5 +104,11 @@
     <init>();
 
     public void onStateUpdate(com.google.android.play.core.assetpacks.AssetPackState);
+}
+
+-keep class com.google.android.play.core.assetpacks.model.AssetPackUpdateAvailability {
+    public static int UNKNOWN;
+    public static int UPDATE_NOT_AVAILABLE;
+    public static int UPDATE_AVAILABLE;
 }
 

@@ -88,6 +88,19 @@ namespace Google.Android.AppBundle.Editor.Internal
             return await appBundleBuilder.CreateBundleWithTask(androidBuildOptions);
         }
 
+        /// <summary>
+        /// Builds an Android App Bundle containing only asset packs.
+        /// </summary>
+        public static async Task BuildAssetOnlyBundle(AssetOnlyBuildOptions assetOnlyBuildOptions)
+        {
+            var appBundleBuilder = CreateAppBundleBuilder();
+            if (!appBundleBuilder.Initialize(new BuildToolLogger()))
+            {
+                throw new Exception("Failed to initialize AppBundleBuilder");
+            }
+
+            await appBundleBuilder.CreateAssetOnlyBundle(assetOnlyBuildOptions);
+        }
 #endif
 
         /// <summary>

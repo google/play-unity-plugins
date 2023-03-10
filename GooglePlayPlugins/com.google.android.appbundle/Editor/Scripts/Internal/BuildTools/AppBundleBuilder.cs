@@ -309,6 +309,73 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             return await taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Builds an Android App Bundle containing only asset packs.
+        /// </summary>
+        public async Task CreateAssetOnlyBundle(AssetOnlyBuildOptions assetOnlyBuildOptions)
+        {
+            var assetOnlyOptions = new AssetOnlyOptions
+            {
+                AppVersions = new List<long>(assetOnlyBuildOptions.AppVersions),
+                AssetVersionTag = assetOnlyBuildOptions.AssetVersionTag
+            };
+
+            var createBundleOptions = new CreateBundleOptions
+            {
+                AabFilePath = assetOnlyBuildOptions.LocationPathName,
+                AssetPackConfig = SerializationHelper.DeepCopy(assetOnlyBuildOptions.AssetPackConfig),
+                AssetOnlyOptions = assetOnlyOptions
+            };
+
+            var completionSource = new TaskCompletionSource<bool>();
+            if (assetOnlyBuildOptions.ForceSingleThreadedBuild || Application.isBatchMode)
+            {
+                CreateBundleInternal(
+                    completionSource,
+                    () => CreateAssetOnlyBundle(createBundleOptions),
+                    true);
+            }
+            else
+            {
+                StartCreateBundleAsync(() =>
+                {
+                    CreateBundleInternal(
+                        completionSource,
+                        () => CreateAssetOnlyBundle(createBundleOptions),
+                        true);
+                });
+            }
+
+            await completionSource.Task;
+        }
+
+        private string CreateAssetOnlyBundle(CreateBundleOptions options)
+        {
+            if (_buildStatus != BuildStatus.Running)
+            {
+                throw new Exception("Unexpected call to CreateAssetOnlyBundle() with status: " + _buildStatus);
+            }
+
+            var moduleDirectoryList = new List<DirectoryInfo>();
+            var workingDirectory = new DirectoryInfo(_workingDirectoryPath);
+
+            var error = CreateAssetModules(moduleDirectoryList, options.AssetPackConfig, workingDirectory);
+            if (error != null)
+            {
+                return error;
+            }
+
+            error = CreateBundle(moduleDirectoryList, options);
+            if (error != null)
+            {
+                return error;
+            }
+
+            Debug.LogFormat("Finished building asset-only app bundle: {0}", options.AabFilePath);
+            _finishedAabFilePath = options.AabFilePath;
+            _buildStatus = BuildStatus.Succeeding;
+            return null;
+        }
 
         private void CreateBundleInternal<T>(
             TaskCompletionSource<T> taskCompletionSource,
@@ -508,8 +575,7 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             }
 
             configParams.containsInstallTimeAssetPack |= options.AssetPackConfig.SplitBaseModuleAssets;
-
-
+            configParams.assetOnlyOptions = options.AssetOnlyOptions;
             return configParams;
         }
 
