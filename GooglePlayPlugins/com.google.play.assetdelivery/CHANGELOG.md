@@ -1,5 +1,8 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.8.2] - 2023-03-10
+- Updated Play Common and Play Core dependency from 1.8.1 to 1.8.2
+
 ## [1.8.1] - 2022-09-08
 - Updated plugin's data collection procedure. For more information and the opt-out
   process, please refer to the [data collection](https://github.com/google/play-unity-plugins#data-collection)

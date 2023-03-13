@@ -2,12 +2,12 @@
   "name": "com.google.play.common",
   "displayName": "Google Play Common",
   "description": "The Google Play Common package provides common files required by some Google Play packages, such as Play Instant.\n\nThis package doesn't provide any features when installed separately.",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "unity": "2017.4",
   "author": {
     "name": "Google LLC"
   },
   "dependencies": {
-    "com.google.android.appbundle": "1.8.0"
+    "com.google.android.appbundle": "1.9.0"
   }
 }

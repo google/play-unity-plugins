@@ -1,7 +1,8 @@
 # Changelog for com.google.android.appbundle
 
-## [1.9.0] - 2023-02-08
+## [1.9.0] - 2023-03-10
 ### New Features
+- Added support for device tier targeting of assets
 - Updated bundletool-all.jar from 1.8.2 to 1.14.0
 
 ## [1.8.0] - 2022-07-06

@@ -2,7 +2,7 @@
   "name": "com.google.android.appbundle",
   "displayName": "Google Android App Bundle",
   "description": "The Google Android App Bundle package provides access to the latest Android App Bundles features, such as Play Asset Delivery.",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "unity": "2017.4",
   "author": {
     "name": "Google LLC"
