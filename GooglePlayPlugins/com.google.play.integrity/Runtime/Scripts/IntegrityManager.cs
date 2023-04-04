@@ -27,7 +27,7 @@ namespace Google.Play.Integrity
         private readonly PlayCoreIntegrityManager _playCoreIntegrityManager;
 
         private const string IntegrityTokenRequestClassName =
-            PlayCoreConstants.PlayCorePackagePrefix + "integrity.IntegrityTokenRequest";
+            PlayCoreConstants.IntegrityPackagePrefix + "IntegrityTokenRequest";
 
         /// <summary>
         /// Constructor.
@@ -68,7 +68,7 @@ namespace Google.Play.Integrity
 
             using (var integrityTokenRequestClass = new AndroidJavaClass(IntegrityTokenRequestClassName))
             using (var integrityTokenRequestBuilder =
-                integrityTokenRequestClass.CallStatic<AndroidJavaObject>("builder"))
+                   integrityTokenRequestClass.CallStatic<AndroidJavaObject>("builder"))
             {
                 integrityTokenRequestBuilder.Call<AndroidJavaObject>("setNonce", integrityTokenRequest.Nonce);
 

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ using UnityEngine;
 namespace Google.Play.Integrity.Internal
 {
     /// <summary>
-    /// Internal implementation of IntegrityManager that wraps Play Core's IntegrityManager.
+    /// Internal implementation of StandardIntegrityManager that wraps Play Core's StandardIntegrityManager.
     /// </summary>
-    internal class PlayCoreIntegrityManager : IDisposable
+    internal class PlayCoreStandardIntegrityManager : IDisposable
     {
-        private readonly AndroidJavaObject _javaIntegrityManager;
+        private readonly AndroidJavaObject _javaStandardIntegrityManager;
 
-        internal PlayCoreIntegrityManager()
+        internal PlayCoreStandardIntegrityManager()
         {
             const string factoryClassName =
                 PlayCoreConstants.IntegrityPackagePrefix + "IntegrityManagerFactory";
@@ -34,12 +34,13 @@ namespace Google.Play.Integrity.Internal
             using (var activity = UnityPlayerHelper.GetCurrentActivity())
             using (var integrityManagerFactory = new AndroidJavaClass(factoryClassName))
             {
-                _javaIntegrityManager = integrityManagerFactory.CallStatic<AndroidJavaObject>("create", activity);
+                _javaStandardIntegrityManager =
+                    integrityManagerFactory.CallStatic<AndroidJavaObject>("createStandard", activity);
             }
 
-            if (_javaIntegrityManager == null)
+            if (_javaStandardIntegrityManager == null)
             {
-                throw new NullReferenceException("Play Core returned null IntegrityManager");
+                throw new NullReferenceException("Play Core returned null StandardIntegrityManager");
             }
 
             PlayCoreEventHandler.CreateInScene();
@@ -49,17 +50,20 @@ namespace Google.Play.Integrity.Internal
         /// Returns a <see cref="PlayServicesTask{TAndroidJava}" /> which returns an IntegrityTokenResponse
         /// AndroidJavaObject on the registered on success callback.
         /// </summary>
-        /// <param name="integrityTokenRequest">The IntegrityTokenRequest AndroidJavaObject.</param>
-        public PlayServicesTask<AndroidJavaObject> RequestIntegrityToken(AndroidJavaObject integrityTokenRequest)
+        /// <param name="prepareIntegrityTokenRequest">The PrepareIntegrityTokenRequest AndroidJavaObject.</param>
+        internal PlayServicesTask<AndroidJavaObject> PrepareIntegrityToken(
+            AndroidJavaObject prepareIntegrityTokenRequest)
         {
             var javaTask =
-                _javaIntegrityManager.Call<AndroidJavaObject>("requestIntegrityToken", integrityTokenRequest);
+                _javaStandardIntegrityManager.Call<AndroidJavaObject>("prepareIntegrityToken",
+                    prepareIntegrityTokenRequest);
             return new PlayServicesTask<AndroidJavaObject>(javaTask);
         }
 
+
         public void Dispose()
         {
-            _javaIntegrityManager.Dispose();
+            _javaStandardIntegrityManager.Dispose();
         }
     }
 }

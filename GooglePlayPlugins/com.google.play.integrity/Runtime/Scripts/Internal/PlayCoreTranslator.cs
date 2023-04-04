@@ -45,28 +45,73 @@ namespace Google.Play.Integrity.Internal
             public const int InternalError = -100;
         }
 
+        private static class JavaStandardIntegrityErrorCode
+        {
+            public const int NoError = 0;
+            public const int ApiNotAvailable = -1;
+            public const int PlayStoreNotFound = -2;
+            public const int NetworkError = -3;
+            public const int AppNotInstalled = -5;
+            public const int PlayServicesNotFound = -6;
+            public const int AppUidMismatch = -7;
+            public const int TooManyRequests = -8;
+            public const int CannotBindToService = -9;
+            public const int GoogleServerUnavailable = -12;
+            public const int PlayStoreVersionOutdated = -14;
+            public const int PlayServicesVersionOutdated = -15;
+            public const int CloudProjectNumberIsInvalid = -16;
+            public const int InternalError = -100;
+        }
+
         private static readonly Dictionary<int, IntegrityErrorCode> PlayCoreToIntegrityErrors =
             new Dictionary<int, IntegrityErrorCode>
             {
-                {JavaIntegrityErrorCode.NoError, IntegrityErrorCode.NoError},
-                {JavaIntegrityErrorCode.ApiNotAvailable, IntegrityErrorCode.ApiNotAvailable},
-                {JavaIntegrityErrorCode.PlayStoreNotFound, IntegrityErrorCode.PlayStoreNotFound},
-                {JavaIntegrityErrorCode.NetworkError, IntegrityErrorCode.NetworkError},
-                {JavaIntegrityErrorCode.PlayStoreAccountNotFound, IntegrityErrorCode.PlayStoreAccountNotFound},
-                {JavaIntegrityErrorCode.AppNotInstalled, IntegrityErrorCode.AppNotInstalled},
-                {JavaIntegrityErrorCode.PlayServicesNotFound, IntegrityErrorCode.PlayServicesNotFound},
-                {JavaIntegrityErrorCode.AppUidMismatch, IntegrityErrorCode.AppUidMismatch},
-                {JavaIntegrityErrorCode.TooManyRequests, IntegrityErrorCode.TooManyRequests},
-                {JavaIntegrityErrorCode.CannotBindToService, IntegrityErrorCode.CannotBindToService},
-                {JavaIntegrityErrorCode.NonceTooShort, IntegrityErrorCode.NonceTooShort},
-                {JavaIntegrityErrorCode.NonceTooLong, IntegrityErrorCode.NonceTooLong},
-                {JavaIntegrityErrorCode.GoogleServerUnavailable, IntegrityErrorCode.GoogleServerUnavailable},
-                {JavaIntegrityErrorCode.NonceIsNotBase64, IntegrityErrorCode.NonceIsNotBase64},
-                {JavaIntegrityErrorCode.PlayStoreVersionOutdated, IntegrityErrorCode.PlayStoreVersionOutdated},
-                {JavaIntegrityErrorCode.PlayServicesVersionOutdated, IntegrityErrorCode.PlayServicesVersionOutdated},
-                {JavaIntegrityErrorCode.InternalError, IntegrityErrorCode.InternalError},
-                {JavaIntegrityErrorCode.CloudProjectNumberIsInvalid, IntegrityErrorCode.CloudProjectNumberIsInvalid},
-                {JavaIntegrityErrorCode.ClientTransientError, IntegrityErrorCode.ClientTransientError},
+                { JavaIntegrityErrorCode.NoError, IntegrityErrorCode.NoError },
+                { JavaIntegrityErrorCode.ApiNotAvailable, IntegrityErrorCode.ApiNotAvailable },
+                { JavaIntegrityErrorCode.PlayStoreNotFound, IntegrityErrorCode.PlayStoreNotFound },
+                { JavaIntegrityErrorCode.NetworkError, IntegrityErrorCode.NetworkError },
+                { JavaIntegrityErrorCode.PlayStoreAccountNotFound, IntegrityErrorCode.PlayStoreAccountNotFound },
+                { JavaIntegrityErrorCode.AppNotInstalled, IntegrityErrorCode.AppNotInstalled },
+                { JavaIntegrityErrorCode.PlayServicesNotFound, IntegrityErrorCode.PlayServicesNotFound },
+                { JavaIntegrityErrorCode.AppUidMismatch, IntegrityErrorCode.AppUidMismatch },
+                { JavaIntegrityErrorCode.TooManyRequests, IntegrityErrorCode.TooManyRequests },
+                { JavaIntegrityErrorCode.CannotBindToService, IntegrityErrorCode.CannotBindToService },
+                { JavaIntegrityErrorCode.NonceTooShort, IntegrityErrorCode.NonceTooShort },
+                { JavaIntegrityErrorCode.NonceTooLong, IntegrityErrorCode.NonceTooLong },
+                { JavaIntegrityErrorCode.GoogleServerUnavailable, IntegrityErrorCode.GoogleServerUnavailable },
+                { JavaIntegrityErrorCode.NonceIsNotBase64, IntegrityErrorCode.NonceIsNotBase64 },
+                { JavaIntegrityErrorCode.PlayStoreVersionOutdated, IntegrityErrorCode.PlayStoreVersionOutdated },
+                { JavaIntegrityErrorCode.PlayServicesVersionOutdated, IntegrityErrorCode.PlayServicesVersionOutdated },
+                { JavaIntegrityErrorCode.InternalError, IntegrityErrorCode.InternalError },
+                { JavaIntegrityErrorCode.CloudProjectNumberIsInvalid, IntegrityErrorCode.CloudProjectNumberIsInvalid },
+                { JavaIntegrityErrorCode.ClientTransientError, IntegrityErrorCode.ClientTransientError },
+            };
+
+        private static readonly Dictionary<int, StandardIntegrityErrorCode> PlayCoreToStandardIntegrityErrors =
+            new Dictionary<int, StandardIntegrityErrorCode>
+            {
+                { JavaIntegrityErrorCode.NoError, StandardIntegrityErrorCode.NoError },
+                { JavaIntegrityErrorCode.ApiNotAvailable, StandardIntegrityErrorCode.ApiNotAvailable },
+                { JavaIntegrityErrorCode.PlayStoreNotFound, StandardIntegrityErrorCode.PlayStoreNotFound },
+                { JavaIntegrityErrorCode.NetworkError, StandardIntegrityErrorCode.NetworkError },
+                { JavaIntegrityErrorCode.AppNotInstalled, StandardIntegrityErrorCode.AppNotInstalled },
+                { JavaIntegrityErrorCode.PlayServicesNotFound, StandardIntegrityErrorCode.PlayServicesNotFound },
+                { JavaIntegrityErrorCode.AppUidMismatch, StandardIntegrityErrorCode.AppUidMismatch },
+                { JavaIntegrityErrorCode.TooManyRequests, StandardIntegrityErrorCode.TooManyRequests },
+                { JavaIntegrityErrorCode.CannotBindToService, StandardIntegrityErrorCode.CannotBindToService },
+                { JavaIntegrityErrorCode.GoogleServerUnavailable, StandardIntegrityErrorCode.GoogleServerUnavailable },
+                {
+                    JavaIntegrityErrorCode.PlayStoreVersionOutdated, StandardIntegrityErrorCode.PlayStoreVersionOutdated
+                },
+                {
+                    JavaIntegrityErrorCode.PlayServicesVersionOutdated,
+                    StandardIntegrityErrorCode.PlayServicesVersionOutdated
+                },
+                {
+                    JavaIntegrityErrorCode.CloudProjectNumberIsInvalid,
+                    StandardIntegrityErrorCode.CloudProjectNumberIsInvalid
+                },
+                { JavaIntegrityErrorCode.InternalError, StandardIntegrityErrorCode.InternalError },
             };
 
         /// <summary>
@@ -81,6 +126,25 @@ namespace Google.Play.Integrity.Internal
             if (!PlayCoreToIntegrityErrors.TryGetValue(javaIntegrityErrorCode, out translatedErrorCode))
             {
                 throw new NotImplementedException("Unexpected error code: " + javaIntegrityErrorCode);
+            }
+
+            return translatedErrorCode;
+        }
+
+        /// <summary>
+        /// Translates Play Core's StandardIntegrityErrorCode into its corresponding public-facing
+        /// StandardIntegrityErrorCode.
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// Throws if the provided Java error code does not have a corresponding value in StandardIntegrityErrorCode.
+        /// </exception>
+        public static StandardIntegrityErrorCode TranslatePlayCoreStandardIntegrityErrorCode(
+            int javaStandardIntegrityErrorCode)
+        {
+            StandardIntegrityErrorCode translatedErrorCode;
+            if (!PlayCoreToStandardIntegrityErrors.TryGetValue(javaStandardIntegrityErrorCode, out translatedErrorCode))
+            {
+                throw new NotImplementedException("Unexpected error code: " + javaStandardIntegrityErrorCode);
             }
 
             return translatedErrorCode;

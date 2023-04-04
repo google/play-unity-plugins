@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Google.Play.Core.Internal
+using Google.Play.Common.Internal;
+
+namespace Google.Play.Integrity.Internal
 {
     /// <summary>
-    /// A collection of constants used for interfacing with the Play Core library.
+    /// Represents an asynchronous operation that produces a result or an StandardIntegrityErrorCode upon completion.
     /// </summary>
-    public static class PlayCoreConstants
+    /// <typeparam name="TResult">The type of the result of the operation.</typeparam>
+    internal class
+        StandardIntegrityAsyncOperation<TResult> : PlayAsyncOperationImpl<TResult, StandardIntegrityErrorCode>
     {
-        public const string PlayCorePackagePrefix = "com.google.android.play.core.";
-        public const string GmsCorePackagePrefix = "com.google.android.gms.";
-        public const string AssetPackPackagePrefix = PlayCorePackagePrefix + "assetpacks.";
-        public const string IntegrityPackagePrefix = PlayCorePackagePrefix + "integrity.";
-        public const int InternalErrorCode = -100;
+        public override bool IsSuccessful
+        {
+            get { return IsDone && Error == StandardIntegrityErrorCode.NoError; }
+        }
     }
 }
