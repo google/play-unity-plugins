@@ -44,7 +44,9 @@ namespace Google.Play.Integrity
         /// <para>You can call this method from time to time in order to refresh the resulting
         /// <see cref="StandardIntegrityTokenProvider"/>.</para>
         ///
-        /// <para>Note that this API makes a call to Google servers and hence requires a network connection.</para>
+        /// <para>The API makes a call to Google servers and hence requires a network connection.</para>
+        ///
+        /// <para>Note that the API is in beta mode.</para>
         /// </summary>
         /// <param name="request">the object to prepare the integrity token with.</param>
         /// <returns>

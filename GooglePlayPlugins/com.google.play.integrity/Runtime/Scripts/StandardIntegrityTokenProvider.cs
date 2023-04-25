@@ -41,6 +41,8 @@ namespace Google.Play.Integrity
         ///
         /// <para> This must be called only after <see cref="StandardIntegrityManager.PrepareIntegrityToken"/>
         /// completes.</para>
+        ///
+        /// <para>Note that the API is in beta mode.</para>
         /// </summary>
         /// <param name="request">the object to request integrity token with.</param>
         /// <returns>

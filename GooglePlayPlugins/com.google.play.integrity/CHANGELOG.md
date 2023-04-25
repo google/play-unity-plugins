@@ -4,6 +4,7 @@
 ### New Features
 - Updated Java Play Integrity API dependency from 1.0.1 to 1.1.0-beta01
 - Added support for Standard APIs (beta).
+- Added new error code `ClientTransientError` in IntegrityErrorCode. This indicates that a transient error has occurred on the device. The caller should retry with [exponential backoff](https://developer.android.com/google/play/integrity/error-codes#retry-logic).
 
 ## [1.0.2] - 2022-09-08
 - Updated plugin's data collection procedure. For more information and the opt-out
