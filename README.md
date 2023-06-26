@@ -22,16 +22,20 @@ libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-6
 
 ## Downloading the plugins
 
-There are 3 different options for obtaining the plugins:
+There are 4 different options for obtaining the plugins:
 
 *   Download individual plugins as `.unitypackage` files or Unity Package
     Manager (`.tgz`) files from
     [Google APIs for Unity](//developers.google.com/unity)
 
+*   Add individual plugins by *git url* using the Unity Package Manager. E.g. For **com.google.play.core** use `https://github.com/google/play-unity-plugins.git?path=/GooglePlayPlugins/com.google.play.core` 
+
 *   Download the latest release from this project's
     [releases page](//github.com/google/play-unity-plugins/releases)
 
 *   `git clone` this repository into the **Assets** folder of your Unity project
+
+
 
 ## Installing the plugins
 
