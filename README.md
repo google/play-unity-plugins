@@ -35,8 +35,6 @@ There are 4 different options for obtaining the plugins:
 
 *   `git clone` this repository into the **Assets** folder of your Unity project
 
-
-
 ## Installing the plugins
 
 For all cases except `git clone` follow the instructions to
