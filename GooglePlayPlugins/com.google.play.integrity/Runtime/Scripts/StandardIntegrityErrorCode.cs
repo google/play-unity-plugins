@@ -116,6 +116,13 @@ namespace Google.Play.Integrity
         CloudProjectNumberIsInvalid = -16,
 
         /// <summary>
+        /// The provided request hash is too long. The request hash length must be less than 500 bytes.
+        ///
+        /// <para>Retry with a shorter request hash.</para>
+        /// </summary>
+        RequestHashTooLong = -17,
+
+        /// <summary>
         /// Unknown internal error.
         /// 
         /// <para>Retry with an exponential backoff. Consider filing a bug if fails consistently.</para>
