@@ -61,6 +61,7 @@ namespace Google.Play.Integrity.Internal
             public const int PlayServicesVersionOutdated = -15;
             public const int CloudProjectNumberIsInvalid = -16;
             public const int RequestHashTooLong = -17;
+            public const int ClientTransientError = -18;
             public const int InternalError = -100;
         }
 
@@ -113,6 +114,7 @@ namespace Google.Play.Integrity.Internal
                     StandardIntegrityErrorCode.CloudProjectNumberIsInvalid
                 },
                 { JavaStandardIntegrityErrorCode.RequestHashTooLong, StandardIntegrityErrorCode.RequestHashTooLong },
+                { JavaStandardIntegrityErrorCode.ClientTransientError, StandardIntegrityErrorCode.ClientTransientError },
                 { JavaIntegrityErrorCode.InternalError, StandardIntegrityErrorCode.InternalError },
             };
 
