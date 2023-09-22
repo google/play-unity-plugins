@@ -133,6 +133,15 @@ namespace Google.Play.Integrity
         ClientTransientError = -18,
 
         /// <summary>
+        /// The <see cref="StandardIntegrityTokenProvider"/> is invalid (e.g.
+        /// it is outdated). This error can be returned only for <see cref="StandardIntegrityTokenProvider.request"/>
+        ///
+        /// <para>Request a new integrity token provider by calling
+        /// <see cref="StandardIntegrityManager.prepareIntegrityToken"/></para>
+        /// </summary>
+        IntegrityTokenProviderInvalid = -19,
+
+        /// <summary>
         /// Unknown internal error.
         /// 
         /// <para>Retry with an exponential backoff. Consider filing a bug if fails consistently.</para>

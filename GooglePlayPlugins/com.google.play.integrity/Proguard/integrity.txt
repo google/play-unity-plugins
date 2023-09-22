@@ -105,5 +105,9 @@
     public static int GOOGLE_SERVER_UNAVAILABLE;
     public static int PLAY_STORE_VERSION_OUTDATED;
     public static int PLAY_SERVICES_VERSION_OUTDATED;
+    public static int CLOUD_PROJECT_NUMBER_IS_INVALID;
+    public static int REQUEST_HASH_TOO_LONG;
+    public static int CLIENT_TRANSIENT_ERROR;
+    public static int INTEGRITY_TOKEN_PROVIDER_INVALID;
     public static int INTERNAL_ERROR;
 }
