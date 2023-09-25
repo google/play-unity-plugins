@@ -180,6 +180,29 @@ namespace Google.Play.AssetDelivery.Internal
             return new PlayServicesTask<int>(task);
         }
 
+        /// <summary>
+        /// Calls the Java Asset Delivery SDK to show a confirmation dialog for all downloads that
+        /// are currently in either the <see cref="AssetDeliveryStatus.RequiresUserConfirmation"/>
+        /// state or the <see cref="AssetDeliveryStatus.WaitingForWifi"/> state.
+        /// </summary>
+        /// <returns>
+        /// Returns a <see cref=" PlayServicesTask{ActivityResult}"/> that completes once the dialog
+        /// has been accepted, denied or closed. A successful task result contains one of the
+        /// following values:
+        /// <ul>
+        ///   <li><see cref="ActivityResult.ResultOk"/> if the user accepted.</li>
+        ///   <li><see cref="ActivityResult.ResultCancelled"/> if the user denied or the dialog has
+        ///       been closed in
+        ///       any other way (e.g. backpress).</li>
+        /// </ul>
+        /// </returns>
+        public PlayServicesTask<int> ShowConfirmationDialog()
+        {
+            var task = _javaAssetPackManager.Call<AndroidJavaObject>("showConfirmationDialog",
+                UnityPlayerHelper.GetCurrentActivity());
+            return new PlayServicesTask<int>(task);
+        }
+
         // Returns a list of asset pack names.
         private static AndroidJavaObject BuildAssetPackList(params string[] assetPackNames)
         {

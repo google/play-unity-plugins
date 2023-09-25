@@ -181,7 +181,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
         /// </summary>
         public void ButtonEventShowCellularDialog()
         {
-            PlayAssetDelivery.ShowCellularDataConfirmation();
+            PlayAssetDelivery.ShowConfirmationDialog();
         }
 
         public void Update()
@@ -207,7 +207,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
                 if (_request.Status == AssetDeliveryStatus.WaitingForWifi)
                 {
                     // Wait until user has confirmed or cancelled the dialog.
-                    var asyncOperation = PlayAssetDelivery.ShowCellularDataConfirmation();
+                    var asyncOperation = PlayAssetDelivery.ShowConfirmationDialog();
                     yield return asyncOperation;
 
                     if (asyncOperation.Error != AssetDeliveryErrorCode.NoError
