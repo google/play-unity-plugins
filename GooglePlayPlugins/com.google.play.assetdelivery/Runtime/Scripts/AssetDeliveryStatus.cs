@@ -56,10 +56,5 @@ namespace Google.Play.AssetDelivery
         /// presented with <see cref="PlayAssetDelivery.ShowCellularDataConfirmation"/>.
         /// </summary>
         WaitingForWifi = 6,
-
-        /// <summary>
-        /// Asset pack download is paused until the user provides consent. Consent can be obtained
-        /// by presenting a dialog with <see cref="PlayAssetDelivery.ShowConfirmationDialog"/>.
-        RequiresUserConfirmation = 7,
     }
 }

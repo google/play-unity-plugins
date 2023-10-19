@@ -37,7 +37,6 @@ namespace Google.Play.AssetDelivery.Internal
             public const int PlayStoreNotFound = -11;
             public const int NetworkUnrestricted = -12;
             public const int AppNotOwned = -13;
-            public const int ConfirmationNotRequired = -14;
             public const int InternalError = -100;
         }
 
@@ -52,7 +51,6 @@ namespace Google.Play.AssetDelivery.Internal
             public const int Canceled = 6;
             public const int WaitingForWifi = 7;
             public const int NotInstalled = 8;
-            public const int RequiresUserConfirmation = 9;
         }
 
         private static readonly Dictionary<int, AssetDeliveryErrorCode> PlayCoreToAssetDeliveryErrors =
@@ -71,7 +69,6 @@ namespace Google.Play.AssetDelivery.Internal
                 {AssetPackErrorCode.PlayStoreNotFound, AssetDeliveryErrorCode.PlayStoreNotFound},
                 {AssetPackErrorCode.NetworkUnrestricted, AssetDeliveryErrorCode.NetworkUnrestricted},
                 {AssetPackErrorCode.AppNotOwned, AssetDeliveryErrorCode.AppNotOwned},
-                {AssetPackErrorCode.ConfirmationNotRequired, AssetDeliveryErrorCode.ConfirmationNotRequired},
             };
 
         private static readonly Dictionary<int, AssetDeliveryStatus> PlayCoreToAssetDeliveryStatuses
@@ -86,7 +83,6 @@ namespace Google.Play.AssetDelivery.Internal
                 {AssetPackStatus.Transferring, AssetDeliveryStatus.Retrieving},
                 {AssetPackStatus.Completed, AssetDeliveryStatus.Available},
                 {AssetPackStatus.WaitingForWifi, AssetDeliveryStatus.WaitingForWifi},
-                {AssetPackStatus.RequiresUserConfirmation, AssetDeliveryStatus.RequiresUserConfirmation},
                 {AssetPackStatus.Failed, AssetDeliveryStatus.Failed},
                 {AssetPackStatus.Unknown, AssetDeliveryStatus.Failed},
                 {AssetPackStatus.Canceled, AssetDeliveryStatus.Failed},
