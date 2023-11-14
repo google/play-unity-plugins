@@ -1,6 +1,6 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.google.android.play:integrity:1.1.0-beta01"/>
+        <androidPackage spec="com.google.android.play:integrity:1.3.0"/>
     </androidPackages>
 </dependencies>
 
