@@ -1,5 +1,8 @@
 # Changelog for com.google.play.integrity
 
+## [1.3.1] - 2024-01-12
+- Updated Unity Play Core dependency from 1.8.1 to 1.8.3
+
 ## [1.3.0] - 2023-11-13
 - Updated Java Play Integrity API dependency from 1.1.0-beta01 to 1.3.0
 - Added new error codes `ClientTransientError` and `IntegrityTokenProviderInvalid` in StandardIntegrityErrorCode.

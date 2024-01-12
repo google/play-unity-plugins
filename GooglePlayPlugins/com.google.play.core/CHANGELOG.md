@@ -1,5 +1,8 @@
 # Changelog for com.google.play.core
 
+## [1.8.3] - 2024-01-12
+- Added integrity prefix constant
+
 ## [1.8.2] - 2023-03-10
 - Updated Android App Bundle dependency from 1.8.0 to 1.9.0
 
