@@ -208,6 +208,31 @@ namespace Google.Play.AssetDelivery.Internal
             return operation;
         }
 
+        internal PlayAsyncOperation<ConfirmationDialogResult, AssetDeliveryErrorCode>
+            ShowConfirmationDialogInternal()
+        {
+            var requestsAwaitingWifi = _requestRepository.GetRequestsWithStatus(AssetDeliveryStatus.WaitingForWifi);
+            var requestsAwaitingConsent = _requestRepository.GetRequestsWithStatus(AssetDeliveryStatus.RequiresUserConfirmation);
+            if (requestsAwaitingWifi.Count == 0 && requestsAwaitingConsent.Count == 0)
+            {
+                throw new Exception("There are no active requests waiting for confirmation.");
+            }
+
+            var task = _assetPackManager.ShowConfirmationDialog();
+            var operation = new AssetDeliveryAsyncOperation<ConfirmationDialogResult>();
+            task.RegisterOnSuccessCallback(resultCode =>
+            {
+                operation.SetResult(ConvertToConfirmationDialogResult(resultCode));
+                task.Dispose();
+            });
+            task.RegisterOnFailureCallback((message, errorCode) =>
+            {
+                operation.SetError(PlayCoreTranslator.TranslatePlayCoreErrorCode(errorCode));
+                task.Dispose();
+            });
+            return operation;
+        }
+
         internal PlayAsyncOperation<long, AssetDeliveryErrorCode> GetDownloadSizeInternal(string assetBundleName)
         {
             var operation = new AssetDeliveryAsyncOperation<long>();

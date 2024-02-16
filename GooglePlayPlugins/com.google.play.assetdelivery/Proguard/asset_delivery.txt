@@ -39,6 +39,7 @@
     public static int API_NOT_AVAILABLE;
     public static int APP_NOT_OWNED;
     public static int APP_UNAVAILABLE;
+    public static int CONFIRMATION_NOT_REQUIRED;
     public static int DOWNLOAD_NOT_FOUND;
     public static int INSUFFICIENT_STORAGE;
     public static int INTERNAL_ERROR;
@@ -46,6 +47,7 @@
     public static int NETWORK_ERROR;
     public static int NO_ERROR;
     public static int PACK_UNAVAILABLE;
+    public static int UNRECOGNIZED_INSTALLATION;
 }
 
 -keep class com.google.android.play.core.assetpacks.AssetPackException {
@@ -70,6 +72,7 @@
     public void registerListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
     public com.google.android.gms.tasks.Task removePack(java.lang.String);
     public com.google.android.gms.tasks.Task showCellularDataConfirmation(android.app.Activity);
+    public com.google.android.gms.tasks.Task showConfirmationDialog(android.app.Activity);
     public void unregisterListener(com.google.android.play.core.assetpacks.AssetPackStateUpdateListener);
 }
 
@@ -90,6 +93,7 @@
     public static int FAILED;
     public static int NOT_INSTALLED;
     public static int PENDING;
+    public static int REQUIRES_USER_CONFIRMATION;
     public static int TRANSFERRING;
     public static int UNKNOWN;
     public static int WAITING_FOR_WIFI;

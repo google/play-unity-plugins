@@ -95,5 +95,16 @@ namespace Google.Play.AssetDelivery
         /// acquired from the Play Store.
         /// </summary>
         AppNotOwned = 13,
+
+        /// <summary>
+        /// Returned if <see cref="PlayAssetDelivery.ShowConfirmationDialog"/> is called but
+        /// no asset packs are waiting for user confirmation.
+        /// </summary>
+        ConfirmationNotRequired = 14,
+
+        /// <summary>
+        /// Returned if the app was not installed by Play.
+        /// </summary>
+        UnrecognizedInstallation = 15,
     }
 }

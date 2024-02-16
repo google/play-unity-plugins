@@ -214,5 +214,35 @@ namespace Google.Play.AssetDelivery
         {
             return Instance.ShowCellularDataConfirmationInternal();
         }
+
+        /// <summary>
+        /// Shows a dialog that asks the user for consent to download packs that are currently in
+        /// either the <see cref="AssetDeliveryStatus.RequiresUserConfirmation"/> state or the
+        /// <see cref="AssetDeliveryStatus.WaitingForWifi"/> state.
+        ///
+        /// A <see cref="PlayAssetBundleRequest"/> is set to
+        /// <see cref="AssetDeliveryStatus.RequiresUserConfirmation"/> If the download is not able
+        /// to proceed without user consent. By showing this dialog, the app can ask the user if
+        /// they accept downloading the asset packs through Google Play. If the app has not been
+        /// installed by Play, an update may be triggered to ensure that a valid version is
+        /// installed. This will cause the app to restart and all asset requests to be cancelled.
+        /// These assets should be requested again after the app restarts.
+        ///
+        /// A <see cref="PlayAssetBundleRequest"/> is set to
+        /// <see cref="AssetDeliveryStatus.WaitingForWifi"/> if the user is currently not on a Wi-Fi
+        /// connection and the AssetBundle is large or the user has set their download preference in
+        /// the Play Store to only download apps over Wi-Fi. By showing this dialog, the app can ask
+        /// the user if they accept downloading the asset packs over cellular data instead of
+        /// waiting for Wi-Fi.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="PlayAsyncOperation{ConfirmationDialogResult, AssetDeliveryErrorCode}"/>
+        /// that completes once the dialog has been accepted, denied, or closed.
+        /// </returns>
+        public static PlayAsyncOperation<ConfirmationDialogResult, AssetDeliveryErrorCode>
+            ShowConfirmationDialog()
+        {
+            return Instance.ShowConfirmationDialogInternal();
+        }
     }
 }
