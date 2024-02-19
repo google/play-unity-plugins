@@ -760,7 +760,13 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
 
         private string GetSymbolsFileName(string prefix)
         {
+#if UNITY_2022_1_OR_NEWER
+            // Unity 2022 started adding the scripting backend to the symbol zip's name
+            var scriptingBackend = PlayerSettings.GetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Android);
+            return string.Format("{0}-{1}-v{2}-{3}.symbols.zip", prefix, _versionName, _versionCode, scriptingBackend);
+#else
             return string.Format("{0}-{1}-v{2}.symbols.zip", prefix, _versionName, _versionCode);
+#endif
         }
 
         private static void CopyFilesRecursively(DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
