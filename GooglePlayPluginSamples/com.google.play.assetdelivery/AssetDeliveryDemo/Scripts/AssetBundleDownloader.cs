@@ -46,13 +46,14 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
         {
             RetrieveAssetBundleButton.onClick.AddListener(ButtonEventRetrieveAssetBundle);
             LoadSceneButton.onClick.AddListener(ButtonEventLoadSceneFromAssetBundle);
-            ShowCellularDialogButton.onClick.AddListener(ButtonEventShowCellularDialog);
+            ShowCellularDialogButton.onClick.AddListener(ButtonEventShowConfirmationDialog);
             CancelDownloadButton.onClick.AddListener(ButtonEventCancelDownload);
             RemoveButton.onClick.AddListener(ButtonEventRemoveAssetBundle);
 
             Display.BindButton(CancelDownloadButton, AssetDeliveryStatus.Pending);
             Display.BindButton(CancelDownloadButton, AssetDeliveryStatus.Retrieving);
             Display.BindButton(ShowCellularDialogButton, AssetDeliveryStatus.WaitingForWifi);
+            Display.BindButton(ShowCellularDialogButton, AssetDeliveryStatus.RequiresUserConfirmation);
             Display.BindButton(RemoveButton, AssetDeliveryStatus.Loaded);
             Display.BindButton(LoadSceneButton, AssetDeliveryStatus.Loaded);
             Display.BindButton(RetrieveAssetBundleButton, AssetDeliveryStatus.Failed);
@@ -111,9 +112,9 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
             };
         }
 
-        public void ButtonEventShowCellularDialog()
+        public void ButtonEventShowConfirmationDialog()
         {
-            PlayAssetDelivery.ShowCellularDataConfirmation();
+            PlayAssetDelivery.ShowConfirmationDialog();
         }
 
         public void Update()
@@ -135,9 +136,9 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
 
             while (!_request.IsDone)
             {
-                if (_request.Status == AssetDeliveryStatus.WaitingForWifi)
+                if (_request.Status == AssetDeliveryStatus.WaitingForWifi || _request.Status == AssetDeliveryStatus.RequiresUserConfirmation)
                 {
-                    var asyncOperation = PlayAssetDelivery.ShowCellularDataConfirmation();
+                    var asyncOperation = PlayAssetDelivery.ShowConfirmationDialog();
                     yield return asyncOperation; // Wait until user has confirmed or cancelled the dialog.
                     if (asyncOperation.Error != AssetDeliveryErrorCode.NoError
                         || asyncOperation.GetResult() != ConfirmationDialogResult.Accepted)
@@ -146,7 +147,7 @@ namespace Google.Play.AssetDelivery.Samples.AssetDeliveryDemo
                         Display.SetStatus(_request.Status, _request.Error);
                     }
 
-                    yield return new WaitUntil(() => _request.Status != AssetDeliveryStatus.WaitingForWifi);
+                    yield return new WaitUntil(() => _request.Status != AssetDeliveryStatus.WaitingForWifi && _request.Status != AssetDeliveryStatus.RequiresUserConfirmation);
                 }
 
                 Display.SetProgress(_request.DownloadProgress);
