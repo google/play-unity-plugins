@@ -1,5 +1,8 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.9.0] - 2024-02-26
+- Add support for the [showConfirmationDialog() API](https://developer.android.com/reference/com/google/android/play/core/assetpacks/AssetPackManager.html#showConfirmationDialog(androidx.activity.result.ActivityResultLauncher%3Candroidx.activity.result.IntentSenderRequest%3E)), which was added in [v2.2.0 of the Java SDK](https://developer.android.com/reference/com/google/android/play/core/release-notes-asset_delivery#2-2-0).
+
 ## [1.8.2] - 2023-03-10
 - Updated Play Common and Play Core dependency from 1.8.1 to 1.8.2
 

@@ -1,5 +1,8 @@
 # Changelog for com.google.play.common
 
+## [1.9.0] - 2024-02-26
+- Incremented version number to match other packages
+
 ## [1.8.2] - 2023-03-10
 - Updated Android App Bundle dependency from 1.8.0 to 1.9.0
 
