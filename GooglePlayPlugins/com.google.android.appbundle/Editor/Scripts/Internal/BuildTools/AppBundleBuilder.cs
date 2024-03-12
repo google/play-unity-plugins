@@ -117,8 +117,6 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             // Cache information that is only accessible from the main thread.
             _minSdkVersion = PlayerSettings.Android.minSdkVersion;
             _packageName = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
-            _versionCode = PlayerSettings.Android.bundleVersionCode;
-            _versionName = PlayerSettings.bundleVersion;
 
             _assetPackManifestTransformers = AssetPackManifestTransformerRegistry.Registry.ConstructInstances();
             var initializedManifestTransformers = true;
@@ -176,7 +174,12 @@ namespace Google.Android.AppBundle.Editor.Internal.BuildTools
             };
 
             // Do not use BuildAndSign since this signature won't be used.
-            return _androidBuilder.Build(updatedBuildPlayerOptions);
+            var buildResult = _androidBuilder.Build(updatedBuildPlayerOptions);
+
+            _versionCode = PlayerSettings.Android.bundleVersionCode;
+            _versionName = PlayerSettings.bundleVersion;
+
+            return buildResult;
         }
 
         /// <summary>
