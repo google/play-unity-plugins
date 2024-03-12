@@ -562,7 +562,13 @@ namespace Google.Play.Billing
             var debugMessage = JniUtils.GetDebugMessageFromBillingResult(billingResult);
             if (responseCode == BillingResponseCode.Ok)
             {
-                var purchasesList = _jniUtils.ParseJavaPurchaseList(javaPurchasesList);
+                var purchasesList = _jniUtils.ParseJavaPurchaseList(javaPurchasesList).ToList();
+                if (purchasesList.Count == 0)
+                {
+                    _productInPurchaseFlow = null;
+                    return;
+                }
+
                 _inventory.UpdatePurchaseInventory(purchasesList);
                 // Unity IAP only supports one purchase at a time.
                 Purchase purchase = purchasesList.First();
