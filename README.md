@@ -9,7 +9,7 @@ various Unity Editor features for building an app that can be published on
 
 ## Note on Github releases
 
-New versions of Play Unity plugins are not published on Github any more.
+New versions of Play Unity plugins are not published on Github any more. You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
 
 ## Downloading the plugins
 
