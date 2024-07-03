@@ -7,9 +7,23 @@ services at runtime from within the Unity Engine. These plugins also provide
 various Unity Editor features for building an app that can be published on
 [Google Play Console](//play.google.com/console).
 
+## Note on Github releases
+
+New versions of Play Unity plugins are not published on Github any more.
+
+## Downloading the plugins
+
+Download individual plugins as `.unitypackage` files or Unity Package
+Manager (`.tgz`) files from
+[Google APIs for Unity](//developers.google.com/unity)
+
+If you need to download older version of plugins from Github, you can either:
+* download plugins from this project's [releases page](//github.com/google/play-unity-plugins/releases), or
+* `git clone` this repository into the **Assets** folder of your Unity project.
+
 ## Version support
 
-These plugins support Unity 2018.4 or later, as well as Unity 2017.4.40.
+Play Unity plugins support Unity 2018.4 or later, as well as Unity 2017.4.40.
 
 Note: some features depending on async tasks are only available on Unity 2018.4
 or later.
@@ -19,19 +33,6 @@ Support for older versions of Unity (including 5.6) was removed after
 because [Google Play requires that apps published with 32 bit native libraries
 also provide 64 bit native
 libaries.](//android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html)
-
-## Downloading the plugins
-
-There are 3 different options for obtaining the plugins:
-
-*   Download individual plugins as `.unitypackage` files or Unity Package
-    Manager (`.tgz`) files from
-    [Google APIs for Unity](//developers.google.com/unity)
-
-*   Download the latest release from this project's
-    [releases page](//github.com/google/play-unity-plugins/releases)
-
-*   `git clone` this repository into the **Assets** folder of your Unity project
 
 ## Installing the plugins
 
@@ -44,7 +45,7 @@ If EDM4U is not installed, the project won't be able to fetch necessary Java dep
 
 ## Feature plugins
 
-These plugins add features, such as Google Play Instant support, to a Unity
+These plugins add features, such as Google Play Integrity API support, to a Unity
 project.
 
 ### Android App Bundle
@@ -98,6 +99,19 @@ Refer to the
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/AppUpdate)
 for more information.
 
+### Play Integrity API
+
+*com.google.play.integrity*
+
+The Play Integrity API helps protect your apps and games from potentially risky
+and fraudulent interactions, allowing you to respond with appropriate actions to
+reduce attacks and abuse such as fraud, cheating, and unauthorized access.
+
+Refer to the
+[documentation](//developer.android.com/google/play/integrity/overview) and
+[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Integrity)
+for more information.
+
 ### Play Instant
 
 *com.google.play.instant*
@@ -110,19 +124,6 @@ Refer to the
 [Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Instant),
 and
 [Editor API reference](//developer.android.com/reference/unity/namespace/Google/Play/Instant/Editor)
-for more information.
-
-### Play Integrity API
-
-*com.google.play.integrity*
-
-The Play Integrity API helps protect your apps and games from potentially risky
-and fraudulent interactions, allowing you to respond with appropriate actions to
-reduce attacks and abuse such as fraud, cheating, and unauthorized access.
-
-Refer to the
-[documentation](//developer.android.com/google/play/integrity/overview) and
-[Runtime API reference](//developer.android.com/reference/unity/namespace/Google/Play/Integrity)
 for more information.
 
 ## Support plugins
