@@ -1,15 +1,15 @@
 # Google Play Plugins for Unity
 
+## Important Note on Github releases
+
+New versions of Play Unity plugins are not published on Github any more. You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
+
 ## Overview
 
 The Google Play Plugins for Unity provide C# APIs for accessing various Play
 services at runtime from within the Unity Engine. These plugins also provide
 various Unity Editor features for building an app that can be published on
 [Google Play Console](//play.google.com/console).
-
-## Note on Github releases
-
-New versions of Play Unity plugins are not published on Github any more. You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
 
 ## Downloading the plugins
 
