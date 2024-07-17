@@ -2,7 +2,9 @@
 
 ## Important Note on Github releases
 
-New versions of Play Unity plugins are not published on Github any more. You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
+New versions of Play Unity plugins are not published on Github any more. Latest versions should be downloaded from the [[Google APIs for Unity]](https://developers.google.com/unity) page. 
+
+You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
 
 ## Overview
 
