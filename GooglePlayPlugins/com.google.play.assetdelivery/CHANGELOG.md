@@ -1,5 +1,11 @@
 # Changelog for com.google.play.assetdelivery
 
+## [1.9.1] - 2024-07-05
+- Added new versioning metadata.
+- Updated Play Common dependency to 1.9.1.
+- Updated Play Core dependency to 1.8.4.
+- Bumped minimum supported Unity version to 2018.4
+
 ## [1.9.0] - 2024-02-26
 - Add support for the [showConfirmationDialog() API](https://developer.android.com/reference/com/google/android/play/core/assetpacks/AssetPackManager.html#showConfirmationDialog(androidx.activity.result.ActivityResultLauncher%3Candroidx.activity.result.IntentSenderRequest%3E)), which was added in [v2.2.0 of the Java SDK](https://developer.android.com/reference/com/google/android/play/core/release-notes-asset_delivery#2-2-0).
 
