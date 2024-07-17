@@ -1,5 +1,10 @@
 # Changelog for com.google.play.integrity
 
+## [1.3.2] - 2024-07-05
+- Added new versioning metadata.
+- Updated Play Common dependency to 1.9.1.
+- Updated Play Core dependency to 1.8.4.
+
 ## [1.3.1] - 2024-01-12
 - Updated Unity Play Core dependency from 1.8.1 to 1.8.3
 
