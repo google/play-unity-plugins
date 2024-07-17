@@ -1,5 +1,11 @@
 # Changelog for com.google.play.review
 
+## [1.8.2] - 2024-07-05
+- Added new versioning metadata.
+- Updated Play Common dependency to 1.9.1.
+- Updated Play Core dependency to 1.8.4.
+- Bumped minimum supported Unity version to 2018.4
+
 ## [1.8.1] - 2022-09-08
 - Updated plugin's data collection procedure. For more information and the opt-out
   process, please refer to the [data collection](https://github.com/google/play-unity-plugins#data-collection)
