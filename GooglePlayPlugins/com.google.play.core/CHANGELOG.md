@@ -1,5 +1,12 @@
 # Changelog for com.google.play.core
 
+## [1.8.5] - 2024-09-18
+- Removed unused dependency on Google Play Android App Bundle.
+
+## [1.8.4] - 2024-07-05
+- Bumped the Core-common Java maven dependency to 2.0.4 to benefit from a number of bug fixes
+- Bumped minimum supported Unity version to 2018.4
+
 ## [1.8.3] - 2024-01-12
 - Added integrity prefix constant
 
