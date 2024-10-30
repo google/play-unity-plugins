@@ -1,5 +1,9 @@
 # Changelog for com.google.play.appupdate
 
+## [1.8.3] - 2024-09-18
+- Updated Play Common dependency to 1.9.2.
+- Updated Play Core dependency to 1.8.5.
+
 ## [1.8.2] - 2024-07-05
 - Added new versioning metadata.
 - Updated Play Common dependency to 1.9.1.

@@ -1,5 +1,14 @@
 # Changelog for com.google.play.integrity
 
+## [1.4.0] - 2024-10-14
+- Updated Java Play Integrity API dependency from 1.3.0 to 1.4.0.
+- Add verdict opt-out to standard requests.
+- Add [remediation dialogs](https://developer.android.com/google/play/integrity/remediation).
+
+## [1.3.3] - 2024-09-18
+- Updated Play Common dependency to 1.9.2.
+- Updated Play Core dependency to 1.8.5.
+
 ## [1.3.2] - 2024-07-05
 - Added new versioning metadata.
 - Updated Play Common dependency to 1.9.1.
