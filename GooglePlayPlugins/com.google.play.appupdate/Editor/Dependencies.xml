@@ -1,6 +1,7 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.google.android.play:app-update:2.0.0"/>
+        <androidPackage spec="com.google.android.play:app-update:2.1.0"/>
+        <androidPackage spec="androidx.activity:activity:1.6.0" />
     </androidPackages>
 </dependencies>
 
