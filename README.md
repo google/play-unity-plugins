@@ -2,7 +2,14 @@
 
 ## Important Note on Github releases
 
-New versions of Play Unity plugins are not published on Github any more. Latest versions should be downloaded from the [[Google APIs for Unity]](https://developers.google.com/unity) page. 
+New versions of Play Unity plugins are published on each plugin's GitHub repository:
+- Play Common: https://github.com/google/play-common-unity
+- Play Core: https://github.com/google/play-core-unity
+- Android Appbundle: https://github.com/google/play-appbundle-unity
+- Play Integrity: https://github.com/google/play-integrity-unity
+- Play In-app Updates: https://github.com/google/play-in-app-updates-unity
+- Play In-app Reviews: https://github.com/google/play-in-app-reviews-unity
+- Play Asset Delivery: https://github.com/google/play-asset-delivery-unity
 
 You can still access old version from this project's [releases page](//github.com/google/play-unity-plugins/releases), but they will not work for apps with `targetSdkVersion` 34.
 
